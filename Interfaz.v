@@ -21,38 +21,56 @@
 
 
 module Interfaz( //Definicion entradas y salidas
-    input wire clk,pixel_x,pixel_y,
+    input wire clk,pixel_x,pixel_y,reset,
     input wire inicioSecuencia,//Indica si se esta iniciando una secuencia de la transmision de datos
     input wire temporizador, // Indica si el temporizador esta activo
     input wire temporizadorFin,//Indica cuando finaliza el temporizador
     input [7:0] datoRTC,//Dato proveniente del RTC
-    input [2:0] cursor//Indica la posicion en la que se encuentra el cursor
+    input [2:0] cursor,//Indica la posicion en la que se encuentra el cursor
+
+    output [11:0] rgb,
+    output hsync,vsync
     );
+
+//_____________________________________________________________________
+//Instanciaciones
+//_____________________________________________________________________
+
+//SincronizadorVGA
+wire [9:0] pixelx, pixely;
+wire video_on, tick25;
+ 
+SincronizadorVGA SincronizadorVGA_unit(
+          .clk(clk),.reset(reset),
+          .hsync(hsync),.vsync(vsync),.video_on(video_on),.tick(tick25),
+          .pixelx(pixelx),.pixely(pixely)
+          );
 
 //_____________________________________________________________________
 //Declaracion de constantes
 //_____________________________________________________________________
 
+
 //Tick antes de refrescar la pantalla
-wire tick=0;//Tick para guardar datos mientras se refresca la pantalla, para que al volver a imprimir los datos esten listos para ser leidos
+reg tick=0;//Tick para guardar datos mientras se refresca la pantalla, para que al volver a imprimir los datos esten listos para ser leidos
 
 //Modulo para pasar los Datos del RTC a codigo Ascii
-localparam tamContador=0;//Tamaño del contador de datos guardados
+reg [3:0]  tamContador=0;//Tamaño del contador de datos guardados
 reg [3:0] contGuardados=0;//Cuenta los datos guardados
-wire finalizoContar=0;//Indica cuando el contador finalizo su cuenta
+reg finalizoContar=0;//Indica cuando el contador finalizo su cuenta
 reg [6:0] dirAsciiDatoU;//Contiene la direccion Ascii de las unidades del dato proveniente del RTC
 reg [6:0] dirAsciiDatoD;//Contiene la direccion Ascii de las decenas del dato proveniente del RTC
 reg [6:0] dirAsciiDatoSigU=0;//Registro para almacenar la siguiente direccion Ascii de las unidades del dato proveniente del RTC
 reg [6:0] dirAsciiDatoSigD=0;//Registro para almacenar la siguiente direccion Ascii de las decenas del dato proveniente del RTC
-wire w,r;//Habilitan el modo escritura o lectura de los registros respectivamente
+reg w, r;//Habilitan el modo escritura o lectura de los registros respectivamente
 
 //Registros con las direcciones de memoria
 //Direcciones de los datos de RTC
 //Reloj
-reg [6:0] SegundosU=7'h30,minutosU=7'h30,horasU=7'h30,fechaU=7'h30,mesU=7'h30,añoU=7'h30,diaSemanaU=7'h30,numeroSemanaU=7'h30;//Inicio de registros unidades en 0
-reg [6:0] SegundosUSig,minutosUSig,horasUSig,fechaUSig,mesUSig,añoUSig,diaSemanaUSig,numeroSemanaUSig;
-reg [6:0] SegundosD=7'h30,minutosD=7'h30,horasD=7'h30,fechaD=7'h30,mesD=7'h30,añoD=7'h30,diaSemanaD=7'h30,numeroSemanaD=7'h30;//Inicio de registros decenas en 0
-reg [6:0] SegundosDSig,minutosDSig,horasDSig,fechaDSig,mesDSig,añoDSig,diaSemanaDSig,numeroSemanaDSig;
+reg [6:0] SegundosU=7'h30, minutosU=7'h30,horasU=7'h30, fechaU=7'h30,mesU=7'h30,anoU=7'h30,diaSemanaU=7'h30, numeroSemanaU=7'h30;//Inicio de registros unidades en 0
+reg [6:0] SegundosUSig,minutosUSig,horasUSig,fechaUSig,mesUSig,anoUSig,diaSemanaUSig,numeroSemanaUSig;
+reg [6:0] SegundosD=7'h30,minutosD=7'h30,horasD=7'h30,fechaD=7'h30,mesD=7'h30,anoD=7'h30,diaSemanaD=7'h30,numeroSemanaD=7'h30;//Inicio de registros decenas en 0
+reg [6:0] SegundosDSig,minutosDSig,horasDSig,fechaDSig,mesDSig,anoDSig,diaSemanaDSig,numeroSemanaDSig;
 //Temporizador
 reg [6:0] SegundosUT=7'h30,minutosUT=7'h30,horasUT=7'h30;//Inicio de registros en 0
 reg [6:0] SegundosUTSig,minutosUTSig,horasUTSig;
@@ -258,7 +276,9 @@ end
 
 always @(w==1 & r==0)//Cuando el modo escritura esta activo, escribe datos en los registros
 //Reloj
-SegundosU<=SegundosUSig;
+if (w)
+begin
+ SegundosU<=SegundosUSig;
 SegundosD<=SegundosDSig;
 minutosU<=minutosUSig;
 minutosD<=minutosDSig;
@@ -268,8 +288,8 @@ fechaU<=fechaUSig;
 fechaD<=fechaDSig;
 mesU<=mesUSig;
 mesD<=mesDSig;
-añoU<=añoUSig;
-añoD<=añoDSig;
+anoU<=anoUSig;
+anoD<=anoDSig;
 diaSemanaU<=diaSemanaUSig;
 diaSemanaD<=diaSemanaDSig;
 numeroSemanaU<=numeroSemanaUSig;
@@ -281,10 +301,37 @@ minutosUT<=minutosUTSig;
 minutosDT<=minutosDTSig;
 horasUT<=horasUTSig;
 horasDT<=horasDTSig;
+end
+else //Evitar latch
+begin
+ SegundosU<=SegundosU;
+SegundosD<=SegundosD;
+minutosU<=minutosU;
+minutosD<=minutosD;
+horasU<=horasU;
+horasD<=horasD;
+fechaU<=fechaU;
+fechaD<=fechaD;
+mesU<=mesU;
+mesD<=mesD;
+anoU<=anoU;
+anoD<=anoD;
+diaSemanaU<=diaSemanaU;
+diaSemanaD<=diaSemanaD;
+numeroSemanaU<=numeroSemanaU;
+numeroSemanaD<=numeroSemanaD;
+//Temporizador
+SegundosUT<=SegundosUT;
+SegundosDT<=SegundosDT;
+minutosUT<=minutosUT;
+minutosDT<=minutosDT;
+horasUT<=horasUT;
+horasDT<=horasDT;
+end
 
 //Logica para los registros que se estan escribiendo
-
-case(contGuardados)//Case para Unidades
+always @*
+case(contGuardados-1)//Case para Unidades //-1 porque el contador en su logica suma 1 apenas guarda la direccion
 //Asigna las direcciones Ascii de los datos provenientes del RTC a los registros en los que se deben guardar
 //Reloj
         4'd0: SegundosUSig = dirAsciiDatoU;
@@ -292,7 +339,7 @@ case(contGuardados)//Case para Unidades
         4'd2: horasUSig = dirAsciiDatoU;
         4'd3: fechaUSig = dirAsciiDatoU;
         4'd4: mesUSig = dirAsciiDatoU;
-        4'd5: añoUSig = dirAsciiDatoU;
+        4'd5: anoUSig = dirAsciiDatoU;
         4'd6: diaSemanaUSig = dirAsciiDatoU;
         4'd7: numeroSemanaUSig = dirAsciiDatoU;
 //Temporizador
@@ -301,7 +348,8 @@ case(contGuardados)//Case para Unidades
         4'd10: horasUTSig = dirAsciiDatoU;
  endcase
 //---------------------------------------------------------
- case(contGuardados)//Case para Decenas
+always @*
+ case(contGuardados-1)//Case para Decenas
  //Asigna las direcciones Ascii de los datos provenientes del RTC a los registros en los que se deben guardar
  //Reloj
          4'd0: SegundosDSig = dirAsciiDatoD;
@@ -309,7 +357,7 @@ case(contGuardados)//Case para Unidades
          4'd2: horasDSig = dirAsciiDatoD;
          4'd3: fechaDSig = dirAsciiDatoD;
          4'd4: mesDSig = dirAsciiDatoD;
-         4'd5: añoDSig = dirAsciiDatoD;
+         4'd5: anoDSig = dirAsciiDatoD;
          4'd6: diaSemanaDSig = dirAsciiDatoD;
          4'd7: numeroSemanaDSig = dirAsciiDatoD;
  //Temporizador
