@@ -480,7 +480,7 @@ Font_rom Font_memory
           .dir(rom_addr),
           .clk(clk),
           .data(font_word)
-     );
+     ); 
 
 
 
