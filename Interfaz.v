@@ -82,15 +82,26 @@ reg [6:0] SegundosDTSig,minutosDTSig,horasDTSig;
 
 //Selector de Registros
 reg [10:0] rom_addr;//Almacena la direccion de memoria completa
-reg [3:0] row_addr;//Cambio entre las filas de la memoria, bits menos significativos de pixel y,bit menos significativos de memoria
-wire [6:0] char_addr; //  bits mas significativos de dirreción de memoria, del caracter a imprimir
+//reg [3:0] row_addr;//Cambio entre las filas de la memoria, bits menos significativos de pixel y,bit menos significativos de memoria
+//wire [6:0] char_addr; //  bits mas significativos de dirreción de memoria, del caracter a imprimir
 wire [7:0] font_word; // datos de memoria
+reg [3:0] color_addr; //Tres bits porque por ahora se van a manejar 15 colores
+
+
+/*
+//Tamaño de fuentes
+reg [1:0] font_size;// Tamaño de fuente
+reg [2:0] f8;//Tamaño de la fuente de 8 bits en el eje x
+reg [3:0] f16;//Tamaño de la fuente de 16 bits en el eje x
+reg [4:0] f32;//Tamaño de la fuente de 32 bits en el eje x
+*/
 
 //Mux recorrido columnas Memoria
-wire fbit;//Bit que determina si un pixel de la pantalla esta activo o no
+wire font_bit;//Bit que determina si un pixel de la pantalla esta activo o no
 
 
-
+//Color
+reg [11:0] color;
 //Cursor ***************
 
 
@@ -453,35 +464,78 @@ end
 
 //Selector de registros
 //Impresion de datos
-assign row_addr= pixely[3:0]; //4 bits menos significatvos de y
 
-always @(pixelx or pixely)
-
-begin
-    if ((pixelx < 10'b0000010111) && (pixelx>10'b0000001111))begin
-        char_addr = SegundosU;end
-    if ((pixelx < 10'b0000001111) && (pixelx>10'b0000000111))begin
-         selecreg = SegundosD;end
-    if (pixelx < 10'b0000000111)begin
-         char_addr = minutosU;end
-    if ((pixelx > 10'b0000010110) | (pixely>5'b0000001111))begin
-         char_addr = minutosD;end
- end
-
-
-
-assign rom_addr ={char_addr, row_addr}; //concatena direcciones de registros y filas
-
-
+ImpresionDatos ImpresionDatos_unit
+    (
+    .clk(clk),.pixelx(pixelx),.pixely(pixely),.rom_addr(rom_addr),
+    .font_size(font_size),.color_addr(color_addr)
+    );
 
 //Memoria Ascii
-Font_rom Font_memory
+Font_rom Font_memory_unit
      (
           .dir(rom_addr),
           .clk(clk),
           .data(font_word)
-     ); 
+     );
 
+/*
+//Tamaño de fuentes y Mux recorrido de columnas Memoria
+assign f8=pixel_x[2:0];
+assign f16=pixel_x[3:0];
+assign f32=pixel_x[4:0];
+
+always @(posedge clk)
+
+if (font_size==2'd0)begin
+font_bit =font_word [f8];end
+
+else if (font_size==2'd1)begin
+font_bit =font_word [f16];end
+
+else begin
+font_bit =font_word [f32];end
+*/
+
+ assign font_bit =font_word [~pixel_x[2:0]]; //Recorre las columnas de los datos extraidos de la memoria
+
+
+//Rom colores
+//Almacena las combinaciones de colores posibles
+
+always @(posedge clk)
+
+case (color_addr) // combinación de colores seleccionados de acuerdo al switch, solo se puede seleccionar un siwtch a la vez
+//         r      g    b
+//color = 0000  0000  0000
+
+4'd0: color = 12'b000100010001;
+4'd1: color = 12'b000100010001;
+4'd2: color = 12'b000100010001;
+4'd3: color = 12'b000100010001;
+4'd4: color = 12'b000100010001;
+4'd5: color = 12'b000100010001;
+4'd6: color = 12'b000100010001;
+4'd7: color = 12'b000100010001;
+4'd8: color = 12'b000100010001;
+4'd9: color = 12'b000100010001;
+4'd10: color = 12'b000100010001;
+4'd11: color = 12'b000100010001;
+4'd12: color = 12'b000100010001;
+4'd13: color = 12'b000100010001;
+4'd14: color = 12'b000100010001;
+4'd15: color = 12'b000100010001;
+endcase
+
+
+
+//Salida VGA
+
+always @(posedge clk) //operación se realiza con cada pulso de reloj
+    if (font_bit==1 & video_on==1)  //se encienden los LEDs solo si el bit se encuentra en 1 en memoria
+        rgb=color;
+ else
+    rgb <= 0;
 
 
 endmodule
