@@ -28,20 +28,20 @@ localparam ABsegundos=10'd19;
 
 //Minutos
 //Limites en el eje x
-localparam IminutosD=10'd100;
-localparam DminutosD=10'd107;
-localparam IminutosU=10'd110;
-localparam DminutosU=10'd117;
+localparam IminutosD=10'd200;
+localparam DminutosD=10'd207;
+localparam IminutosU=10'd210;
+localparam DminutosU=10'd217;
 //Limites en el eje y
 localparam ARminutos=10'd3; //Solo 2 porque siempre van a estar a la par
 localparam ABminutos=10'd19;
 
 //horas
 //Limites en el eje x
-localparam IhorasD=10'd100;
-localparam DhorasD=10'd107;
-localparam IhorasU=10'd110;
-localparam DhorasU=10'd117;
+localparam IhorasD=10'd300;
+localparam DhorasD=10'd307;
+localparam IhorasU=10'd310;
+localparam DhorasU=10'd317;
 //Limites en el eje y
 localparam ARhoras=10'd3; //Solo 2 porque siempre van a estar a la par
 localparam ABhoras=10'd19;
