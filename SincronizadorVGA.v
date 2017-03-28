@@ -2,7 +2,7 @@
 
 module SincronizadorVGA(
   input wire clk,reset,
-  output wire hsync,vsync,video_on,tick,
+  output wire hsync,vsync,video_on,
   output wire [9:0] pixelx,pixely
   );
 
@@ -121,7 +121,7 @@ assign hsync=hsync_reg;
 assign vsync=vsync_reg;
 assign pixelx=hcount_reg;
 assign pixely=vcount_reg;
-assign tick=pixel_tick;
+
 
 
 endmodule

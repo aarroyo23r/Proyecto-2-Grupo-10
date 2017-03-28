@@ -21,7 +21,7 @@
 
 
 module Interfaz( //Definicion entradas y salidas
-    input wire clk,pixel_x,pixel_y,reset,
+    input wire clk,reset,
     input wire inicioSecuencia,//Indica si se esta iniciando una secuencia de la transmision de datos
     input wire temporizador, // Indica si el temporizador esta activo
     input wire temporizadorFin,//Indica cuando finaliza el temporizador
@@ -38,11 +38,11 @@ module Interfaz( //Definicion entradas y salidas
 
 //SincronizadorVGA
 wire [9:0] pixelx, pixely;
-wire video_on, tick25;
- 
+wire video_on;
+
 SincronizadorVGA SincronizadorVGA_unit(
           .clk(clk),.reset(reset),
-          .hsync(hsync),.vsync(vsync),.video_on(video_on),.tick(tick25),
+          .hsync(hsync),.vsync(vsync),.video_on(video_on),
           .pixelx(pixelx),.pixely(pixely)
           );
 
@@ -55,9 +55,10 @@ SincronizadorVGA SincronizadorVGA_unit(
 reg tick=0;//Tick para guardar datos mientras se refresca la pantalla, para que al volver a imprimir los datos esten listos para ser leidos
 
 //Modulo para pasar los Datos del RTC a codigo Ascii
-reg [3:0]  tamContador=0;//Tamaño del contador de datos guardados
+reg [3:0]  tamContador;//Tamaño del contador de datos guardados
 reg [3:0] contGuardados=0;//Cuenta los datos guardados
 reg finalizoContar=0;//Indica cuando el contador finalizo su cuenta
+
 reg [6:0] dirAsciiDatoU;//Contiene la direccion Ascii de las unidades del dato proveniente del RTC
 reg [6:0] dirAsciiDatoD;//Contiene la direccion Ascii de las decenas del dato proveniente del RTC
 reg [6:0] dirAsciiDatoSigU=0;//Registro para almacenar la siguiente direccion Ascii de las unidades del dato proveniente del RTC
@@ -67,22 +68,23 @@ reg w, r;//Habilitan el modo escritura o lectura de los registros respectivament
 //Registros con las direcciones de memoria
 //Direcciones de los datos de RTC
 //Reloj
-reg [6:0] SegundosU=7'h30, minutosU=7'h30,horasU=7'h30, fechaU=7'h30,mesU=7'h30,anoU=7'h30,diaSemanaU=7'h30, numeroSemanaU=7'h30;//Inicio de registros unidades en 0
+reg [6:0] SegundosU, minutosU,horasU, fechaU,mesU,anoU,diaSemanaU, numeroSemanaU;//Inicio de registros unidades en 0
 reg [6:0] SegundosUSig,minutosUSig,horasUSig,fechaUSig,mesUSig,anoUSig,diaSemanaUSig,numeroSemanaUSig;
-reg [6:0] SegundosD=7'h30,minutosD=7'h30,horasD=7'h30,fechaD=7'h30,mesD=7'h30,anoD=7'h30,diaSemanaD=7'h30,numeroSemanaD=7'h30;//Inicio de registros decenas en 0
+reg [6:0] SegundosD,minutosD,horasD,fechaD,mesD,anoD,diaSemanaD,numeroSemanaD;//Inicio de registros decenas en 0
 reg [6:0] SegundosDSig,minutosDSig,horasDSig,fechaDSig,mesDSig,anoDSig,diaSemanaDSig,numeroSemanaDSig;
 //Temporizador
-reg [6:0] SegundosUT=7'h30,minutosUT=7'h30,horasUT=7'h30;//Inicio de registros en 0
+reg [6:0] SegundosUT,minutosUT,horasUT;//Inicio de registros en 0
 reg [6:0] SegundosUTSig,minutosUTSig,horasUTSig;
-reg [6:0] SegundosDT=7'h30,minutosDT=7'h30,horasDT=7'h30;//Inicio de registros en 0
+reg [6:0] SegundosDT,minutosDT,horasDT;//Inicio de registros en 0
 reg [6:0] SegundosDTSig,minutosDTSig,horasDTSig;
 //Direcciones Datos extra
 
 
-//Selector de Direcciones
-reg [10:0] dirMemoria;//Almacena la direccion de memoria
-reg [3:0] filaMemoria;//Cambio entre las filas de la memoria
-
+//Selector de Registros
+reg [10:0] rom_addr;//Almacena la direccion de memoria completa
+reg [3:0] row_addr;//Cambio entre las filas de la memoria, bits menos significativos de pixel y,bit menos significativos de memoria
+wire [6:0] char_addr; //  bits mas significativos de dirreción de memoria, del caracter a imprimir
+wire [7:0] font_word; // datos de memoria
 
 //Mux recorrido columnas Memoria
 wire fbit;//Bit que determina si un pixel de la pantalla esta activo o no
@@ -103,14 +105,14 @@ wire fbit;//Bit que determina si un pixel de la pantalla esta activo o no
 
 //Tick antes de refrescar la pantalla
 always @(posedge clk)//Se activa la señal tick cuando la pantalla comienza a refrescarse
-if (finalizoContar==0 & 639<=pixel_x>=799 & 479<pixel_y>524) //finalizoContar desactiva la señal cuando ya se guardaron todos los datos
+if (finalizoContar==0 & pixely>=10'd480) //finalizoContar desactiva la señal cuando ya se guardaron todos los datos
 begin
 tick=1;
 end
 else
 begin
 tick=0;
-end
+end//Probado
 
 
 //Modulo para pasar los Datos del RTC a codigo Ascii
@@ -123,160 +125,275 @@ dirAsciiDatoD<=dirAsciiDatoSigD;
 end
 else
 begin
-tamContador=4'd9;
+tamContador=4'd10;
 dirAsciiDatoU<=dirAsciiDatoSigU;
 dirAsciiDatoD<=dirAsciiDatoSigD;
 end
 
-always @(tick & inicioSecuencia)// Cada vez que se refresca la pantalla se guarda una secuencia de datos
 
-if (contGuardados!=tamContador)
+always @(posedge clk)// Cada vez que se refresca la pantalla se guarda una secuencia de datos
+
+if ((contGuardados!=tamContador) & tick==1 & inicioSecuencia==1 )
 begin
 r= 0;
 w= 1; //Señal modo escritura
-case(datoRTC)//Le asigna el valor Ascii del dato proveniente del RTC
-        8'd0: dirAsciiDatoSigU = 7'h30;
-        8'd0: dirAsciiDatoSigD = 7'h30;
-        8'd1: dirAsciiDatoSigU = 7'h31;
-        8'd1: dirAsciiDatoSigD = 7'h30;
-        8'd2: dirAsciiDatoSigU = 7'h32;
-        8'd2: dirAsciiDatoSigD = 7'h30;
-        8'd3: dirAsciiDatoSigU = 7'h33;
-        8'd3: dirAsciiDatoSigD = 7'h30;
-        8'd4: dirAsciiDatoSigU = 7'h34;
-        8'd4: dirAsciiDatoSigD = 7'h30;
-        8'd5: dirAsciiDatoSigU = 7'h35;
-        8'd5: dirAsciiDatoSigD = 7'h30;
-        8'd6: dirAsciiDatoSigU = 7'h36;
-        8'd6: dirAsciiDatoSigD = 7'h30;
-        8'd7: dirAsciiDatoSigU = 7'h37;
-        8'd7: dirAsciiDatoSigD = 7'h30;
-        8'd8: dirAsciiDatoSigU = 7'h38;
-        8'd8: dirAsciiDatoSigD = 7'h30;
-        8'd9: dirAsciiDatoSigU = 7'h39;
-        8'd9: dirAsciiDatoSigD = 7'h30;
-        8'd10: dirAsciiDatoSigU = 7'h30;
-        8'd10: dirAsciiDatoSigD = 7'h31;
-        8'd11: dirAsciiDatoSigU = 7'h31;
-        8'd11: dirAsciiDatoSigD = 7'h31;
-        8'd12: dirAsciiDatoSigU = 7'h32;
-        8'd12: dirAsciiDatoSigD = 7'h31;
-        8'd13: dirAsciiDatoSigU = 7'h33;
-        8'd13: dirAsciiDatoSigD = 7'h31;
-        8'd14: dirAsciiDatoSigU = 7'h34;
-        8'd14: dirAsciiDatoSigD = 7'h31;
-        8'd15: dirAsciiDatoSigU = 7'h35;
-        8'd15: dirAsciiDatoSigD = 7'h31;
-        8'd16: dirAsciiDatoSigU = 7'h36;
-        8'd16: dirAsciiDatoSigD = 7'h31;
-        8'd17: dirAsciiDatoSigU = 7'h37;
-        8'd17: dirAsciiDatoSigD = 7'h31;
-        8'd18: dirAsciiDatoSigU = 7'h38;
-        8'd18: dirAsciiDatoSigD = 7'h31;
-        8'd19: dirAsciiDatoSigU = 7'h39;
-        8'd19: dirAsciiDatoSigD = 7'h31;
-        8'd20: dirAsciiDatoSigU = 7'h30;
-        8'd20: dirAsciiDatoSigD = 7'h32;
-        8'd21: dirAsciiDatoSigU = 7'h31;
-        8'd21: dirAsciiDatoSigD = 7'h32;
-        8'd22: dirAsciiDatoSigU = 7'h32;
-        8'd22: dirAsciiDatoSigD = 7'h32;
-        8'd23: dirAsciiDatoSigU = 7'h33;
-        8'd23: dirAsciiDatoSigD = 7'h32;
-        8'd24: dirAsciiDatoSigU = 7'h34;
-        8'd24: dirAsciiDatoSigD = 7'h32;
-        8'd25: dirAsciiDatoSigU = 7'h35;
-        8'd25: dirAsciiDatoSigD = 7'h32;
-        8'd26: dirAsciiDatoSigU = 7'h36;
-        8'd26: dirAsciiDatoSigD = 7'h32;
-        8'd27: dirAsciiDatoSigU = 7'h37;
-        8'd27: dirAsciiDatoSigD = 7'h32;
-        8'd28: dirAsciiDatoSigU = 7'h38;
-        8'd28: dirAsciiDatoSigD = 7'h32;
-        8'd29: dirAsciiDatoSigU = 7'h39;
-        8'd29: dirAsciiDatoSigD = 7'h32;
-        8'd30: dirAsciiDatoSigU = 7'h30;
-        8'd30: dirAsciiDatoSigD = 7'h33;
-        8'd31: dirAsciiDatoSigU = 7'h31;
-        8'd31: dirAsciiDatoSigD = 7'h33;
-        8'd32: dirAsciiDatoSigU = 7'h32;
-        8'd32: dirAsciiDatoSigD = 7'h33;
-        8'd33: dirAsciiDatoSigU = 7'h33;
-        8'd33: dirAsciiDatoSigD = 7'h33;
-        8'd34: dirAsciiDatoSigU = 7'h34;
-        8'd34: dirAsciiDatoSigD = 7'h33;
-        8'd35: dirAsciiDatoSigU = 7'h35;
-        8'd35: dirAsciiDatoSigD = 7'h33;
-        8'd36: dirAsciiDatoSigU = 7'h36;
-        8'd36: dirAsciiDatoSigD = 7'h33;
-        8'd37: dirAsciiDatoSigU = 7'h37;
-        8'd37: dirAsciiDatoSigD = 7'h33;
-        8'd38: dirAsciiDatoSigU = 7'h38;
-        8'd38: dirAsciiDatoSigD = 7'h33;
-        8'd39: dirAsciiDatoSigU = 7'h39;
-        8'd39: dirAsciiDatoSigD = 7'h33;
-        8'd40: dirAsciiDatoSigU = 7'h30;
-        8'd40: dirAsciiDatoSigD = 7'h34;
-        8'd41: dirAsciiDatoSigU = 7'h31;
-        8'd41: dirAsciiDatoSigD = 7'h34;
-        8'd42: dirAsciiDatoSigU = 7'h32;
-        8'd42: dirAsciiDatoSigD = 7'h34;
-        8'd43: dirAsciiDatoSigU = 7'h33;
-        8'd43: dirAsciiDatoSigD = 7'h34;
-        8'd44: dirAsciiDatoSigU = 7'h34;
-        8'd44: dirAsciiDatoSigD = 7'h34;
-        8'd45: dirAsciiDatoSigU = 7'h35;
-        8'd45: dirAsciiDatoSigD = 7'h34;
-        8'd46: dirAsciiDatoSigU = 7'h36;
-        8'd46: dirAsciiDatoSigD = 7'h34;
-        8'd47: dirAsciiDatoSigU = 7'h37;
-        8'd47: dirAsciiDatoSigD = 7'h34;
-        8'd48: dirAsciiDatoSigU = 7'h38;
-        8'd48: dirAsciiDatoSigD = 7'h34;
-        8'd49: dirAsciiDatoSigU = 7'h39;
-        8'd49: dirAsciiDatoSigD = 7'h34;
-        8'd50: dirAsciiDatoSigU = 7'h30;
-        8'd50: dirAsciiDatoSigD = 7'h35;
-        8'd51: dirAsciiDatoSigU = 7'h31;
-        8'd51: dirAsciiDatoSigD = 7'h35;
-        8'd52: dirAsciiDatoSigU = 7'h32;
-        8'd52: dirAsciiDatoSigD = 7'h35;
-        8'd53: dirAsciiDatoSigU = 7'h33;
-        8'd53: dirAsciiDatoSigD = 7'h35;
-        8'd54: dirAsciiDatoSigU = 7'h34;
-        8'd54: dirAsciiDatoSigD = 7'h35;
-        8'd55: dirAsciiDatoSigU = 7'h35;
-        8'd55: dirAsciiDatoSigD = 7'h35;
-        8'd56: dirAsciiDatoSigU = 7'h36;
-        8'd56: dirAsciiDatoSigD = 7'h35;
-        8'd57: dirAsciiDatoSigU = 7'h37;
-        8'd57: dirAsciiDatoSigD = 7'h35;
-        8'd58: dirAsciiDatoSigU = 7'h38;
-        8'd58: dirAsciiDatoSigD = 7'h35;
-        8'd59: dirAsciiDatoSigU = 7'h39;
-        8'd59: dirAsciiDatoSigD = 7'h35;
-        8'd60: dirAsciiDatoSigU = 7'h30;
-        8'd60: dirAsciiDatoSigD = 7'h36;
- endcase
+case(datoRTC)//Le asigna el valor Ascii del dato proveniente del RTC Unidades
+
+         8'd0: dirAsciiDatoSigU = 7'h30;
+         8'd1: dirAsciiDatoSigU = 7'h30;
+         8'd2: dirAsciiDatoSigU = 7'h30;
+         8'd3: dirAsciiDatoSigU = 7'h30;
+         8'd4: dirAsciiDatoSigU = 7'h30;
+         8'd5: dirAsciiDatoSigU = 7'h30;
+         8'd6: dirAsciiDatoSigU = 7'h30;
+         8'd7: dirAsciiDatoSigU = 7'h30;
+         8'd8: dirAsciiDatoSigU = 7'h30;
+         8'd9: dirAsciiDatoSigU = 7'h30;
+         8'd10: dirAsciiDatoSigU = 7'h31;
+         8'd11: dirAsciiDatoSigU = 7'h31;
+         8'd12: dirAsciiDatoSigU = 7'h31;
+         8'd13: dirAsciiDatoSigU = 7'h31;
+         8'd14: dirAsciiDatoSigU = 7'h31;
+         8'd15: dirAsciiDatoSigU = 7'h31;
+         8'd16: dirAsciiDatoSigU = 7'h31;
+         8'd17: dirAsciiDatoSigU = 7'h31;
+         8'd18: dirAsciiDatoSigU = 7'h31;
+         8'd19: dirAsciiDatoSigU = 7'h31;
+         8'd20: dirAsciiDatoSigU = 7'h32;
+         8'd21: dirAsciiDatoSigU = 7'h32;
+         8'd22: dirAsciiDatoSigU = 7'h32;
+         8'd23: dirAsciiDatoSigU = 7'h32;
+         8'd24: dirAsciiDatoSigU = 7'h32;
+         8'd25: dirAsciiDatoSigU = 7'h32;
+         8'd26: dirAsciiDatoSigU = 7'h32;
+         8'd27: dirAsciiDatoSigU = 7'h32;
+         8'd28: dirAsciiDatoSigU = 7'h32;
+         8'd29: dirAsciiDatoSigU = 7'h32;
+         8'd30: dirAsciiDatoSigU = 7'h33;
+         8'd31: dirAsciiDatoSigU = 7'h33;
+         8'd32: dirAsciiDatoSigU = 7'h33;
+         8'd33: dirAsciiDatoSigU = 7'h33;
+         8'd34: dirAsciiDatoSigU = 7'h33;
+         8'd35: dirAsciiDatoSigU = 7'h33;
+         8'd36: dirAsciiDatoSigU = 7'h33;
+         8'd37: dirAsciiDatoSigU = 7'h33;
+         8'd38: dirAsciiDatoSigU = 7'h33;
+         8'd39: dirAsciiDatoSigU = 7'h33;
+         8'd40: dirAsciiDatoSigU = 7'h34;
+         8'd41: dirAsciiDatoSigU = 7'h34;
+         8'd42: dirAsciiDatoSigU = 7'h34;
+         8'd43: dirAsciiDatoSigU = 7'h34;
+         8'd44: dirAsciiDatoSigU = 7'h34;
+         8'd45: dirAsciiDatoSigU = 7'h34;
+         8'd46: dirAsciiDatoSigU = 7'h34;
+         8'd47: dirAsciiDatoSigU = 7'h34;
+         8'd48: dirAsciiDatoSigU = 7'h34;
+         8'd49: dirAsciiDatoSigU = 7'h34;
+         8'd50: dirAsciiDatoSigU = 7'h35;
+         8'd51: dirAsciiDatoSigU = 7'h35;
+         8'd52: dirAsciiDatoSigU = 7'h35;
+         8'd53: dirAsciiDatoSigU = 7'h35;
+         8'd54: dirAsciiDatoSigU = 7'h35;
+         8'd55: dirAsciiDatoSigU = 7'h35;
+         8'd56: dirAsciiDatoSigU = 7'h35;
+         8'd57: dirAsciiDatoSigU = 7'h35;
+         8'd58: dirAsciiDatoSigU = 7'h35;
+         8'd59: dirAsciiDatoSigU = 7'h35;
+         8'd60: dirAsciiDatoSigU = 7'h36;
+  endcase
+
+ case(datoRTC)//Le asigna el valor Ascii del dato proveniente del RTC Decenas
+
+         8'd0: dirAsciiDatoSigD = 7'h30;
+         8'd1: dirAsciiDatoSigD = 7'h30;
+         8'd2: dirAsciiDatoSigD = 7'h30;
+         8'd3: dirAsciiDatoSigD = 7'h30;
+         8'd4: dirAsciiDatoSigD = 7'h30;
+         8'd5: dirAsciiDatoSigD = 7'h30;
+         8'd6: dirAsciiDatoSigD = 7'h30;
+         8'd7: dirAsciiDatoSigD = 7'h30;
+         8'd8: dirAsciiDatoSigD = 7'h30;
+         8'd9: dirAsciiDatoSigD = 7'h30;
+         8'd10: dirAsciiDatoSigD = 7'h31;
+         8'd11: dirAsciiDatoSigD = 7'h31;
+         8'd12: dirAsciiDatoSigD = 7'h31;
+         8'd13: dirAsciiDatoSigD = 7'h31;
+         8'd14: dirAsciiDatoSigD = 7'h31;
+         8'd15: dirAsciiDatoSigD = 7'h31;
+         8'd16: dirAsciiDatoSigD = 7'h31;
+         8'd17: dirAsciiDatoSigD = 7'h31;
+         8'd18: dirAsciiDatoSigD = 7'h31;
+         8'd19: dirAsciiDatoSigD = 7'h31;
+         8'd20: dirAsciiDatoSigD = 7'h32;
+         8'd21: dirAsciiDatoSigD = 7'h32;
+         8'd22: dirAsciiDatoSigD = 7'h32;
+         8'd23: dirAsciiDatoSigD = 7'h32;
+         8'd24: dirAsciiDatoSigD = 7'h32;
+         8'd25: dirAsciiDatoSigD = 7'h32;
+         8'd26: dirAsciiDatoSigD = 7'h32;
+         8'd27: dirAsciiDatoSigD = 7'h32;
+         8'd28: dirAsciiDatoSigD = 7'h32;
+         8'd29: dirAsciiDatoSigD = 7'h32;
+         8'd30: dirAsciiDatoSigD = 7'h33;
+         8'd31: dirAsciiDatoSigD = 7'h33;
+         8'd32: dirAsciiDatoSigD = 7'h33;
+         8'd33: dirAsciiDatoSigD = 7'h33;
+         8'd34: dirAsciiDatoSigD = 7'h33;
+         8'd35: dirAsciiDatoSigD = 7'h33;
+         8'd36: dirAsciiDatoSigD = 7'h33;
+         8'd37: dirAsciiDatoSigD = 7'h33;
+         8'd38: dirAsciiDatoSigD = 7'h33;
+         8'd39: dirAsciiDatoSigD = 7'h33;
+         8'd40: dirAsciiDatoSigD = 7'h34;
+         8'd41: dirAsciiDatoSigD = 7'h34;
+         8'd42: dirAsciiDatoSigD = 7'h34;
+         8'd43: dirAsciiDatoSigD = 7'h34;
+         8'd44: dirAsciiDatoSigD = 7'h34;
+         8'd45: dirAsciiDatoSigD = 7'h34;
+         8'd46: dirAsciiDatoSigD = 7'h34;
+         8'd47: dirAsciiDatoSigD = 7'h34;
+         8'd48: dirAsciiDatoSigD = 7'h34;
+         8'd49: dirAsciiDatoSigD = 7'h34;
+         8'd50: dirAsciiDatoSigD = 7'h35;
+         8'd51: dirAsciiDatoSigD = 7'h35;
+         8'd52: dirAsciiDatoSigD = 7'h35;
+         8'd53: dirAsciiDatoSigD = 7'h35;
+         8'd54: dirAsciiDatoSigD = 7'h35;
+         8'd55: dirAsciiDatoSigD = 7'h35;
+         8'd56: dirAsciiDatoSigD = 7'h35;
+         8'd57: dirAsciiDatoSigD = 7'h35;
+         8'd58: dirAsciiDatoSigD = 7'h35;
+         8'd59: dirAsciiDatoSigD = 7'h35;
+         8'd60: dirAsciiDatoSigD = 7'h36;
+  endcase
+
 contGuardados=contGuardados+1;
 end
-
 else
 begin
 r=1;//Señal modo lectura
 w= 0;
+if (contGuardados==tamContador)//Para que finalizoContar se active unicamente  cuando esto es cierto
+begin
 finalizoContar=1;
+end
+else
+begin
+finalizoContar=0;
+end
+
 contGuardados=0;
 end
+
 //**********Ver reinicio de finalizoContar y contGuardados********
 
 
 //Registros con las direcciones de memoria
 //Logica Registros
 
-always @(w==1 & r==0)//Cuando el modo escritura esta activo, escribe datos en los registros
+
+
+//Logica para los registros que se estan escribiendo
+
+
+/*
+always @(posedge clk)
+case(contGuardados)//Case para Unidades //-1 porque el contador en su logica suma 1 apenas guarda la direccion
+//Asigna las direcciones Ascii de los datos provenientes del RTC a los registros en los que se deben guardar
 //Reloj
-if (w)
+        4'd1: SegundosUSig = dirAsciiDatoU;
+        4'd2: minutosUSig = dirAsciiDatoU;
+        4'd3: horasUSig = dirAsciiDatoU;
+        4'd4: fechaUSig = dirAsciiDatoU;
+        4'd5: mesUSig = dirAsciiDatoU;
+        4'd6: anoUSig = dirAsciiDatoU;
+        4'd7: diaSemanaUSig = dirAsciiDatoU;
+        4'd8: numeroSemanaUSig = dirAsciiDatoU;
+//Temporizador
+        4'd9: SegundosUTSig = dirAsciiDatoU;
+        4'd10: minutosUTSig = dirAsciiDatoU;
+        4'd11: horasUTSig = dirAsciiDatoU;
+ endcase
+//---------------------------------------------------------
+always @(posedge clk)
+ case(contGuardados)//Case para Decenas
+ //Asigna las direcciones Ascii de los datos provenientes del RTC a los registros en los que se deben guardar
+ //Reloj
+         4'd1: SegundosDSig = dirAsciiDatoD;
+         4'd2: minutosDSig = dirAsciiDatoD;
+         4'd3: horasDSig = dirAsciiDatoD;
+         4'd4: fechaDSig = dirAsciiDatoD;
+         4'd5: mesDSig = dirAsciiDatoD;
+         4'd6 : anoDSig = dirAsciiDatoD;
+         4'd7: diaSemanaDSig = dirAsciiDatoD;
+         4'd8: numeroSemanaDSig = dirAsciiDatoD;
+ //Temporizador
+         4'd9: SegundosDTSig = dirAsciiDatoD;
+         4'd10: minutosDTSig = dirAsciiDatoD;
+         4'd11: horasDTSig = dirAsciiDatoD;
+
+  endcase
+*/
+
+
+//Guarda los datos decodificados en registros intermedios
+always @(posedge clk)
+//reloj
+if (contGuardados==4'd3)begin //Se empieza en el contador 3 porque el 1 y el 2 se utilizan para generar la direccion que se va a guardar en estos registros
+SegundosUSig = dirAsciiDatoU;
+SegundosDSig = dirAsciiDatoD;end
+
+else if (contGuardados==4'd4)begin
+minutosUSig = dirAsciiDatoU;
+minutosDSig = dirAsciiDatoD;end
+
+else if (contGuardados==4'd5)begin
+horasUSig = dirAsciiDatoU;
+horasDSig = dirAsciiDatoD;end
+
+else if (contGuardados==4'd6)begin
+fechaUSig = dirAsciiDatoU;
+fechaDSig = dirAsciiDatoD;end
+
+else if (contGuardados==4'd7)begin
+mesUSig = dirAsciiDatoU;
+mesDSig = dirAsciiDatoD;end
+
+else if (contGuardados==4'd8)begin
+anoUSig = dirAsciiDatoU;
+anoDSig = dirAsciiDatoD;end
+
+else if (contGuardados==4'd9)begin
+diaSemanaUSig = dirAsciiDatoU;
+diaSemanaDSig = dirAsciiDatoD;end
+
+else if (contGuardados==4'd10)begin
+numeroSemanaUSig = dirAsciiDatoU;
+numeroSemanaDSig = dirAsciiDatoD;end
+
+//Temporizador
+else if (contGuardados==4'd11)begin
+SegundosUTSig = dirAsciiDatoU;
+SegundosDTSig = dirAsciiDatoD;end
+
+else if (contGuardados==4'd12)begin
+minutosUTSig = dirAsciiDatoU;
+minutosDTSig = dirAsciiDatoD;end
+
+else if (contGuardados==4'd13)begin
+horasUTSig = dirAsciiDatoU;
+horasDTSig = dirAsciiDatoD;end
+
+
+
+
+
+
+//Registros Datos principales
+
+always @(posedge clk)//Cuando el modo escritura esta activo escribe datos en los registros y si no los mantiene para ser leidos
+//Reloj
+if (w==1 & r==0)
 begin
  SegundosU<=SegundosUSig;
 SegundosD<=SegundosDSig;
@@ -302,7 +419,7 @@ minutosDT<=minutosDTSig;
 horasUT<=horasUTSig;
 horasDT<=horasDTSig;
 end
-else //Evitar latch
+else //Evitar warning latch
 begin
  SegundosU<=SegundosU;
 SegundosD<=SegundosD;
@@ -329,48 +446,41 @@ horasUT<=horasUT;
 horasDT<=horasDT;
 end
 
-//Logica para los registros que se estan escribiendo
-always @*
-case(contGuardados-1)//Case para Unidades //-1 porque el contador en su logica suma 1 apenas guarda la direccion
-//Asigna las direcciones Ascii de los datos provenientes del RTC a los registros en los que se deben guardar
-//Reloj
-        4'd0: SegundosUSig = dirAsciiDatoU;
-        4'd1: minutosUSig = dirAsciiDatoU;
-        4'd2: horasUSig = dirAsciiDatoU;
-        4'd3: fechaUSig = dirAsciiDatoU;
-        4'd4: mesUSig = dirAsciiDatoU;
-        4'd5: anoUSig = dirAsciiDatoU;
-        4'd6: diaSemanaUSig = dirAsciiDatoU;
-        4'd7: numeroSemanaUSig = dirAsciiDatoU;
-//Temporizador
-        4'd8: SegundosUTSig = dirAsciiDatoU;
-        4'd9: minutosUTSig = dirAsciiDatoU;
-        4'd10: horasUTSig = dirAsciiDatoU;
- endcase
-//---------------------------------------------------------
-always @*
- case(contGuardados-1)//Case para Decenas
- //Asigna las direcciones Ascii de los datos provenientes del RTC a los registros en los que se deben guardar
- //Reloj
-         4'd0: SegundosDSig = dirAsciiDatoD;
-         4'd1: minutosDSig = dirAsciiDatoD;
-         4'd2: horasDSig = dirAsciiDatoD;
-         4'd3: fechaDSig = dirAsciiDatoD;
-         4'd4: mesDSig = dirAsciiDatoD;
-         4'd5: anoDSig = dirAsciiDatoD;
-         4'd6: diaSemanaDSig = dirAsciiDatoD;
-         4'd7: numeroSemanaDSig = dirAsciiDatoD;
- //Temporizador
-         4'd8: SegundosDTSig = dirAsciiDatoD;
-         4'd9: minutosDTSig = dirAsciiDatoD;
-         4'd10: horasDTSig = dirAsciiDatoD;
-  endcase
+//____________________________________________________________________________________________________
+//____________________________________________________________________________________________________
+//Sección  Lectura
+
+
+//Selector de registros
+//Impresion de datos
+assign row_addr= pixely[3:0]; //4 bits menos significatvos de y
+
+always @(pixelx or pixely)
+
+begin
+    if ((pixelx < 10'b0000010111) && (pixelx>10'b0000001111))begin
+        char_addr = SegundosU;end
+    if ((pixelx < 10'b0000001111) && (pixelx>10'b0000000111))begin
+         selecreg = SegundosD;end
+    if (pixelx < 10'b0000000111)begin
+         char_addr = minutosU;end
+    if ((pixelx > 10'b0000010110) | (pixely>5'b0000001111))begin
+         char_addr = minutosD;end
+ end
 
 
 
+assign rom_addr ={char_addr, row_addr}; //concatena direcciones de registros y filas
 
 
 
+//Memoria Ascii
+Font_rom Font_memory
+     (
+          .dir(rom_addr),
+          .clk(clk),
+          .data(font_word)
+     );
 
 
 
