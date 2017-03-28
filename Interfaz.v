@@ -469,6 +469,8 @@ ImpresionDatos ImpresionDatos_unit
     (
     .clk(clk),.pixelx(pixelx),.pixely(pixely),.rom_addr(rom_addr),
     .font_size(font_size),.color_addr(color_addr)
+    .SegundosU(SegundosU),.SegundosD(SegundosD),.minutosU(minutosU)
+    ,.minutosD(minutosD),.horasU(horasU),.horasD(horasD),
     );
 
 
