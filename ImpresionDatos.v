@@ -3,7 +3,7 @@
 module ImpresionDatos
     (
     input wire clk,
-    input wire SegundosU,SegundosD,minutosU,minutosD,horasU,horasD,
+    input wire [6:0] SegundosU,SegundosD,minutosU,minutosD,horasU,horasD,
     input wire [9:0] pixelx, //posición pixel x actual
     input wire [9:0] pixely,//posición pixel y actual
     output wire [10:0] rom_addr,//Direccion en la memoria del dato
@@ -67,7 +67,7 @@ always @(pixelx or pixely)//Se ejecuta cuando hay un cambio en pixel x o pixel y
     if ((pixelx >= IsegundosD) && (pixelx<=DsegundosD) && (pixely >= ARsegundos) && (pixely<=ABsegundos))begin
         char_addr = SegundosU; //direccion de lo que se va a imprimir
         color_addr=4'd2;// Color de lo que se va a imprimir
-        font_size=1; end//Tamaño de fuente
+        font_size=2'd1; end//Tamaño de fuente
 
     else if ((pixelx >= IsegundosU) && (pixelx<=DsegundosU) && (pixely >= ARsegundos) && (pixely<=ABsegundos))begin
         char_addr = SegundosD; //direccion de lo que se va a imprimir
@@ -78,28 +78,28 @@ always @(pixelx or pixely)//Se ejecuta cuando hay un cambio en pixel x o pixel y
   else if ((pixelx >= IminutosD) && (pixelx<=DminutosD) && (pixely >= ARminutos) && (pixely<=ABminutos))begin
       char_addr = minutosD; //direccion de lo que se va a imprimir
       color_addr=4'd2;// Color de lo que se va a imprimir
-      font_size=1; end//Tamaño de fuente
+      font_size=2'd1; end//Tamaño de fuente
 
   else if ((pixelx >= IminutosU) && (pixelx<=DminutosU) && (pixely >= ARminutos) && (pixely<=ABminutos))begin
       char_addr = minutosU; //direccion de lo que se va a imprimir
       color_addr=4'd2;// Color de lo que se va a imprimir
-      font_size=1; end//Tamaño de fuente
+      font_size=2'd1; end//Tamaño de fuente
 
 //Horas
 else if ((pixelx >= IhorasD) && (pixelx<=DhorasD) && (pixely >= ARhoras) && (pixely<=ABhoras))begin
     char_addr = horasD; //direccion de lo que se va a imprimir
     color_addr=4'd2;// Color de lo que se va a imprimir
-    font_size=1; end//Tamaño de fuente
+    font_size=2'd1; end//Tamaño de fuente
 
 else if ((pixelx >= IhorasU) && (pixelx<=DhorasU) && (pixely >= ARhoras) && (pixely<=ABhoras))begin
     char_addr = horasU;//direccion de lo que se va a imprimir
     color_addr=4'd2;// Color de lo que se va a imprimir
-    font_size=1; end//Tamaño de fuente
+    font_size=2'd1; end//Tamaño de fuente
 
 
  else //Si no se cumple ninguna de estas impresiones se pone la pantalla en negro
  begin
- char_addr = 0;end
+ char_addr = 7'd0;end
 
 assign rom_addr ={char_addr, row_addr}; //concatena direcciones de registros y filas
 

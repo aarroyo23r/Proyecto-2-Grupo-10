@@ -28,7 +28,7 @@ module Interfaz( //Definicion entradas y salidas
     input [7:0] datoRTC,//Dato proveniente del RTC
     input [2:0] cursor,//Indica la posicion en la que se encuentra el cursor
 
-    output [11:0] rgb,
+    output reg  [11:0] rgb,
     output hsync,vsync
     );
 
@@ -81,16 +81,17 @@ reg [6:0] SegundosDTSig,minutosDTSig,horasDTSig;
 
 
 //Selector de Registros
-reg [10:0] rom_addr;//Almacena la direccion de memoria completa
+wire [10:0] rom_addr;//Almacena la direccion de memoria completa
 //reg [3:0] row_addr;//Cambio entre las filas de la memoria, bits menos significativos de pixel y,bit menos significativos de memoria
 //wire [6:0] char_addr; //  bits mas significativos de dirreción de memoria, del caracter a imprimir
 wire [7:0] font_word; // datos de memoria
-reg [3:0] color_addr; //Tres bits porque por ahora se van a manejar 15 colores
+wire [3:0] color_addr; //Tres bits porque por ahora se van a manejar 15 colores
 
 
-/*
+
 //Tamaño de fuentes
-reg [1:0] font_size;// Tamaño de fuente
+wire [1:0] font_size;// Tamaño de fuente
+/*
 reg [2:0] f8;//Tamaño de la fuente de 8 bits en el eje x
 reg [3:0] f16;//Tamaño de la fuente de 16 bits en el eje x
 reg [4:0] f32;//Tamaño de la fuente de 32 bits en el eje x
@@ -468,9 +469,9 @@ end
 ImpresionDatos ImpresionDatos_unit
     (
     .clk(clk),.pixelx(pixelx),.pixely(pixely),.rom_addr(rom_addr),
-    .font_size(font_size),.color_addr(color_addr)
+    .font_size(font_size),.color_addr(color_addr),
     .SegundosU(SegundosU),.SegundosD(SegundosD),.minutosU(minutosU)
-    ,.minutosD(minutosD),.horasU(horasU),.horasD(horasD),
+    ,.minutosD(minutosD),.horasU(horasU),.horasD(horasD)
     );
 
 
@@ -500,7 +501,7 @@ else begin
 font_bit =font_word [f32];end
 */
 
- assign font_bit =font_word [~pixel_x[2:0]]; //Recorre las columnas de los datos extraidos de la memoria
+ assign font_bit =font_word [~pixelx[2:0]]; //Recorre las columnas de los datos extraidos de la memoria
 
 
 //Rom colores
