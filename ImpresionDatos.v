@@ -37,7 +37,7 @@ localparam ARminutos=10'd3; //Solo 2 porque siempre van a estar a la par
 localparam ABminutos=10'd19;
 
 //horas
-//Limites en el eje x
+//Limites en el eje x 
 localparam IhorasD=10'd300;
 localparam DhorasD=10'd307;
 localparam IhorasU=10'd310;

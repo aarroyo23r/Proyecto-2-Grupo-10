@@ -145,7 +145,7 @@ dirAsciiDatoU<=dirAsciiDatoSigU;
 dirAsciiDatoD<=dirAsciiDatoSigD;
 end
 
-
+ 
 always @(posedge clk)// Cada vez que se refresca la pantalla se guarda una secuencia de datos
 
 if ((contGuardados!=tamContador) & tick==1 & inicioSecuencia==1 )
