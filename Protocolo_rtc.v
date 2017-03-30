@@ -8,36 +8,37 @@ module Protocolo_rtc(
     output wire ChipSelect,Read,Write,AoD, //Señales de control rtc
     inout  wire [7:0]DATA_ADDRESS, //Patillas bi-direccionales rtc
     output wire bit_inicio, //Bit que indica inicio de escritura
-    output wire [7:0] data_vga //datos al controlador de la vga
+    output wire [7:0] data_vga
 );
 
-GeneradorFunciones Gd_tbunit(.clk(clk),.IndicadorMaquina(IndicadorMaquina),.ChipSelect1(ChipSelect),.Read1(Read),.Write1(Write),.AoD1(AoD));
+wire [7:0]contador;
+GeneradorFunciones Gd_tbunit(.clk(clk),.IndicadorMaquina(IndicadorMaquina),.ChipSelect1(ChipSelect),.Read1(Read),.Write1(Write),.AoD1(AoD),.contador1(contador));
+
 
 reg [7:0]Dir_Dato;
-reg [7:0]in_out;
-reg [7:0]data_vga1;
-reg bitinicio;
-assign DATA_ADDRESS = in_out;
-assign data_vga = data_vga1;
+reg [7:0]data_vga1;                                                                                                                                                
+reg bitinicio;                                                                        
+reg [7:0]command = 8'b11110000;
+assign bit_inicio = bitinicio;
+assign data_vga =data_vga1;
 
-always @(posedge clk)begin //FUNCION WRITE
-if(AoD==0 && IndicadorMaquina==0)begin     //LEE LA DIRECCIÓN a modificar
-    Dir_Dato <= address;
-    in_out <= Dir_Dato; end //Pasa la dirección a las patillas AD0-7
-else
-if(AoD==1 && IndicadorMaquina==0) begin //LEE LOS DATOS PARA ESCRIBIR EN EL RTC
-    Dir_Dato <= DATA_WRITE;    
-    in_out <= Dir_Dato;end    //Lee asigna los datos a modificar o las direcciones a la patilla bi-direccional
-end
+//Función Write
+assign DATA_ADDRESS =((AoD==0 && IndicadorMaquina==0 && contador<8'b10100000)|(contador>8'b01010001 && contador<8'b01010011 && IndicadorMaquina==0)) ? address:8'bZZZZZZZZ;
+assign DATA_ADDRESS =((AoD==1 && ChipSelect ==0 && IndicadorMaquina==0 && contador <8'b10100000)|(contador>8'b01100001 && contador<8'b01100100 && IndicadorMaquina==0)) ? DATA_WRITE:8'bZZZZZZZZ;
+assign DATA_ADDRESS =((AoD==0 && IndicadorMaquina==0 && contador>8'b10100000)|(contador>8'b11011101 && contador<8'b11011111 && IndicadorMaquina==0))? command:8'bZZZZZZZZ;
+
+//FUNCIÓN READ
+assign DATA_ADDRESS =((AoD==0 && IndicadorMaquina==1 && Read==1 && contador <8'b10100000)|(contador>8'b01010001 && contador<8'b01010011 && IndicadorMaquina==1))? command:8'bZZZZZZZZ;
+assign DATA_ADDRESS =((AoD==0 && IndicadorMaquina==1 && Read==1 && contador >8'b10100000)|(contador>8'b11011101 && contador<8'b11011111 && IndicadorMaquina==1))? address:8'bZZZZZZZZ;
 
 always @(posedge clk)begin //FUNCIOÓN READ
-if(AoD==0 && IndicadorMaquina==1 && Read==1)begin  //LEE LA DIRECCIÓN  a leer
-    Dir_Dato <= address;
-    in_out <= Dir_Dato;end    //Pasa la dirección a las patillas AD0-7
+if(AoD==1 && IndicadorMaquina==1 && Read==0 && contador>8'b10100000)begin //LEE DATO DEL RTC
+        data_vga1 <= DATA_ADDRESS;
+        end
 else
-if(AoD==1 && IndicadorMaquina==1 && Read==0)begin //LEE DATO DEL RTC
-        data_vga1 <= in_out;end      //Asigna el valor de las patillas a la variable
+data_vga1<=8'b00000000;
 end
+
 
 always @(posedge clk)begin //Compara para generar bit de inicio de lectura
     if(address==8'b00100001 && IndicadorMaquina==1)
