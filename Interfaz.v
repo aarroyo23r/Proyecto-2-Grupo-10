@@ -25,11 +25,14 @@ module Interfaz( //Definicion entradas y salidas
     input wire inicioSecuencia,//Indica si se esta iniciando una secuencia de la transmision de datos
     input wire temporizador, // Indica si el temporizador esta activo
     input wire temporizadorFin,//Indica cuando finaliza el temporizador
-    input [7:0] datoRTC,//Dato proveniente del RTC
-    input [2:0] cursor,//Indica la posicion en la que se encuentra el cursor
+    input wire [7:0] datoRTC,//Dato proveniente del RTC
+    input wire [2:0] cursor,//Indica la posicion en la que se encuentra el cursor
 
-    output reg  [11:0] rgb,
+    output wire  [11:0] rgb,
     output hsync,vsync
+    //output reg  [6:0] SegundosU, minutosU, horasU, fechaU,mesU,anoU,diaSemanaU, numeroSemanaU,
+    //output  reg [6:0] SegundosDSig,minutosDSig,horasDSig,fechaDSig,mesDSig,anoDSig,diaSemanaDSig,numeroSemanaDSig
+    //output wire [9:0] pixely
     );
 
 //_____________________________________________________________________
@@ -107,7 +110,7 @@ reg [11:0] color;
 
 
 //Salida VGA***********
-
+reg [11:0] rgb;
 
 
 //*******************************************************************************************
@@ -152,66 +155,66 @@ w= 1; //Señal modo escritura
 case(datoRTC)//Le asigna el valor Ascii del dato proveniente del RTC Unidades
 
          8'd0: dirAsciiDatoSigU = 7'h30;
-         8'd1: dirAsciiDatoSigU = 7'h30;
-         8'd2: dirAsciiDatoSigU = 7'h30;
-         8'd3: dirAsciiDatoSigU = 7'h30;
-         8'd4: dirAsciiDatoSigU = 7'h30;
-         8'd5: dirAsciiDatoSigU = 7'h30;
-         8'd6: dirAsciiDatoSigU = 7'h30;
-         8'd7: dirAsciiDatoSigU = 7'h30;
-         8'd8: dirAsciiDatoSigU = 7'h30;
-         8'd9: dirAsciiDatoSigU = 7'h30;
-         8'd10: dirAsciiDatoSigU = 7'h31;
+         8'd1: dirAsciiDatoSigU = 7'h31;
+         8'd2: dirAsciiDatoSigU = 7'h32;
+         8'd3: dirAsciiDatoSigU = 7'h33;
+         8'd4: dirAsciiDatoSigU = 7'h34;
+         8'd5: dirAsciiDatoSigU = 7'h35;
+         8'd6: dirAsciiDatoSigU = 7'h36;
+         8'd7: dirAsciiDatoSigU = 7'h37;
+         8'd8: dirAsciiDatoSigU = 7'h38;
+         8'd9: dirAsciiDatoSigU = 7'h39;
+         8'd10: dirAsciiDatoSigU = 7'h30;
          8'd11: dirAsciiDatoSigU = 7'h31;
-         8'd12: dirAsciiDatoSigU = 7'h31;
-         8'd13: dirAsciiDatoSigU = 7'h31;
-         8'd14: dirAsciiDatoSigU = 7'h31;
-         8'd15: dirAsciiDatoSigU = 7'h31;
-         8'd16: dirAsciiDatoSigU = 7'h31;
-         8'd17: dirAsciiDatoSigU = 7'h31;
-         8'd18: dirAsciiDatoSigU = 7'h31;
-         8'd19: dirAsciiDatoSigU = 7'h31;
-         8'd20: dirAsciiDatoSigU = 7'h32;
-         8'd21: dirAsciiDatoSigU = 7'h32;
+         8'd12: dirAsciiDatoSigU = 7'h32;
+         8'd13: dirAsciiDatoSigU = 7'h33;
+         8'd14: dirAsciiDatoSigU = 7'h34;
+         8'd15: dirAsciiDatoSigU = 7'h35;
+         8'd16: dirAsciiDatoSigU = 7'h36;
+         8'd17: dirAsciiDatoSigU = 7'h37;
+         8'd18: dirAsciiDatoSigU = 7'h38;
+         8'd19: dirAsciiDatoSigU = 7'h39;
+         8'd20: dirAsciiDatoSigU = 7'h30;
+         8'd21: dirAsciiDatoSigU = 7'h31;
          8'd22: dirAsciiDatoSigU = 7'h32;
-         8'd23: dirAsciiDatoSigU = 7'h32;
-         8'd24: dirAsciiDatoSigU = 7'h32;
-         8'd25: dirAsciiDatoSigU = 7'h32;
-         8'd26: dirAsciiDatoSigU = 7'h32;
-         8'd27: dirAsciiDatoSigU = 7'h32;
-         8'd28: dirAsciiDatoSigU = 7'h32;
-         8'd29: dirAsciiDatoSigU = 7'h32;
-         8'd30: dirAsciiDatoSigU = 7'h33;
-         8'd31: dirAsciiDatoSigU = 7'h33;
-         8'd32: dirAsciiDatoSigU = 7'h33;
+         8'd23: dirAsciiDatoSigU = 7'h33;
+         8'd24: dirAsciiDatoSigU = 7'h34;
+         8'd25: dirAsciiDatoSigU = 7'h35;
+         8'd26: dirAsciiDatoSigU = 7'h36;
+         8'd27: dirAsciiDatoSigU = 7'h37;
+         8'd28: dirAsciiDatoSigU = 7'h38;
+         8'd29: dirAsciiDatoSigU = 7'h39;
+         8'd30: dirAsciiDatoSigU = 7'h30;
+         8'd31: dirAsciiDatoSigU = 7'h31;
+         8'd32: dirAsciiDatoSigU = 7'h32;
          8'd33: dirAsciiDatoSigU = 7'h33;
-         8'd34: dirAsciiDatoSigU = 7'h33;
-         8'd35: dirAsciiDatoSigU = 7'h33;
-         8'd36: dirAsciiDatoSigU = 7'h33;
-         8'd37: dirAsciiDatoSigU = 7'h33;
-         8'd38: dirAsciiDatoSigU = 7'h33;
-         8'd39: dirAsciiDatoSigU = 7'h33;
-         8'd40: dirAsciiDatoSigU = 7'h34;
-         8'd41: dirAsciiDatoSigU = 7'h34;
-         8'd42: dirAsciiDatoSigU = 7'h34;
-         8'd43: dirAsciiDatoSigU = 7'h34;
+         8'd34: dirAsciiDatoSigU = 7'h34;
+         8'd35: dirAsciiDatoSigU = 7'h35;
+         8'd36: dirAsciiDatoSigU = 7'h36;
+         8'd37: dirAsciiDatoSigU = 7'h37;
+         8'd38: dirAsciiDatoSigU = 7'h38;
+         8'd39: dirAsciiDatoSigU = 7'h39;
+         8'd40: dirAsciiDatoSigU = 7'h30;
+         8'd41: dirAsciiDatoSigU = 7'h31;
+         8'd42: dirAsciiDatoSigU = 7'h32;
+         8'd43: dirAsciiDatoSigU = 7'h33;
          8'd44: dirAsciiDatoSigU = 7'h34;
-         8'd45: dirAsciiDatoSigU = 7'h34;
-         8'd46: dirAsciiDatoSigU = 7'h34;
-         8'd47: dirAsciiDatoSigU = 7'h34;
-         8'd48: dirAsciiDatoSigU = 7'h34;
-         8'd49: dirAsciiDatoSigU = 7'h34;
-         8'd50: dirAsciiDatoSigU = 7'h35;
-         8'd51: dirAsciiDatoSigU = 7'h35;
-         8'd52: dirAsciiDatoSigU = 7'h35;
-         8'd53: dirAsciiDatoSigU = 7'h35;
-         8'd54: dirAsciiDatoSigU = 7'h35;
+         8'd45: dirAsciiDatoSigU = 7'h35;
+         8'd46: dirAsciiDatoSigU = 7'h36;
+         8'd47: dirAsciiDatoSigU = 7'h37;
+         8'd48: dirAsciiDatoSigU = 7'h38;
+         8'd49: dirAsciiDatoSigU = 7'h39;
+         8'd50: dirAsciiDatoSigU = 7'h30;
+         8'd51: dirAsciiDatoSigU = 7'h31;
+         8'd52: dirAsciiDatoSigU = 7'h32;
+         8'd53: dirAsciiDatoSigU = 7'h33;
+         8'd54: dirAsciiDatoSigU = 7'h34;
          8'd55: dirAsciiDatoSigU = 7'h35;
-         8'd56: dirAsciiDatoSigU = 7'h35;
-         8'd57: dirAsciiDatoSigU = 7'h35;
-         8'd58: dirAsciiDatoSigU = 7'h35;
-         8'd59: dirAsciiDatoSigU = 7'h35;
-         8'd60: dirAsciiDatoSigU = 7'h36;
+         8'd56: dirAsciiDatoSigU = 7'h36;
+         8'd57: dirAsciiDatoSigU = 7'h37;
+         8'd58: dirAsciiDatoSigU = 7'h38;
+         8'd59: dirAsciiDatoSigU = 7'h39;
+         8'd60: dirAsciiDatoSigU = 7'h30;
   endcase
 
  case(datoRTC)//Le asigna el valor Ascii del dato proveniente del RTC Decenas
@@ -514,8 +517,8 @@ case (color_addr) // combinación de colores seleccionados de acuerdo al switch,
 //color = 0000  0000  0000
 
 4'd0: color = 12'b000100010001;
-4'd1: color = 12'b000100010001;
-4'd2: color = 12'b000100010001;
+4'd1: color = 12'hFFF;
+4'd2: color = 12'hFFF;
 4'd3: color = 12'b000100010001;
 4'd4: color = 12'b000100010001;
 4'd5: color = 12'b000100010001;
@@ -541,5 +544,7 @@ always @(posedge clk) //operación se realiza con cada pulso de reloj
  else
     rgb <= 0;
 
+
+assign rgbO=rgb;
 
 endmodule

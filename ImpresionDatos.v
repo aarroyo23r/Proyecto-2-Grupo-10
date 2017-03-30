@@ -68,7 +68,7 @@ always @(pixelx or pixely)//Se ejecuta cuando hay un cambio en pixel x o pixel y
         char_addr = SegundosU; //direccion de lo que se va a imprimir
         color_addr=4'd2;// Color de lo que se va a imprimir
         font_size=2'd1; end//Tamaño de fuente
-
+/*
     else if ((pixelx >= IsegundosU) && (pixelx<=DsegundosU) && (pixely >= ARsegundos) && (pixely<=ABsegundos))begin
         char_addr = SegundosD; //direccion de lo que se va a imprimir
         color_addr=4'd2;// Color de lo que se va a imprimir
@@ -95,7 +95,7 @@ else if ((pixelx >= IhorasU) && (pixelx<=DhorasU) && (pixely >= ARhoras) && (pix
     char_addr = horasU;//direccion de lo que se va a imprimir
     color_addr=4'd2;// Color de lo que se va a imprimir
     font_size=2'd1; end//Tamaño de fuente
-
+*/
 
  else //Si no se cumple ninguna de estas impresiones se pone la pantalla en negro
  begin
