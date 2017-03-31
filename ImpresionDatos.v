@@ -8,7 +8,8 @@ module ImpresionDatos
     input wire [9:0] pixely,//posición pixel y actual
     output wire [10:0] rom_addr,//Direccion en la memoria del dato
     output reg [1:0] font_size,// Tamaño de fuente
-    output reg [3:0] color_addr //Tres bits porque por ahora se van a manejar 15 colores
+    output reg [3:0] color_addr, //Tres bits porque por ahora se van a manejar 15 colores
+    output reg dp //Dice si va a haber un dato en pantalla
  );
 
 
@@ -17,8 +18,8 @@ module ImpresionDatos
 
 //Segundos
 //Limites en el eje x
-localparam IsegundosD=10'd100;
-localparam DsegundosD=10'd107;
+localparam IsegundosD=10'd002;
+localparam DsegundosD=10'd009;
 localparam IsegundosU=10'd110;
 localparam DsegundosU=10'd117;
 //Limites en el eje y
@@ -37,7 +38,7 @@ localparam ARminutos=10'd3; //Solo 2 porque siempre van a estar a la par
 localparam ABminutos=10'd19;
 
 //horas
-//Limites en el eje x 
+//Limites en el eje x
 localparam IhorasD=10'd300;
 localparam DhorasD=10'd307;
 localparam IhorasU=10'd310;
@@ -60,14 +61,17 @@ localparam ABhoras=10'd19;
 //body
 assign row_addr= pixely[3:0]; //4 bits menos significatvos de y, para variar de filas en la memoria
 
-always @(pixelx or pixely)//Se ejecuta cuando hay un cambio en pixel x o pixel y
+always @(posedge clk)//Se ejecuta cuando hay un cambio en pixel x o pixel y
+
+
 
 //Impresion
    //Segundos
-    if ((pixelx >= IsegundosD) && (pixelx<=DsegundosD) && (pixely >= ARsegundos) && (pixely<=ABsegundos))begin
-        char_addr = SegundosU; //direccion de lo que se va a imprimir
+    if ((pixelx >= 10'd002) && (pixelx<=10'd009) && (pixely >= 10'd3) & (pixely<=10'd19))begin
+        char_addr = SegundosD; //direccion de lo que se va a imprimir
         color_addr=4'd2;// Color de lo que se va a imprimir
-        font_size=2'd1; end//Tamaño de fuente
+        font_size=2'd1;//Tamaño de fuente
+        dp=1'b1; end
 /*
     else if ((pixelx >= IsegundosU) && (pixelx<=DsegundosU) && (pixely >= ARsegundos) && (pixely<=ABsegundos))begin
         char_addr = SegundosD; //direccion de lo que se va a imprimir
@@ -99,7 +103,8 @@ else if ((pixelx >= IhorasU) && (pixelx<=DhorasU) && (pixely >= ARhoras) && (pix
 
  else //Si no se cumple ninguna de estas impresiones se pone la pantalla en negro
  begin
- char_addr = 7'd0;end
+ char_addr = 7'd0;
+ dp=1'b0;end
 
 assign rom_addr ={char_addr, row_addr}; //concatena direcciones de registros y filas
 

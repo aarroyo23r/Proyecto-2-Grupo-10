@@ -28,8 +28,10 @@ module Interfaz( //Definicion entradas y salidas
     input wire [7:0] datoRTC,//Dato proveniente del RTC
     input wire [2:0] cursor,//Indica la posicion en la que se encuentra el cursor
 
-    output wire  [11:0] rgb,
-    output hsync,vsync
+    output reg  [11:0] rgb,
+    output hsync,vsync,
+    output reg font_bit
+
     //output reg  [6:0] SegundosU, minutosU, horasU, fechaU,mesU,anoU,diaSemanaU, numeroSemanaU,
     //output  reg [6:0] SegundosDSig,minutosDSig,horasDSig,fechaDSig,mesDSig,anoDSig,diaSemanaDSig,numeroSemanaDSig
     //output wire [9:0] pixely
@@ -42,7 +44,6 @@ module Interfaz( //Definicion entradas y salidas
 //SincronizadorVGA
 wire [9:0] pixelx, pixely;
 wire video_on;
-
 SincronizadorVGA SincronizadorVGA_unit(
           .clk(clk),.reset(reset),
           .hsync(hsync),.vsync(vsync),.video_on(video_on),
@@ -101,7 +102,8 @@ reg [4:0] f32;//Tamaño de la fuente de 32 bits en el eje x
 */
 
 //Mux recorrido columnas Memoria
-wire font_bit;//Bit que determina si un pixel de la pantalla esta activo o no
+//wire font_bit;//Bit que determina si un pixel de la pantalla esta activo o no
+wire dp;
 
 
 //Color
@@ -110,7 +112,7 @@ reg [11:0] color;
 
 
 //Salida VGA***********
-reg [11:0] rgb;
+//reg [11:0] rgb;
 
 
 //*******************************************************************************************
@@ -134,18 +136,18 @@ end//Probado
 always @(posedge clk)
 if (temporizador) //Asigna el tamaño del contador de datos guardados dependiendo
 begin             // de si el temporizador esta activo o no
-tamContador=4'd13;// Y guarda las nuevas direcciones
+tamContador=4'd14;// Y guarda las nuevas direcciones
 dirAsciiDatoU<=dirAsciiDatoSigU;
 dirAsciiDatoD<=dirAsciiDatoSigD;
 end
 else
 begin
-tamContador=4'd10;
+tamContador=4'd11;
 dirAsciiDatoU<=dirAsciiDatoSigU;
 dirAsciiDatoD<=dirAsciiDatoSigD;
 end
 
- 
+
 always @(posedge clk)// Cada vez que se refresca la pantalla se guarda una secuencia de datos
 
 if ((contGuardados!=tamContador) & tick==1 & inicioSecuencia==1 )
@@ -291,13 +293,14 @@ w= 0;
 if (contGuardados==tamContador)//Para que finalizoContar se active unicamente  cuando esto es cierto
 begin
 finalizoContar=1;
+contGuardados=0;
 end
 else
 begin
 finalizoContar=0;
 end
 
-contGuardados=0;
+
 end
 
 //**********Ver reinicio de finalizoContar y contGuardados********
@@ -354,48 +357,48 @@ always @(posedge clk)
 //Guarda los datos decodificados en registros intermedios
 always @(posedge clk)
 //reloj
-if (contGuardados==4'd3)begin //Se empieza en el contador 3 porque el 1 y el 2 se utilizan para generar la direccion que se va a guardar en estos registros
+if (contGuardados==4'd4)begin //Se empieza en el contador 4 porque antes de esto es un retardo que se utiliza para generar la direccion que se va a guardar en estos registros
 SegundosUSig = dirAsciiDatoU;
 SegundosDSig = dirAsciiDatoD;end
 
-else if (contGuardados==4'd4)begin
+else if (contGuardados==4'd5)begin
 minutosUSig = dirAsciiDatoU;
 minutosDSig = dirAsciiDatoD;end
 
-else if (contGuardados==4'd5)begin
+else if (contGuardados==4'd6)begin
 horasUSig = dirAsciiDatoU;
 horasDSig = dirAsciiDatoD;end
 
-else if (contGuardados==4'd6)begin
+else if (contGuardados==4'd7)begin
 fechaUSig = dirAsciiDatoU;
 fechaDSig = dirAsciiDatoD;end
 
-else if (contGuardados==4'd7)begin
+else if (contGuardados==4'd8)begin
 mesUSig = dirAsciiDatoU;
 mesDSig = dirAsciiDatoD;end
 
-else if (contGuardados==4'd8)begin
+else if (contGuardados==4'd9)begin
 anoUSig = dirAsciiDatoU;
 anoDSig = dirAsciiDatoD;end
 
-else if (contGuardados==4'd9)begin
+else if (contGuardados==4'd10)begin
 diaSemanaUSig = dirAsciiDatoU;
 diaSemanaDSig = dirAsciiDatoD;end
 
-else if (contGuardados==4'd10)begin
+else if (contGuardados==4'd11)begin
 numeroSemanaUSig = dirAsciiDatoU;
 numeroSemanaDSig = dirAsciiDatoD;end
 
 //Temporizador
-else if (contGuardados==4'd11)begin
+else if (contGuardados==4'd12)begin
 SegundosUTSig = dirAsciiDatoU;
 SegundosDTSig = dirAsciiDatoD;end
 
-else if (contGuardados==4'd12)begin
+else if (contGuardados==4'd13)begin
 minutosUTSig = dirAsciiDatoU;
 minutosDTSig = dirAsciiDatoD;end
 
-else if (contGuardados==4'd13)begin
+else if (contGuardados==4'd14)begin
 horasUTSig = dirAsciiDatoU;
 horasDTSig = dirAsciiDatoD;end
 
@@ -474,7 +477,7 @@ ImpresionDatos ImpresionDatos_unit
     .clk(clk),.pixelx(pixelx),.pixely(pixely),.rom_addr(rom_addr),
     .font_size(font_size),.color_addr(color_addr),
     .SegundosU(SegundosU),.SegundosD(SegundosD),.minutosU(minutosU)
-    ,.minutosD(minutosD),.horasU(horasU),.horasD(horasD)
+    ,.minutosD(minutosD),.horasU(horasU),.horasD(horasD),.dp(dp)
     );
 
 
@@ -504,7 +507,11 @@ else begin
 font_bit =font_word [f32];end
 */
 
- assign font_bit =font_word [~pixelx[2:0]]; //Recorre las columnas de los datos extraidos de la memoria
+//Mux columnas
+always @(posedge clk)
+if (dp)begin
+ font_bit =font_word [~pixelx[2:0]]; //Recorre las columnas de los datos extraidos de la memoria
+ end
 
 
 //Rom colores
