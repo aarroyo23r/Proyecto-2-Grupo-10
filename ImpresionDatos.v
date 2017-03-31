@@ -54,23 +54,23 @@ localparam ABhoras=10'd255;
 
 //Fecha
 //Limites en el eje x
-localparam IfechaD=10'd300;
-localparam DfechaD=10'd307;
-localparam IfechaU=10'd310;
-localparam DfechaU=10'd317;
+localparam IfechaD=10'd591;
+localparam DfechaD=10'd598;
+localparam IfechaU=10'd599;
+localparam DfechaU=10'd606;
 //Limites en el eje y
-localparam ARfecha=10'd3; //Solo 2 porque siempre van a estar a la par
-localparam ABfecha=10'd19;
+localparam ARfecha=10'd353; //Solo 2 porque siempre van a estar a la par
+localparam ABfecha=10'd368;
 
 //Mes
 //Limites en el eje x
-localparam ImesD=10'd300;
-localparam DmesD=10'd307;
-localparam ImesU=10'd310;
-localparam DmesU=10'd317;
+localparam ImesD=10'd607;
+localparam DmesD=10'd614;
+localparam ImesU=10'd615;
+localparam DmesU=10'd622;
 //Limites en el eje y
-localparam ARmes=10'd120; //Solo 2 porque siempre van a estar a la par
-localparam ABmes=10'd135;
+localparam ARmes=10'd369; //Solo 2 porque siempre van a estar a la par
+localparam ABmes=10'd384;
 
 
 //Año
@@ -86,13 +86,13 @@ localparam ABano=10'd352;
 
 //Dia de la semana
 //Limites en el eje x
-localparam IdiaD=10'd591;
-localparam DdiaD=10'd598;
-localparam IdiaU=10'd599;
-localparam DdiaU=10'd606;
+localparam IdiaD=10'd575;
+localparam DdiaD=10'd582;
+localparam IdiaU=10'd583;
+localparam DdiaU=10'd590;
 //Limites en el eje y
-localparam ARdia=10'd353; //Solo 2 porque siempre van a estar a la par
-localparam ABdia=10'd368;
+localparam ARdia=10'd369; //Solo 2 porque siempre van a estar a la par
+localparam ABdia=10'd384;
 
 
 
@@ -183,6 +183,27 @@ always @(posedge clk)//Se ejecuta cuando hay un cambio en pixel x o pixel y
     color_addr=4'd2;// Color de lo que se va a imprimir
     font_size=2'd1;
     dp=1'b1; end//Tamaño de fuente
+/*
+    //Rayas Amarillas
+     else if ((pixelx >= 10'd0) && (pixelx<=10'd640) && (pixely >= 10'd477) && (pixely<=10'd480))begin
+        char_addr = 7'h0a; //direccion de lo que se va a imprimir
+        color_addr=4'd0;// Color de lo que se va a imprimir
+        font_size=2'd1;
+        dp=1'b1; end//Tamaño de fuente
+
+        //Rayas Amarillas
+         else if ((pixelx >= 10'd0) && (pixelx<=10'd640) && (pixely >= 10'd459) && (pixely<=10'd469))begin
+            char_addr = 7'h0a; //direccion de lo que se va a imprimir
+            color_addr=4'd3;// Color de lo que se va a imprimir
+            font_size=2'd1;
+            dp=1'b1; end//Tamaño de fuente
+*/
+            //Rayas rojas
+             else if ((pixelx >= 10'd0) && (pixelx<=10'd640) && (pixely >= 10'd448) && (pixely<=10'd458))begin
+                char_addr = 7'h0a; //direccion de lo que se va a imprimir
+                color_addr=4'd4;// Color de lo que se va a imprimir
+                font_size=2'd1;
+                dp=1'b1; end//Tamaño de fuente*/
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 
@@ -246,6 +267,7 @@ else if ((pixelx >= IsemanaU) && (pixelx<=DsemanaU) && (pixely >= ARsemana) && (
         font_size=2'd1;
         dp=1'b1;end//Tamaño de fuente
 
+
 //Dia
         else if ((pixelx >= IdiaD) && (pixelx<=DdiaD) && (pixely >= ARdia) && (pixely<=ABdia))begin
             char_addr = diaSemanaD;//direccion de lo que se va a imprimir
@@ -258,6 +280,23 @@ else if ((pixelx >= IsemanaU) && (pixelx<=DsemanaU) && (pixely >= ARsemana) && (
                 color_addr=4'd2;// Color de lo que se va a imprimir
                 font_size=2'd1;
                 dp=1'b1;end//Tamaño de fuente
+
+
+                //Fecha
+                        else if ((pixelx >= IfechaD) && (pixelx<=DfechaD) && (pixely >= ARfecha) && (pixely<=ABfecha))begin
+                            char_addr = fechaD;//direccion de lo que se va a imprimir
+                            color_addr=4'd2;// Color de lo que se va a imprimir
+                            font_size=2'd1;
+                            dp=1'b1;end//Tamaño de fuente
+
+                            else if ((pixelx >= IdiaU) && (pixelx<=DdiaU) && (pixely >= ARdia) && (pixely<=ABdia))begin
+                                char_addr = fechaU;//direccion de lo que se va a imprimir
+                                color_addr=4'd2;// Color de lo que se va a imprimir
+                                font_size=2'd1;
+                                dp=1'b1;end//Tamaño de fuente
+
+
+
 
 
 //Año 20
@@ -287,6 +326,20 @@ else if ((pixelx >= 10'd583) && (pixelx<=10'd590) && (pixely >= ARano) && (pixel
                 color_addr=4'd2;// Color de lo que se va a imprimir
                 font_size=2'd1;
                 dp=1'b1;end//Tamaño de fuente
+
+
+                //Año
+                          else if ((pixelx >= ImesD) && (pixelx<=DmesD) && (pixely >= ARmes) && (pixely<=ABmes))begin
+                            char_addr =mesD;//direccion de lo que se va a imprimir
+                            color_addr=4'd2;// Color de lo que se va a imprimir
+                              font_size=2'd1;
+                              dp=1'b1;end//Tamaño de fuente
+
+                          else if ((pixelx >= ImesU) && (pixelx<=DmesU) && (pixely >= ARmes) && (pixely<=ABmes))begin
+                            char_addr = mesU;//direccion de lo que se va a imprimir
+                            color_addr=4'd2;// Color de lo que se va a imprimir
+                            font_size=2'd1;
+                            dp=1'b1;end//Tamaño de fuente
 
  else //Si no se cumple ninguna de estas impresiones se pone la pantalla en negro
  begin

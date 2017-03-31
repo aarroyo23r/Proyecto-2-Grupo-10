@@ -57,6 +57,7 @@ datoRTC=8'd2;// se cambia para comprobar que no varien los datos guardados aunqu
 inicioSecuencia=8'd1;
 #10;
 //Cambio de datos
+
 datoRTC=8'd24;//Segundos
  #10;//Duración del primer dato
 
@@ -73,13 +74,13 @@ datoRTC=8'd24;//Segundos
  datoRTC=8'd12;
  #10;
 
- datoRTC=8'd21;
+ datoRTC=8'd17;
  #10;
 
  datoRTC=8'd5;
  #10;
 
- datoRTC=8'd6;
+ datoRTC=8'd4;
  #10;
 #30;//retardo inicio secuencia
  inicioSecuencia=0;
@@ -105,7 +106,7 @@ datoRTC=8'd24;//Segundos
           end
           end
 
-       if (pixelx_tb==10'd800) begin  
+       if (pixelx_tb==10'd800) begin
           pixelx_tb= 10'd0;
           pixely_tb=pixely_tb+10'd1;
           $fwrite   (file,"\n");
