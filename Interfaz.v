@@ -507,10 +507,14 @@ else begin
 font_bit =font_word [f32];end
 */
 
+wire[2:0]  bit_addr;
+
+assign bit_addr= pixelx[2:0];//Para poder ver la direccion de recorrido del Mux columnas
+
 //Mux columnas
 always @(posedge clk)
 if (dp)begin
- font_bit =font_word [~pixelx[2:0]]; //Recorre las columnas de los datos extraidos de la memoria
+ font_bit =font_word [~(bit_addr)]; //Recorre las columnas de los datos extraidos de la memoria
  end
 
 
@@ -546,7 +550,7 @@ endcase
 //Salida VGA
 
 always @(posedge clk) //operación se realiza con cada pulso de reloj
-    if (font_bit==1 & video_on==1)  //se encienden los LEDs solo si el bit se encuentra en 1 en memoria
+    if (font_bit==1 & video_on==1 & dp==1)  //se encienden los LEDs solo si el bit se encuentra en 1 en memoria
         rgb=color;
  else
     rgb <= 0;

@@ -116,7 +116,7 @@ end
 // #16000000;
 
 
- if (pixely_tb == 10'd524)begin
+ if (pixely_tb == 10'd525)begin
 $fclose(file);
 $finish;
 end
