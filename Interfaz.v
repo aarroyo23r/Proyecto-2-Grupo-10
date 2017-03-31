@@ -72,9 +72,9 @@ reg w, r;//Habilitan el modo escritura o lectura de los registros respectivament
 //Registros con las direcciones de memoria
 //Direcciones de los datos de RTC
 //Reloj
-reg [6:0] SegundosU, minutosU,horasU, fechaU,mesU,anoU,diaSemanaU, numeroSemanaU;//Inicio de registros unidades en 0
+reg [6:0] SegundosU, minutosU,horasU, fechaU,mesU,anoU,diaSemanaU, numeroSemanaU;
 reg [6:0] SegundosUSig,minutosUSig,horasUSig,fechaUSig,mesUSig,anoUSig,diaSemanaUSig,numeroSemanaUSig;
-reg [6:0] SegundosD,minutosD,horasD,fechaD,mesD,anoD,diaSemanaD,numeroSemanaD;//Inicio de registros decenas en 0
+reg [6:0] SegundosD,minutosD,horasD,fechaD,mesD,anoD,diaSemanaD,numeroSemanaD;
 reg [6:0] SegundosDSig,minutosDSig,horasDSig,fechaDSig,mesDSig,anoDSig,diaSemanaDSig,numeroSemanaDSig;
 //Temporizador
 reg [6:0] SegundosUT,minutosUT,horasUT;//Inicio de registros en 0
@@ -478,6 +478,9 @@ ImpresionDatos ImpresionDatos_unit
     .font_size(font_size),.color_addr(color_addr),
     .SegundosU(SegundosU),.SegundosD(SegundosD),.minutosU(minutosU)
     ,.minutosD(minutosD),.horasU(horasU),.horasD(horasD),.dp(dp)
+    ,.fechaU(fechaU),.mesU(mesU),.anoU(anoU),.diaSemanaU(diaSemanaU),
+     .numeroSemanaU(numeroSemanaU),.fechaD(fechaD),.mesD(mesD),.anoD(anoD),.diaSemanaD(diaSemanaD),
+     .numeroSemanaD(numeroSemanaD)
     );
 
 

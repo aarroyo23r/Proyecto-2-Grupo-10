@@ -4,6 +4,8 @@ module ImpresionDatos
     (
     input wire clk,
     input wire [6:0] SegundosU,SegundosD,minutosU,minutosD,horasU,horasD,
+    fechaU,mesU,anoU,diaSemanaU, numeroSemanaU,fechaD,mesD,anoD,diaSemanaD,
+    numeroSemanaD,
     input wire [9:0] pixelx, //posición pixel x actual
     input wire [9:0] pixely,//posición pixel y actual
     output wire [10:0] rom_addr,//Direccion en la memoria del dato
@@ -49,6 +51,62 @@ localparam DhorasU=10'd317;
 //Limites en el eje y
 localparam ARhoras=10'd3; //Solo 2 porque siempre van a estar a la par
 localparam ABhoras=10'd19;
+
+//Fecha
+//Limites en el eje x
+localparam IfechaD=10'd300;
+localparam DfechaD=10'd307;
+localparam IfechaU=10'd310;
+localparam DfechaU=10'd317;
+//Limites en el eje y
+localparam ARfecha=10'd3; //Solo 2 porque siempre van a estar a la par
+localparam ABfecha=10'd19;
+
+//Mes
+//Limites en el eje x
+localparam ImesD=10'd300;
+localparam DmesD=10'd307;
+localparam ImesU=10'd310;
+localparam DmesU=10'd317;
+//Limites en el eje y
+localparam ARmes=10'd3; //Solo 2 porque siempre van a estar a la par
+localparam ABmes=10'd19;
+
+
+//Año
+//Limites en el eje x
+localparam IanoD=10'd300;
+localparam DanoD=10'd307;
+localparam IanoU=10'd310;
+localparam DanoU=10'd317;
+//Limites en el eje y
+localparam ARano=10'd3; //Solo 2 porque siempre van a estar a la par
+localparam ABano=10'd19;
+
+
+//Dia de la semana
+//Limites en el eje x
+localparam IdiaD=10'd300;
+localparam DdiaD=10'd307;
+localparam IdiaU=10'd310;
+localparam DdiaU=10'd317;
+//Limites en el eje y
+localparam ARdia=10'd3; //Solo 2 porque siempre van a estar a la par
+localparam ABdia=10'd19;
+
+
+
+//Numero de Semana
+//Limites en el eje x
+localparam IsemanaD=10'd300;
+localparam DsemanaD=10'd307;
+localparam IsemanaU=10'd310;
+localparam DsemanaU=10'd317;
+//Limites en el eje y
+localparam ARsemana=10'd3; //Solo 2 porque siempre van a estar a la par
+localparam ABsemana=10'd19;
+
+
 
 
 
