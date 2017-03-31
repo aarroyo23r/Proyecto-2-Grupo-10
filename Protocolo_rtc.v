@@ -2,13 +2,14 @@
 
 module Protocolo_rtc( 
     input wire clk, //Señal clk de 100Mhz
-    input wire [7:0]address, //Dirección donde se modifique un dato
+    input wire [7:0]address, //Dirección del dato
     input wire [7:0]DATA_WRITE, //Dato modificado +1 o -1
     input wire IndicadorMaquina, //Bit indicador de maquina general
     output wire ChipSelect,Read,Write,AoD, //Señales de control rtc
     inout  wire [7:0]DATA_ADDRESS, //Patillas bi-direccionales rtc
     output wire bit_inicio, //Bit que indica inicio de escritura
-    output wire [7:0] data_vga
+    output wire [7:0] data_vga,
+    input wire camb_fecha,camb_hora,camb_crono
 );
 
 wire [7:0]contador;
@@ -39,9 +40,8 @@ else
 data_vga1<=8'b00000000;
 end
 
-
 always @(posedge clk)begin //Compara para generar bit de inicio de lectura
-    if(address==8'b00100001 && IndicadorMaquina==1)
+    if(address==8'b00100001 && IndicadorMaquina==1 && camb_crono==0 && camb_fecha==0 && camb_hora==0)
         bitinicio<=1;
       else
         bitinicio<=0;
