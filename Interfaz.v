@@ -30,7 +30,8 @@ module Interfaz( //Definicion entradas y salidas
 
     output reg  [11:0] rgb,
     output hsync,vsync,
-    output reg font_bit
+    output reg font_bit,
+    output wire video_on
 
     //output reg  [6:0] SegundosU, minutosU, horasU, fechaU,mesU,anoU,diaSemanaU, numeroSemanaU,
     //output  reg [6:0] SegundosDSig,minutosDSig,horasDSig,fechaDSig,mesDSig,anoDSig,diaSemanaDSig,numeroSemanaDSig
@@ -43,7 +44,7 @@ module Interfaz( //Definicion entradas y salidas
 
 //SincronizadorVGA
 wire [9:0] pixelx, pixely;
-wire video_on;
+
 SincronizadorVGA SincronizadorVGA_unit(
           .clk(clk),.reset(reset),
           .hsync(hsync),.vsync(vsync),.video_on(video_on),

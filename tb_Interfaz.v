@@ -12,7 +12,6 @@ module tb_Interfaz();
      wire font_bit;
 
      reg [9:0] pixelx_tb,pixely_tb;
-     wire contador;
      integer i,j;
      integer file;
 
@@ -20,7 +19,7 @@ module tb_Interfaz();
            .clk(clk),.reset(reset),.inicioSecuencia(inicioSecuencia),
            .temporizador(temporizador),.temporizadorFin(temporizadorFin),
            .datoRTC(datoRTC),.cursor(cursor),.rgb(rgb),.hsync(hsync),
-           .vsync(vsync),.font_bit(font_bit)
+           .vsync(vsync),.font_bit(font_bit),.video_on(video_on)
 
            );
 
@@ -100,8 +99,10 @@ datoRTC=8'd24;
        for (i=0; i<800; i=i+1) begin
           #40;//Tiempo que dura en cambiar un pixel
            pixelx_tb = pixelx_tb + 10'd1;
-          $display   (file, "bit = %b", rgb[0]);
-          $fwrite   (file, "%b",  rgb[0]);
+           if(video_on)begin
+          $display   (file, "bit = %h", rgb);
+          $fwrite   (file, "%h",  rgb);
+          end
           end
 
        if (pixelx_tb==10'd800) begin
