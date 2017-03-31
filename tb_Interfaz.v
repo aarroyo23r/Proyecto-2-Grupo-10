@@ -105,7 +105,7 @@ datoRTC=8'd24;//Segundos
           end
           end
 
-       if (pixelx_tb==10'd800) begin 
+       if (pixelx_tb==10'd800) begin  
           pixelx_tb= 10'd0;
           pixely_tb=pixely_tb+10'd1;
           $fwrite   (file,"\n");

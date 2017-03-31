@@ -178,7 +178,7 @@ always @(posedge clk)//Se ejecuta cuando hay un cambio en pixel x o pixel y
 
 
 //Rayas
- else if ((pixelx >= 10'd295) && (pixelx<=10'd357) && (pixely >= 10'd256) && (pixely<=10'd258))begin
+ else if ((pixelx >= 10'd295) && (pixelx<=10'd357) && (pixely >= 10'd255) && (pixely<=10'd258))begin
     char_addr = 7'h0a; //direccion de lo que se va a imprimir
     color_addr=4'd2;// Color de lo que se va a imprimir
     font_size=2'd1;
