@@ -481,7 +481,7 @@ ImpresionDatos ImpresionDatos_unit
     ,.minutosD(minutosD),.horasU(horasU),.horasD(horasD),.dp(dp)
     ,.fechaU(fechaU),.mesU(mesU),.anoU(anoU),.diaSemanaU(diaSemanaU),
      .numeroSemanaU(numeroSemanaU),.fechaD(fechaD),.mesD(mesD),.anoD(anoD),.diaSemanaD(diaSemanaD),
-     .numeroSemanaD(numeroSemanaD)
+     .numeroSemanaD(numeroSemanaD),.memInt(memInt)
     );
 
 
@@ -518,8 +518,14 @@ assign bit_addr= pixelx[2:0];//Para poder ver la direccion de recorrido del Mux 
 //Mux columnas
 always @(posedge clk)
 if (dp)begin
+if (memInt)begin
+font_bit=1;
+end
+else begin
  font_bit =font_word [~(bit_addr)]; //Recorre las columnas de los datos extraidos de la memoria
  end
+end
+
 
 
 //Rom colores
@@ -531,12 +537,12 @@ case (color_addr) // combinación de colores seleccionados de acuerdo al switch,
 //         r      g    b
 //color = 0000  0000  0000
 
-4'd0: color = 12'h032;//Amarillo
-4'd1: color = 12'h000;//Blanco
-4'd2: color = 12'hFFE;
-4'd3: color = 12'h777;
-4'd4: color = 12'h211;
-4'd5: color = 12'b000100010001;
+4'd0: color = 12'h032;//Verde
+4'd1: color = 12'h000;//Negro
+4'd2: color = 12'hFFE;//Blanco
+4'd3: color = 12'h111;
+4'd4: color = 12'h222;
+4'd5: color = 12'h333;
 4'd6: color = 12'b000100010001;
 4'd7: color = 12'b000100010001;
 4'd8: color = 12'b000100010001;
