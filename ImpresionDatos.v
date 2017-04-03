@@ -183,21 +183,21 @@ always @(posedge clk)//Se ejecuta cuando hay un cambio en pixel x o pixel y
     color_addr=4'd2;// Color de lo que se va a imprimir
     font_size=2'd1;
     dp=1'b1; end//Tamaño de fuente
-/*
+
     //Rayas Amarillas
      else if ((pixelx >= 10'd0) && (pixelx<=10'd640) && (pixely >= 10'd477) && (pixely<=10'd480))begin
         char_addr = 7'h0a; //direccion de lo que se va a imprimir
         color_addr=4'd0;// Color de lo que se va a imprimir
         font_size=2'd1;
         dp=1'b1; end//Tamaño de fuente
-
+/*
         //Rayas Amarillas
          else if ((pixelx >= 10'd0) && (pixelx<=10'd640) && (pixely >= 10'd459) && (pixely<=10'd469))begin
             char_addr = 7'h0a; //direccion de lo que se va a imprimir
             color_addr=4'd3;// Color de lo que se va a imprimir
             font_size=2'd1;
             dp=1'b1; end//Tamaño de fuente
-*/
+
             //Rayas rojas
              else if ((pixelx >= 10'd0) && (pixelx<=10'd640) && (pixely >= 10'd448) && (pixely<=10'd458))begin
                 char_addr = 7'h0a; //direccion de lo que se va a imprimir
@@ -289,7 +289,7 @@ else if ((pixelx >= IsemanaU) && (pixelx<=DsemanaU) && (pixely >= ARsemana) && (
                             font_size=2'd1;
                             dp=1'b1;end//Tamaño de fuente
 
-                            else if ((pixelx >= IdiaU) && (pixelx<=DdiaU) && (pixely >= ARdia) && (pixely<=ABdia))begin
+                            else if ((pixelx >= IfechaU) && (pixelx<=DfechaU) && (pixely >= ARfecha) && (pixely<=ABfecha))begin
                                 char_addr = fechaU;//direccion de lo que se va a imprimir
                                 color_addr=4'd2;// Color de lo que se va a imprimir
                                 font_size=2'd1;

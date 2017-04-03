@@ -68,19 +68,19 @@ datoRTC=8'd24;//Segundos
  datoRTC=8'd3;//Horas
  #10;
 
- datoRTC=8'd23;
+ datoRTC=8'd23;//Fecha
  #10;
 
- datoRTC=8'd12;
+ datoRTC=8'd12;//Mes
  #10;
 
- datoRTC=8'd17;
+ datoRTC=8'd17;//Año
  #10;
 
- datoRTC=8'd5;
+ datoRTC=8'd5;//Dia
  #10;
 
- datoRTC=8'd4;
+ datoRTC=8'd4;//Semana
  #10;
 #30;//retardo inicio secuencia
  inicioSecuencia=0;
