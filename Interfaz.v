@@ -531,10 +531,10 @@ case (color_addr) // combinación de colores seleccionados de acuerdo al switch,
 //         r      g    b
 //color = 0000  0000  0000
 
-4'd0: color = 12'h730;//Amarillo
-4'd1: color = 12'hFFF;//Blanco
+4'd0: color = 12'h032;//Amarillo
+4'd1: color = 12'h000;//Blanco
 4'd2: color = 12'hFFE;
-4'd3: color = 12'h320;
+4'd3: color = 12'h777;
 4'd4: color = 12'h211;
 4'd5: color = 12'b000100010001;
 4'd6: color = 12'b000100010001;

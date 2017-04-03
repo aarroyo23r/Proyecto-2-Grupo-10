@@ -342,10 +342,94 @@ else if ((pixelx >= 10'd583) && (pixelx<=10'd590) && (pixely >= ARano) && (pixel
                             dp=1'b1;end//Tamaño de fuente
 
  else //Si no se cumple ninguna de estas impresiones se pone la pantalla en negro
- begin
- char_addr = 7'd0;
- dp=1'b0;
- dp=1'b1;end
+begin
+//Fondo de pantalla
+if ((pixely >= 10'd0) && (pixely<=10'd11))begin
+char_addr = 7'h0a; //direccion de lo que se va a imprimir
+color_addr=4'd0;// Color de lo que se va a imprimir
+font_size=2'd1;
+dp=1'b1; end//Tamaño de fuente
+
+//Semana
+else if ((pixely >= 10'd20) && (pixely<=10'd140))begin
+char_addr = 7'h0a; //direccion de lo que se va a imprimir
+color_addr=4'd0;// Color de lo que se va a imprimir
+font_size=2'd1;
+dp=1'b1; end//Tamaño de fuente
+
+
+else if ((pixely >= 10'd141) && (pixely<=10'd151))begin
+char_addr = 7'h0a; //direccion de lo que se va a imprimir
+color_addr=4'd1;// Color de lo que se va a imprimir
+font_size=2'd1;
+dp=1'b1; end//Tamaño de fuente
+
+
+//Cuadros
+
+else if ((pixely >= 10'd339) && (pixely<=10'd348))begin
+char_addr = 7'h0a; //direccion de lo que se va a imprimir
+color_addr=4'd1;// Color de lo que se va a imprimir
+font_size=2'd1;
+dp=1'b1; end//Tamaño de fuente
+
+
+
+else if ((pixely >= 10'd349) && (pixely<=10'd351))begin
+char_addr = 7'h0a; //direccion de lo que se va a imprimir
+color_addr=4'd0;// Color de lo que se va a imprimir
+font_size=2'd1;
+dp=1'b1; end//Tamaño de fuente
+
+
+
+else if ((pixely >= 10'd352) && (pixely<=10'd353))begin
+char_addr = 7'h0a; //direccion de lo que se va a imprimir
+color_addr=4'd1;// Color de lo que se va a imprimir
+font_size=2'd1;
+dp=1'b1; end//Tamaño de fuente
+
+
+else if ((pixely >= 10'd354) && (pixely<=10'd440))begin
+char_addr = 7'h0a; //direccion de lo que se va a imprimir
+color_addr=4'd0;// Color de lo que se va a imprimir
+font_size=2'd1;
+dp=1'b1; end//Tamaño de fuente
+
+
+
+//Crono
+
+
+else if ((pixely >= 10'd667) && (pixely<=10'd472))begin
+char_addr = 7'h0a; //direccion de lo que se va a imprimir
+color_addr=4'd0;// Color de lo que se va a imprimir
+font_size=2'd1;
+dp=1'b1; end//Tamaño de fuente
+
+
+
+else if ((pixely >= 10'd473) && (pixely<= 10'd480))begin
+char_addr = 7'h0a; //direccion de lo que se va a imprimir
+color_addr=4'd2;// Color de lo que se va a imprimir
+font_size=2'd1;
+dp=1'b1; end//Tamaño de fuente
+
+
+else begin
+char_addr = 7'h0a; //direccion de lo que se va a imprimir
+color_addr=4'd3;// Color de lo que se va a imprimir
+font_size=2'd1;
+dp=1'b1; end//Tamaño de fuente
+
+
+end
+
+
+
+
+
+
 
 assign rom_addr ={char_addr, row_addr}; //concatena direcciones de registros y filas
 
