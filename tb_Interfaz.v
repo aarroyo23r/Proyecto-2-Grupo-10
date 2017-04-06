@@ -17,8 +17,8 @@ module tb_Interfaz();
 
  Interfaz uut(
            .clk(clk),.reset(reset),.inicioSecuencia(inicioSecuencia),
-           .temporizador(temporizador),.temporizadorFin(temporizadorFin),
-           .datoRTC(datoRTC),.cursor(cursor),.rgb(rgb),.hsync(hsync),
+
+           .datoRTC(datoRTC),.rgbO(rgb),.hsync(hsync),
            .vsync(vsync),.font_bit(font_bit),.video_on(video_on)
 
            );
@@ -29,11 +29,11 @@ module tb_Interfaz();
 
  file= $fopen ( "Pantalla.txt", "w");   // Abre el archivo donde vamos a escribir
  reset=0;
- temporizador=0;
+ //temporizador=0;
  pixelx_tb=10'd0;
   pixely_tb=10'd0;
  temporizadorFin=0;
- cursor=0;
+ //cursor=0;
 
 
  //#16000000; // Duración de una impresión de pantalla
@@ -53,7 +53,9 @@ datoRTC=8'd2;// se cambia para comprobar que no varien los datos guardados aunqu
  //Llegada de los datos
 */
 
-#15360025 //Espera para que venga el tick
+#15360025 //Espera  el tick
+datoRTC=8'd00;
+
 inicioSecuencia=8'd1;
 #10;
 //Cambio de datos
@@ -84,7 +86,7 @@ datoRTC=8'd24;//Segundos
  #10;
 #30;//retardo inicio secuencia
  inicioSecuencia=0;
-
+$finish;
  reset=1;
  #10
  reset=0;
