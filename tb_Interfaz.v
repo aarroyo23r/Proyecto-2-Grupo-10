@@ -26,19 +26,26 @@ module tb_Interfaz();
 //155 u carga 8 datos
 initial begin
   clk=0;
- 
-  file= $fopen ( "Pantalla.txt", "w");   // Abre el archivo donde vamos a escribir
+
   reset=0;
+  #10;
+  reset=1;
+  #10;
+  reset=0;
+  #10;
+
+  file= $fopen ( "Pantalla.txt", "w");   // Abre el archivo donde vamos a escribir
+
   //temporizador=0;
   pixelx_tb=10'd0;
    pixely_tb=10'd0;
   //temporizadorFin=0;
   //cursor=0;
- 
- 
+
+
   //#16000000; // Duración de una impresión de pantalla
  #200; //Tiempo extra
- 
+
  /*
  //Carga de datos en 0
  inicioSecuencia=0;
@@ -50,36 +57,36 @@ initial begin
  datoRTC=8'd2;// se cambia para comprobar que no varien los datos guardados aunque lleguen otros datos
   //Llegada de los datos
  */
- 
+
  #15360025 //Espera  el tick
  datoRTC=8'd00;
- 
+
  inicioSecuencia=8'd1;
  #10;
  //Cambio de datos
- 
+
  datoRTC=8'd24;//Segundos
   #10;//Duración del primer dato
- 
- 
+
+
   datoRTC=8'd4;//Minutos
   #10;
- 
+
   datoRTC=8'd3;//Horas
   #10;
- 
+
   datoRTC=8'd23;//Fecha
   #10;
- 
+
   datoRTC=8'd12;//Mes
   #10;
- 
+
   datoRTC=8'd17;//Año
   #10;
- 
+
   datoRTC=8'd5;//Dia
   #10;
- 
+
   datoRTC=8'd4;//Semana
   #10;
  #30;//retardo inicio secuencia

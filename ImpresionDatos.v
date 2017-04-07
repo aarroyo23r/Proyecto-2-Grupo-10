@@ -137,16 +137,16 @@ localparam ABsemana=10'd31;
 always @(posedge clk)
 
 if (font_size==2'd1)begin
-row_addr= pixely[3:0];end
+row_addr<= pixely[3:0];end
 
 else if (font_size==2'd0)begin
-row_addr= pixely[4:1];end
+row_addr<= pixely[4:1];end
 
 else if (font_size==2'd2)begin
-row_addr= pixely[5:2];end
+row_addr<= pixely[5:2];end
 
 else begin
-row_addr= pixely[3:0];end
+row_addr<= pixely[3:0];end
 
 
 //Sin escalar
@@ -163,50 +163,50 @@ always @(posedge clk)//Se ejecuta cuando hay un cambio en pixel x o pixel y
  //Para el segundo mozaico x=7-14  y=0-15
    //Segundos
     if ((pixelx >= IsegundosD) && (pixelx<=DsegundosD) && (pixely >= ARsegundos) & (pixely<=ABsegundos))begin
-        char_addr = SegundosD; //direccion de lo que se va a imprimir
-        color_addr=4'd2;// Color de lo que se va a imprimir
-        font_size=2'd1;//Tamaño de fuente
-        memInt=1'd0;
-        dp=1'd1; end
+        char_addr <= SegundosD; //direccion de lo que se va a imprimir
+        color_addr<=4'd2;// Color de lo que se va a imprimir
+        font_size<=2'd1;//Tamaño de fuente
+        memInt<=1'd0;
+        dp<=1'd1; end
 
     else if ((pixelx >= IsegundosU) && (pixelx<=DsegundosU) && (pixely >= ARsegundos) && (pixely<=ABsegundos))begin
-        char_addr = SegundosU; //direccion de lo que se va a imprimir
-        color_addr=4'd2;// Color de lo que se va a imprimir
-        font_size=1;
-        memInt=1'd0;
-        dp=1'd1;end//Tamaño de fuente
+        char_addr <= SegundosU; //direccion de lo que se va a imprimir
+        color_addr<=4'd2;// Color de lo que se va a imprimir
+        font_size<=1;
+        memInt<=1'd0;
+        dp<=1'd1;end//Tamaño de fuente
 
 //Minutos
   else if ((pixelx >= IminutosD) && (pixelx<=DminutosD) && (pixely >= ARminutos) && (pixely<=ABminutos))begin
-      char_addr = minutosD; //direccion de lo que se va a imprimir
-      color_addr=4'd2;// Color de lo que se va a imprimir
-      font_size=2'd1;
-      memInt=1'd0;
-      dp=1'd1;end//Tamaño de fuente
+      char_addr <= minutosD; //direccion de lo que se va a imprimir
+      color_addr<=4'd2;// Color de lo que se va a imprimir
+      font_size<=2'd1;
+      memInt<=1'd0;
+      dp<=1'd1;end//Tamaño de fuente
 
   else if ((pixelx >= IminutosU) && (pixelx<=DminutosU) && (pixely >= ARminutos) && (pixely<=ABminutos))begin
-      char_addr = minutosU; //direccion de lo que se va a imprimir
-      color_addr=4'd2;// Color de lo que se va a imprimir
-      font_size=2'd1;
-      memInt=1'd0;
-      dp=1'd1;end//Tamaño de fuente
+      char_addr <= minutosU; //direccion de lo que se va a imprimir
+      color_addr<=4'd2;// Color de lo que se va a imprimir
+      font_size<=2'd1;
+      memInt<=1'd0;
+      dp<=1'd1;end//Tamaño de fuente
 
 //Horas
  else if ((pixelx >= IhorasD) && (pixelx<=DhorasD) && (pixely >= ARhoras) && (pixely<=ABhoras))begin
-    char_addr = horasD; //direccion de lo que se va a imprimir
-    color_addr=4'd2;// Color de lo que se va a imprimir
-    font_size=2'd1;
-    memInt=1'd0;
-    dp=1'd1; end//Tamaño de fuente
+    char_addr <= horasD; //direccion de lo que se va a imprimir
+    color_addr<=4'd2;// Color de lo que se va a imprimir
+    font_size<=2'd1;
+    memInt<=1'd0;
+    dp<=1'd1; end//Tamaño de fuente
 
 
 
     else if ((pixelx >= IhorasU) && (pixelx<=DhorasU) && (pixely >= ARhoras) && (pixely<=ABhoras))begin
-        char_addr = horasU;//direccion de lo que se va a imprimir
-        color_addr=4'd2;// Color de lo que se va a imprimir
-        font_size=2'd1;
-        memInt=1'd0;
-        dp=1'd1;end//Tamaño de fuente
+        char_addr <= horasU;//direccion de lo que se va a imprimir
+        color_addr<=4'd2;// Color de lo que se va a imprimir
+        font_size<=2'd1;
+        memInt<=1'd0;
+        dp<=1'd1;end//Tamaño de fuente
 
 
 
@@ -232,101 +232,101 @@ always @(posedge clk)//Se ejecuta cuando hay un cambio en pixel x o pixel y
         //Texto semana
         //S
         else if ((pixelx >= 10'd287) && (pixelx<=10'd294) && (pixely >= ARsemana) && (pixely<=ABsemana))begin
-            char_addr = 7'h53;//direccion de lo que se va a imprimir
-            color_addr=4'd2;// Color de lo que se va a imprimir
-            font_size=2'd1;
-            memInt=1'd0;
-            dp=1'd1;end//Tamaño de fuente
+            char_addr <= 7'h53;//direccion de lo que se va a imprimir
+            color_addr<=4'd2;// Color de lo que se va a imprimir
+            font_size<=2'd1;
+            memInt<=1'd0;
+            dp<=1'd1;end//Tamaño de fuente
 
 
             //E
             else if ((pixelx >= 10'd295) && (pixelx<=10'd302) && (pixely >= ARsemana) && (pixely<=ABsemana))begin
-                char_addr = 7'h45;//direccion de lo que se va a imprimir
-                color_addr=4'd2;// Color de lo que se va a imprimir
-                font_size=2'd1;
-                memInt=1'd0;
-                dp=1'd1;end
+                char_addr <= 7'h45;//direccion de lo que se va a imprimir
+                color_addr<=4'd2;// Color de lo que se va a imprimir
+                font_size<=2'd1;
+                memInt<=1'd0;
+                dp<=1'd1;end
 
                 //M
           else if ((pixelx >= 10'd303) && (pixelx<=10'd310) && (pixely >= ARsemana) && (pixely<=ABsemana))begin
-                char_addr = 7'h4d;//direccion de lo que se va a imprimir
-                color_addr=4'd2;// Color de lo que se va a imprimir
-                font_size=2'd1;
-                memInt=1'd0;
-                dp=1'd1;end
+                char_addr <= 7'h4d;//direccion de lo que se va a imprimir
+                color_addr<=4'd2;// Color de lo que se va a imprimir
+                font_size<=2'd1;
+                memInt<=1'd0;
+                dp<=1'd1;end
 
                 //A
           else if ((pixelx >= 10'd311) && (pixelx<=10'd319) && (pixely >= ARsemana) && (pixely<=ABsemana))begin
-                char_addr = 7'h41;//direccion de lo que se va a imprimir
-                color_addr=4'd2;// Color de lo que se va a imprimir
-                font_size=2'd1;
-                memInt=1'd0;
-                dp=1'd1;end
+                char_addr <= 7'h41;//direccion de lo que se va a imprimir
+                color_addr<=4'd2;// Color de lo que se va a imprimir
+                font_size<=2'd1;
+                memInt<=1'd0;
+                dp<=1'd1;end
 
 
                 //N
           else if ((pixelx >= 10'd320) && (pixelx<=10'd327) && (pixely >= ARsemana) && (pixely<=ABsemana))begin
-                char_addr = 7'h4e;//direccion de lo que se va a imprimir
-                color_addr=4'd2;// Color de lo que se va a imprimir
-                font_size=2'd1;
-                memInt=1'd0;
-                dp=1'd1;end
+                char_addr <= 7'h4e;//direccion de lo que se va a imprimir
+                color_addr<=4'd2;// Color de lo que se va a imprimir
+                font_size<=2'd1;
+                memInt<=1'd0;
+                dp<=1'd1;end
 
 
                 //A
           else if ((pixelx >= 10'd328) && (pixelx<=10'd334) && (pixely >= ARsemana) && (pixely<=ABsemana))begin
-                char_addr = 7'h41;//direccion de lo que se va a imprimir
-                color_addr=4'd2;// Color de lo que se va a imprimir
-                font_size=2'd1;
-                memInt=1'd0;
-                dp=1'd1;end
+                char_addr <= 7'h41;//direccion de lo que se va a imprimir
+                color_addr<=4'd2;// Color de lo que se va a imprimir
+                font_size<=2'd1;
+                memInt<=1'd0;
+                dp<=1'd1;end
 
 //Semana
 else if ((pixelx >= IsemanaU) && (pixelx<=DsemanaU) && (pixely >= ARsemana) && (pixely<=ABsemana))begin
-    char_addr = numeroSemanaU;//direccion de lo que se va a imprimir
-    color_addr=4'd2;// Color de lo que se va a imprimir
-    font_size=2'd1;
-    memInt=1'd0;
-    dp=1'd1;end//Tamaño de fuente
+    char_addr <= numeroSemanaU;//direccion de lo que se va a imprimir
+    color_addr<=4'd2;// Color de lo que se va a imprimir
+    font_size<=2'd1;
+    memInt<=1'd0;
+    dp<=1'd1;end//Tamaño de fuente
 
     else if ((pixelx >= IsemanaD) && (pixelx<=DsemanaD) && (pixely >= ARsemana) && (pixely<=ABsemana))begin
-        char_addr = numeroSemanaD;//direccion de lo que se va a imprimir
-        color_addr=4'd2;// Color de lo que se va a imprimir
-        font_size=2'd1;
-        memInt=1'd0;
-        dp=1'd1;end//Tamaño de fuente
+        char_addr <= numeroSemanaD;//direccion de lo que se va a imprimir
+        color_addr<=4'd2;// Color de lo que se va a imprimir
+        font_size<=2'd1;
+        memInt<=1'd0;
+        dp<=1'd1;end//Tamaño de fuente
 
 
 //Dia
         else if ((pixelx >= IdiaD) && (pixelx<=DdiaD) && (pixely >= ARdia) && (pixely<=ABdia))begin
-            char_addr = diaSemanaD;//direccion de lo que se va a imprimir
-            color_addr=4'd2;// Color de lo que se va a imprimir
-            font_size=2'd1;
-            memInt=1'd0;
-            dp=1'd1;end//Tamaño de fuente
+            char_addr <= diaSemanaD;//direccion de lo que se va a imprimir
+            color_addr<=4'd2;// Color de lo que se va a imprimir
+            font_size<=2'd1;
+            memInt<=1'd0;
+            dp<=1'd1;end//Tamaño de fuente
 
             else if ((pixelx >= IdiaU) && (pixelx<=DdiaU) && (pixely >= ARdia) && (pixely<=ABdia))begin
-                char_addr = diaSemanaU;//direccion de lo que se va a imprimir
-                color_addr=4'd2;// Color de lo que se va a imprimir
-                font_size=2'd1;
-                memInt=1'd0;
-                dp=1'd1;end//Tamaño de fuente
+                char_addr <= diaSemanaU;//direccion de lo que se va a imprimir
+                color_addr<=4'd2;// Color de lo que se va a imprimir
+                font_size<=2'd1;
+                memInt<=1'd0;
+                dp<=1'd1;end//Tamaño de fuente
 
 
                 //Fecha
                         else if ((pixelx >= IfechaD) && (pixelx<=DfechaD) && (pixely >= ARfecha) && (pixely<=ABfecha))begin
-                            char_addr = fechaD;//direccion de lo que se va a imprimir
-                            color_addr=4'd2;// Color de lo que se va a imprimir
-                            font_size=2'd1;
-                            memInt=1'd0;
-                            dp=1'd1;end//Tamaño de fuente
+                            char_addr <= fechaD;//direccion de lo que se va a imprimir
+                            color_addr<=4'd2;// Color de lo que se va a imprimir
+                            font_size<=2'd1;
+                            memInt<=1'd0;
+                            dp<=1'd1;end//Tamaño de fuente
 
                             else if ((pixelx >= IfechaU) && (pixelx<=DfechaU) && (pixely >= ARfecha) && (pixely<=ABfecha))begin
-                                char_addr = fechaU;//direccion de lo que se va a imprimir
-                                color_addr=4'd2;// Color de lo que se va a imprimir
-                                font_size=2'd1;
-                                memInt=1'd0;
-                                dp=1'd1;end//Tamaño de fuente
+                                char_addr <= fechaU;//direccion de lo que se va a imprimir
+                                color_addr<=4'd2;// Color de lo que se va a imprimir
+                                font_size<=2'd1;
+                                memInt<=1'd0;
+                                dp<=1'd1;end//Tamaño de fuente
 
 
 
@@ -335,50 +335,50 @@ else if ((pixelx >= IsemanaU) && (pixelx<=DsemanaU) && (pixely >= ARsemana) && (
 //Año 20
 
   else if ((pixelx >= 10'd591) && (pixelx<=10'd598) && (pixely >= ARano) && (pixely<=ABano))begin
-  char_addr = 7'h30;//direccion de lo que se va a imprimir
-  color_addr=4'd2;// Color de lo que se va a imprimir
-    font_size=2'd2;
-    memInt=1'd0;
-    dp=1'd1;end//Tamaño de fuente
+  char_addr <= 7'h30;//direccion de lo que se va a imprimir
+  color_addr<=4'd2;// Color de lo que se va a imprimir
+    font_size<=2'd2;
+    memInt<=1'd0;
+    dp<=1'd1;end//Tamaño de fuente
 
 else if ((pixelx >= 10'd583) && (pixelx<=10'd590) && (pixely >= ARano) && (pixely<=ABano))begin
-  char_addr = 7'h32;//direccion de lo que se va a imprimir
-  color_addr=4'd2;// Color de lo que se va a imprimir
-  font_size=2'd1;
-  memInt=1'd0;
-  dp=1'd1;end//Tamaño de fuente
+  char_addr <= 7'h32;//direccion de lo que se va a imprimir
+  color_addr<=4'd2;// Color de lo que se va a imprimir
+  font_size<=2'd1;
+  memInt<=1'd0;
+  dp<=1'd1;end//Tamaño de fuente
 
 
     //Año
               else if ((pixelx >= IanoD) && (pixelx<=DanoD) && (pixely >= ARano) && (pixely<=ABano))begin
-                char_addr = anoD;//direccion de lo que se va a imprimir
-                color_addr=4'd2;// Color de lo que se va a imprimir
-                  font_size=2'd1;
-                  memInt=1'd0;
+                char_addr <= anoD;//direccion de lo que se va a imprimir
+                color_addr<=4'd2;// Color de lo que se va a imprimir
+                  font_size<=2'd1;
+                  memInt<=1'd0;
                   dp=1'd1;end//Tamaño de fuente
 
               else if ((pixelx >= IanoU) && (pixelx<=DanoU) && (pixely >= ARano) && (pixely<=ABano))begin
-                char_addr = anoU;//direccion de lo que se va a imprimir
-                color_addr=4'd2;// Color de lo que se va a imprimir
-                font_size=2'd1;
-                memInt=1'd0;
-                dp=1'd1;end//Tamaño de fuente
+                char_addr <= anoU;//direccion de lo que se va a imprimir
+                color_addr<=4'd2;// Color de lo que se va a imprimir
+                font_size<=2'd1;
+                memInt<=1'd0;
+                dp<=1'd1;end//Tamaño de fuente
 
 
                 //Año
                           else if ((pixelx >= ImesD) && (pixelx<=DmesD) && (pixely >= ARmes) && (pixely<=ABmes))begin
-                            char_addr =mesD;//direccion de lo que se va a imprimir
-                            color_addr=4'd2;// Color de lo que se va a imprimir
-                              font_size=2'd1;
-                              memInt=1'd0;
-                              dp=1'd1;end//Tamaño de fuente
+                            char_addr <=mesD;//direccion de lo que se va a imprimir
+                            color_addr<=4'd2;// Color de lo que se va a imprimir
+                              font_size<=2'd1;
+                              memInt<=1'd0;
+                              dp<=1'd1;end//Tamaño de fuente
 
                           else if ((pixelx >= ImesU) && (pixelx<=DmesU) && (pixely >= ARmes) && (pixely<=ABmes))begin
-                            char_addr = mesU;//direccion de lo que se va a imprimir
-                            color_addr=4'd2;// Color de lo que se va a imprimir
-                            font_size=2'd1;
-                            memInt=1'd0;
-                            dp=1'd1;end//Tamaño de fuente
+                            char_addr <= mesU;//direccion de lo que se va a imprimir
+                            color_addr<=4'd2;// Color de lo que se va a imprimir
+                            font_size<=2'd1;
+                            memInt<=1'd0;
+                            dp<=1'd1;end//Tamaño de fuente
 
  else //Fondo de Pamtalla
 begin
@@ -937,53 +937,53 @@ end//Tamaño de fuente
 //-----------------------------------------------------------
 
 else if ((pixely >= 10'd339) && (pixely<=10'd348))begin
-char_addr = 7'h0a; //direccion de lo que se va a imprimir
-color_addr=4'd1;// Color de lo que se va a imprimir
-font_size=2'd1;
-memInt=1'd1;
-dp=1'd1; end//Tamaño de fuente
+char_addr <= 7'h0a; //direccion de lo que se va a imprimir
+color_addr<=4'd1;// Color de lo que se va a imprimir
+font_size<=2'd1;
+memInt<=1'd1;
+dp<=1'd1; end//Tamaño de fuente
 
 
 
 else if ((pixely >= 10'd349) && (pixely<=10'd351))begin
-char_addr = 7'h0a; //direccion de lo que se va a imprimir
-color_addr=4'd0;// Color de lo que se va a imprimir
-font_size=2'd1;
-memInt=1'd1;
-dp=1'd1; end//Tamaño de fuente
+char_addr <= 7'h0a; //direccion de lo que se va a imprimir
+color_addr<=4'd0;// Color de lo que se va a imprimir
+font_size<=2'd1;
+memInt<=1'd1;
+dp<=1'd1; end//Tamaño de fuente
 
 
 
 else if ((pixely >= 10'd352) && (pixely<=10'd353))begin
-char_addr = 7'h0a; //direccion de lo que se va a imprimir
-color_addr=4'd1;// Color de lo que se va a imprimir
-font_size=2'd1;
-memInt=1;
-dp=1'd1; end//Tamaño de fuente
+char_addr <= 7'h0a; //direccion de lo que se va a imprimir
+color_addr<=4'd1;// Color de lo que se va a imprimir
+font_size<=2'd1;
+memInt<=1;
+dp<=1'd1; end//Tamaño de fuente
 
 
 else if ((pixely >= 10'd354) && (pixely<=10'd472))begin
-char_addr = 7'h0a; //direccion de lo que se va a imprimir
-color_addr=4'd0;// Color de lo que se va a imprimir
-font_size=2'd1;
-memInt=1;
-dp=1'd1; end//Tamaño de fuente
+char_addr <= 7'h0a; //direccion de lo que se va a imprimir
+color_addr<=4'd0;// Color de lo que se va a imprimir
+font_size<=2'd1;
+memInt<=1;
+dp<=1'd1; end//Tamaño de fuente
 
 
 
 else if ((pixely >= 10'd473) && (pixely<= 10'd480))begin
-char_addr = 7'h0a; //direccion de lo que se va a imprimir
-color_addr=4'd2;// Color de lo que se va a imprimir
-font_size=2'd1;
-memInt=1;
-dp=1'd1; end//Tamaño de fuente
+char_addr <= 7'h0a; //direccion de lo que se va a imprimir
+color_addr<=4'd2;// Color de lo que se va a imprimir
+font_size<=2'd1;
+memInt<=1;
+dp<=1'd1; end//Tamaño de fuente
 
 
 else begin
-char_addr = 7'h0a; //direccion de lo que se va a imprimir
-color_addr=4'd0;// Color de lo que se va a imprimir
-font_size=2'd1;
-dp=1'd1; end//Tamaño de fuente
+char_addr <= 7'h0a; //direccion de lo que se va a imprimir
+color_addr<=4'd0;// Color de lo que se va a imprimir
+font_size<=2'd1;
+dp<=1'd1; end//Tamaño de fuente
 
 
 end
@@ -994,7 +994,7 @@ end
 
 
 
-assign rom_addr ={char_addr, row_addr}; //concatena direcciones de registros y filas
+assign rom_addr = {char_addr, row_addr}; //concatena direcciones de registros y filas
 
 
 endmodule
