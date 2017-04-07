@@ -4,10 +4,10 @@
 module tb_Interfaz();
      reg clk,reset;
      wire hsync,vsync;
-     reg inicioSecuencia,temporizador;
-     reg temporizadorFin;//Indica cuando finaliza el temporizador
+     reg inicioSecuencia;
+    // reg temporizadorFin;//Indica cuando finaliza el temporizador
      reg [7:0] datoRTC;//Dato proveniente del RTC
-     reg [2:0] cursor;//Indica la posicion en la que se encuentra el cursor
+    // reg [2:0] cursor;//Indica la posicion en la que se encuentra el cursor
      wire [11:0] rgb;
      wire font_bit;
 
@@ -19,78 +19,72 @@ module tb_Interfaz();
            .clk(clk),.reset(reset),.inicioSecuencia(inicioSecuencia),
 
            .datoRTC(datoRTC),.rgbO(rgb),.hsync(hsync),
-           .vsync(vsync),.font_bit(font_bit),.video_on(video_on)
+           .vsync(vsync),.video_on(video_on)
 
            );
 
 //155 u carga 8 datos
- initial begin
- clk=0;
-
- file= $fopen ( "Pantalla.txt", "w");   // Abre el archivo donde vamos a escribir
- reset=0;
- //temporizador=0;
- pixelx_tb=10'd0;
-  pixely_tb=10'd0;
- temporizadorFin=0;
- //cursor=0;
-
-
- //#16000000; // Duración de una impresión de pantalla
-#200; //Tiempo extra
-
-/*
-//Carga de datos en 0
-inicioSecuencia=0;
-datoRTC=8'd0;
-#16000000; // Duración de una impresión de pantalla
-#200; //Tiempo extra
-
-
-//Lectura de datos en 0
-inicioSecuencia=0;
-datoRTC=8'd2;// se cambia para comprobar que no varien los datos guardados aunque lleguen otros datos
- //Llegada de los datos
-*/
-
-#15360025 //Espera  el tick
-datoRTC=8'd00;
-
-inicioSecuencia=8'd1;
-#10;
-//Cambio de datos
-
-datoRTC=8'd24;//Segundos
- #10;//Duración del primer dato
-
-
- datoRTC=8'd4;//Minutos
- #10;
-
- datoRTC=8'd3;//Horas
- #10;
-
- datoRTC=8'd23;//Fecha
- #10;
-
- datoRTC=8'd12;//Mes
- #10;
-
- datoRTC=8'd17;//Año
- #10;
-
- datoRTC=8'd5;//Dia
- #10;
-
- datoRTC=8'd4;//Semana
- #10;
-#30;//retardo inicio secuencia
+initial begin
+  clk=0;
+ 
+  file= $fopen ( "Pantalla.txt", "w");   // Abre el archivo donde vamos a escribir
+  reset=0;
+  //temporizador=0;
+  pixelx_tb=10'd0;
+   pixely_tb=10'd0;
+  //temporizadorFin=0;
+  //cursor=0;
+ 
+ 
+  //#16000000; // Duración de una impresión de pantalla
+ #200; //Tiempo extra
+ 
+ /*
+ //Carga de datos en 0
  inicioSecuencia=0;
-$finish;
- reset=1;
- #10
- reset=0;
- #10
+ datoRTC=8'd0;
+ #16000000; // Duración de una impresión de pantalla
+ #200; //Tiempo extra
+ //Lectura de datos en 0
+ inicioSecuencia=0;
+ datoRTC=8'd2;// se cambia para comprobar que no varien los datos guardados aunque lleguen otros datos
+  //Llegada de los datos
+ */
+ 
+ #15360025 //Espera  el tick
+ datoRTC=8'd00;
+ 
+ inicioSecuencia=8'd1;
+ #10;
+ //Cambio de datos
+ 
+ datoRTC=8'd24;//Segundos
+  #10;//Duración del primer dato
+ 
+ 
+  datoRTC=8'd4;//Minutos
+  #10;
+ 
+  datoRTC=8'd3;//Horas
+  #10;
+ 
+  datoRTC=8'd23;//Fecha
+  #10;
+ 
+  datoRTC=8'd12;//Mes
+  #10;
+ 
+  datoRTC=8'd17;//Año
+  #10;
+ 
+  datoRTC=8'd5;//Dia
+  #10;
+ 
+  datoRTC=8'd4;//Semana
+  #10;
+ #30;//retardo inicio secuencia
+  inicioSecuencia=0;
+
 
 
  if (!file) begin

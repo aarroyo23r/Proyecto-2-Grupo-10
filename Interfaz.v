@@ -23,19 +23,10 @@
 module Interfaz( //Definicion entradas y salidas
     input wire clk,reset,
     input wire inicioSecuencia,//Indica si se esta iniciando una secuencia de la transmision de datos
-    //input wire temporizador, // Indica si el temporizador esta activo
-    //input wire temporizadorFin,//Indica cuando finaliza el temporizador
     input wire [7:0] datoRTC,//Dato proveniente del RTC
-   // input wire [2:0] cursor,//Indica la posicion en la que se encuentra el cursor
-
     output wire  [11:0] rgbO,
-    output hsync,vsync,
-    output reg font_bit,
+    output wire hsync,vsync,
     output wire video_on
-
-    //output reg  [6:0] SegundosU, minutosU, horasU, fechaU,mesU,anoU,diaSemanaU, numeroSemanaU,
-    //output  reg [6:0] SegundosDSig,minutosDSig,horasDSig,fechaDSig,mesDSig,anoDSig,diaSemanaDSig,numeroSemanaDSig
-    //output wire [9:0] pixely
     );
 
 //_____________________________________________________________________
@@ -60,35 +51,27 @@ SincronizadorVGA SincronizadorVGA_unit(
 reg tick=0;//Tick para guardar datos mientras se refresca la pantalla, para que al volver a imprimir los datos esten listos para ser leidos
 
 //Modulo para pasar los Datos del RTC a codigo Ascii
-reg [3:0]  tamContador=4'hf;//Tamaño del contador de datos guardados
-reg [3:0] contGuardados=0;//Cuenta los datos guardados
-reg finalizoContar=0;//Indica cuando el contador finalizo su cuenta
+reg [3:0]  tamContador=4'hc;//Tamaño del contador de datos guardados
+reg [3:0] contGuardados=4'd0;//Cuenta los datos guardados
+reg finalizoContar=1'b0;//Indica cuando el contador finalizo su cuenta
 
-reg [6:0] dirAsciiDatoU;//Contiene la direccion Ascii de las unidades del dato proveniente del RTC
-reg [6:0] dirAsciiDatoD;//Contiene la direccion Ascii de las decenas del dato proveniente del RTC
-reg [6:0] dirAsciiDatoSigU=7'hcf;//Registro para almacenar la siguiente direccion Ascii de las unidades del dato proveniente del RTC
-reg [6:0] dirAsciiDatoSigD=7'hcf;//Registro para almacenar la siguiente direccion Ascii de las decenas del dato proveniente del RTC
+reg [6:0] dirAsciiDatoSigU=7'h57;//Registro para almacenar la siguiente direccion Ascii de las unidades del dato proveniente del RTC
+reg [6:0] dirAsciiDatoSigD=7'h57;//Registro para almacenar la siguiente direccion Ascii de las decenas del dato proveniente del RTC
 reg w, r;//Habilitan el modo escritura o lectura de los registros respectivamente
 
 //Registros con las direcciones de memoria
 //Direcciones de los datos de RTC
 //Reloj
 reg [6:0] SegundosU, minutosU,horasU, fechaU,mesU,anoU,diaSemanaU, numeroSemanaU;
-reg [6:0] SegundosUSig,minutosUSig,horasUSig,fechaUSig,mesUSig,anoUSig,diaSemanaUSig,numeroSemanaUSig;
 reg [6:0] SegundosD,minutosD,horasD,fechaD,mesD,anoD,diaSemanaD,numeroSemanaD;
-reg [6:0] SegundosDSig,minutosDSig,horasDSig,fechaDSig,mesDSig,anoDSig,diaSemanaDSig,numeroSemanaDSig;
 //Temporizador
 reg [6:0] SegundosUT,minutosUT,horasUT;//Inicio de registros en 0
-reg [6:0] SegundosUTSig,minutosUTSig,horasUTSig;
 reg [6:0] SegundosDT,minutosDT,horasDT;//Inicio de registros en 0
-reg [6:0] SegundosDTSig,minutosDTSig,horasDTSig;
 //Direcciones Datos extra
 
 
 //Selector de Registros
 wire [10:0] rom_addr;//Almacena la direccion de memoria completa
-//reg [3:0] row_addr;//Cambio entre las filas de la memoria, bits menos significativos de pixel y,bit menos significativos de memoria
-//wire [6:0] char_addr; //  bits mas significativos de dirreción de memoria, del caracter a imprimir
 wire [7:0] font_word; // datos de memoria
 wire [2:0] color_addr; //Tres bits porque por ahora se van a manejar 15 colores
 
@@ -96,15 +79,12 @@ wire [2:0] color_addr; //Tres bits porque por ahora se van a manejar 15 colores
 
 //Tamaño de fuentes
 wire [1:0] font_size;// Tamaño de fuente
-wire [2:0]  bit_addr;
-/*
-reg [2:0] f8;//Tamaño de la fuente de 8 bits en el eje x
-reg [3:0] f16;//Tamaño de la fuente de 16 bits en el eje x
-reg [4:0] f32;//Tamaño de la fuente de 32 bits en el eje x
-*/
+//wire [2:0]  bit_addr;
+reg [2:0] f8,f16,f32;
+
 
 //Mux recorrido columnas Memoria
-//wire font_bit;//Bit que determina si un pixel de la pantalla esta activo o no
+reg  font_bit ;//Bit que determina si un pixel de la pantalla esta activo o no
 wire dp;
 
 
@@ -134,21 +114,22 @@ tick=0;
 end//Probado
 
 
-//Modulo para pasar los Datos del RTC a codigo Ascii
-always @(posedge clk)
-if (reset==1'h0)
-begin
-dirAsciiDatoU<=7'd0;
-dirAsciiDatoD<=7'd0;
-end
-else
-begin
-dirAsciiDatoU<=dirAsciiDatoSigU;
-dirAsciiDatoD<=dirAsciiDatoSigD;
+//Asignacion del codigo ascii para los datos
+
+//Unidades
+always @(posedge clk, posedge reset)// Cada vez que se refresca la pantalla se guarda una secuencia de datos
+
+if (reset) begin
+r=1;//Señal modo lectura
+w= 0;
+dirAsciiDatoSigU <= 7'h4f;
+contGuardados=4'd0;
+finalizoContar=1'd0;
 end
 
 
-always @(posedge clk)// Cada vez que se refresca la pantalla se guarda una secuencia de datos
+
+else begin
 
 if ((contGuardados!=tamContador) & tick==1 & inicioSecuencia==1 )
 begin
@@ -217,10 +198,44 @@ case(datoRTC)//Le asigna el valor Ascii del dato proveniente del RTC Unidades
          8'd58: dirAsciiDatoSigU = 7'h38;
          8'd59: dirAsciiDatoSigU = 7'h39;
          8'd60: dirAsciiDatoSigU = 7'h30;
-         default begin
-         dirAsciiDatoSigU = 7'h00;
-         end
+         default : dirAsciiDatoSigU = 7'h00;
+
   endcase
+
+contGuardados=contGuardados+1;
+end
+else
+begin
+r=1;//Señal modo lectura
+w= 0;
+dirAsciiDatoSigU<=dirAsciiDatoSigU;
+if (contGuardados==tamContador)//Para que finalizoContar se active unicamente  cuando esto es cierto
+begin
+finalizoContar=1;
+contGuardados=0;
+end
+
+else
+begin
+finalizoContar=0;
+end
+end
+end
+
+//Decenas
+
+always @(posedge clk, posedge reset)// Cada vez que se refresca la pantalla se guarda una secuencia de datos
+
+if (reset) begin
+dirAsciiDatoSigD <= 7'h4f;
+end
+
+
+
+else begin
+
+if ((contGuardados!=tamContador) & tick==1 & inicioSecuencia==1 )
+begin
 
  case(datoRTC)//Le asigna el valor Ascii del dato proveniente del RTC Decenas
 
@@ -285,190 +300,127 @@ case(datoRTC)//Le asigna el valor Ascii del dato proveniente del RTC Unidades
          8'd58: dirAsciiDatoSigD = 7'h35;
          8'd59: dirAsciiDatoSigD = 7'h35;
          8'd60: dirAsciiDatoSigD = 7'h36;
-         default begin
-         dirAsciiDatoSigU = 7'h00;
-         end
+         default : dirAsciiDatoSigD = 7'h00;
   endcase
-
-contGuardados=contGuardados+1;
 end
+
 else
 begin
-r=1;//Señal modo lectura
-w= 0;
-if (contGuardados==tamContador)//Para que finalizoContar se active unicamente  cuando esto es cierto
-begin
-finalizoContar=1;
-contGuardados=0;
+dirAsciiDatoSigD<=dirAsciiDatoSigD;
 end
-else
-begin
-finalizoContar=0;
 end
-
-
-end
-
-//**********Ver reinicio de finalizoContar y contGuardados********
-
-
-//Registros con las direcciones de memoria
-//Logica Registros
-
-
-
-//Logica para los registros que se estan escribiendo
-
-
-/*
-always @(posedge clk)
-case(contGuardados)//Case para Unidades //-1 porque el contador en su logica suma 1 apenas guarda la direccion
-//Asigna las direcciones Ascii de los datos provenientes del RTC a los registros en los que se deben guardar
-//Reloj
-        4'd1: SegundosUSig = dirAsciiDatoU;
-        4'd2: minutosUSig = dirAsciiDatoU;
-        4'd3: horasUSig = dirAsciiDatoU;
-        4'd4: fechaUSig = dirAsciiDatoU;
-        4'd5: mesUSig = dirAsciiDatoU;
-        4'd6: anoUSig = dirAsciiDatoU;
-        4'd7: diaSemanaUSig = dirAsciiDatoU;
-        4'd8: numeroSemanaUSig = dirAsciiDatoU;
-//Temporizador
-        4'd9: SegundosUTSig = dirAsciiDatoU;
-        4'd10: minutosUTSig = dirAsciiDatoU;
-        4'd11: horasUTSig = dirAsciiDatoU;
- endcase
-//---------------------------------------------------------
-always @(posedge clk)
- case(contGuardados)//Case para Decenas
- //Asigna las direcciones Ascii de los datos provenientes del RTC a los registros en los que se deben guardar
- //Reloj
-         4'd1: SegundosDSig = dirAsciiDatoD;
-         4'd2: minutosDSig = dirAsciiDatoD;
-         4'd3: horasDSig = dirAsciiDatoD;
-         4'd4: fechaDSig = dirAsciiDatoD;
-         4'd5: mesDSig = dirAsciiDatoD;
-         4'd6 : anoDSig = dirAsciiDatoD;
-         4'd7: diaSemanaDSig = dirAsciiDatoD;
-         4'd8: numeroSemanaDSig = dirAsciiDatoD;
- //Temporizador
-         4'd9: SegundosDTSig = dirAsciiDatoD;
-         4'd10: minutosDTSig = dirAsciiDatoD;
-         4'd11: horasDTSig = dirAsciiDatoD;
-
-  endcase
-*/
 
 
 //Guarda los datos decodificados en registros intermedios
-always @(posedge clk)
+always @(posedge clk, posedge reset)
 //reloj
-if (contGuardados==4'd4)begin //Se empieza en el contador 4 porque antes de esto es un retardo que se utiliza para generar la direccion que se va a guardar en estos registros
-SegundosUSig <= dirAsciiDatoU;
-SegundosDSig <= dirAsciiDatoD;end
+if (reset)begin
+SegundosU <= 7'd0;
+SegundosD<= 7'd0;
+minutosU <= 7'd0;
+minutosD <= 7'd0;
+horasU <= 7'd0;
+horasD <= 7'd0;
+fechaU <= 7'd0;
+fechaD <= 7'd0;
+mesU <= 7'd0;
+mesD <= 7'd0;
+anoU <= 7'd0;
+anoD <= 7'd0;
+diaSemanaU <= 7'd0;
+diaSemanaD <= 7'd0;
+numeroSemanaU <= 7'd0;
+numeroSemanaD <= 7'd0;
+SegundosUT <= 7'd0;
+SegundosDT <= 7'd0;
+minutosUT <= 7'd0;
+minutosDT <= 7'd0;
+horasUT <= 7'd0;
+horasDT <= 7'd0;
+
+end
+
+else begin
+
+if (w==1 & r==0)begin
+if (contGuardados==4'd2)begin //Se empieza en el contador 4 porque antes de esto es un retardo que se utiliza para generar la direccion que se va a guardar en estos registros
+SegundosU <= dirAsciiDatoSigU;
+SegundosD <= dirAsciiDatoSigD;end
+
+else if (contGuardados==4'd3)begin
+minutosU <= dirAsciiDatoSigU;
+minutosD <= dirAsciiDatoSigD;end
+
+else if (contGuardados==4'd4)begin
+horasU <= dirAsciiDatoSigU;
+horasD <= dirAsciiDatoSigD;end
 
 else if (contGuardados==4'd5)begin
-minutosUSig <= dirAsciiDatoU;
-minutosDSig <= dirAsciiDatoD;end
+fechaU <= dirAsciiDatoSigU;
+fechaD <= dirAsciiDatoSigD;end
 
 else if (contGuardados==4'd6)begin
-horasUSig <= dirAsciiDatoU;
-horasDSig <= dirAsciiDatoD;end
+mesU <= dirAsciiDatoSigU;
+mesD <= dirAsciiDatoSigD;end
 
 else if (contGuardados==4'd7)begin
-fechaUSig <= dirAsciiDatoU;
-fechaDSig <= dirAsciiDatoD;end
+anoU <= dirAsciiDatoSigU;
+anoD <= dirAsciiDatoSigD;end
 
 else if (contGuardados==4'd8)begin
-mesUSig <= dirAsciiDatoU;
-mesDSig <= dirAsciiDatoD;end
+diaSemanaU <= dirAsciiDatoSigU;
+diaSemanaD <= dirAsciiDatoSigD;end
 
 else if (contGuardados==4'd9)begin
-anoUSig <= dirAsciiDatoU;
-anoDSig <= dirAsciiDatoD;end
-
-else if (contGuardados==4'd10)begin
-diaSemanaUSig <= dirAsciiDatoU;
-diaSemanaDSig <= dirAsciiDatoD;end
-
-else if (contGuardados==4'd11)begin
-numeroSemanaUSig <= dirAsciiDatoU;
-numeroSemanaDSig <= dirAsciiDatoD;end
+numeroSemanaU <= dirAsciiDatoSigU;
+numeroSemanaD <= dirAsciiDatoSigD;end
 
 //Temporizador
+else if (contGuardados==4'd10)begin
+SegundosUT <= dirAsciiDatoSigU;
+SegundosDT <= dirAsciiDatoSigD;end
+
+else if (contGuardados==4'd11)begin
+minutosUT <= dirAsciiDatoSigU;
+minutosDT <= dirAsciiDatoSigD;end
+
 else if (contGuardados==4'd12)begin
-SegundosUTSig <= dirAsciiDatoU;
-SegundosDTSig <= dirAsciiDatoD;end
+horasUT <= dirAsciiDatoSigU;
+horasDT <= dirAsciiDatoSigD;end
 
-else if (contGuardados==4'd13)begin
-minutosUTSig <= dirAsciiDatoU;
-minutosDTSig <= dirAsciiDatoD;end
+end
 
-else if (contGuardados==4'd14)begin
-horasUTSig <= dirAsciiDatoU;
-horasDTSig <= dirAsciiDatoD;end
+else begin
+SegundosU <= SegundosU;
+SegundosD <= SegundosD;
+minutosU <= minutosU;
+minutosD <= minutosD;
+horasU <= horasU;
+horasD <= horasD;
+fechaU <= fechaU;
+fechaD <= fechaD;
+mesU <= mesU;
+mesD <= mesD;
+anoU <= anoU;
+anoD <= anoD;
+diaSemanaU <= diaSemanaU;
+diaSemanaD <= diaSemanaD;
+numeroSemanaU <= numeroSemanaU;
+numeroSemanaD <= numeroSemanaD;
+SegundosUT <= SegundosUT;
+SegundosDT <= SegundosDT;
+minutosUT <= minutosUT;
+minutosDT <= minutosDT;
+horasUT <= horasUT;
+horasDT <= horasDT;
+end
 
-
-
+end
 
 
 
 //Registros Datos principales
 
-always @(posedge clk)//Cuando el modo escritura esta activo escribe datos en los registros y si no los mantiene para ser leidos
-//Reloj
-if (w==1 & r==0)
-begin
- SegundosU<=SegundosUSig;
-SegundosD<=SegundosDSig;
-minutosU<=minutosUSig;
-minutosD<=minutosDSig;
-horasU<=horasUSig;
-horasD<=horasDSig;
-fechaU<=fechaUSig;
-fechaD<=fechaDSig;
-mesU<=mesUSig;
-mesD<=mesDSig;
-anoU<=anoUSig;
-anoD<=anoDSig;
-diaSemanaU<=diaSemanaUSig;
-diaSemanaD<=diaSemanaDSig;
-numeroSemanaU<=numeroSemanaUSig;
-numeroSemanaD<=numeroSemanaDSig;
-//Temporizador
-SegundosUT<=SegundosUTSig;
-SegundosDT<=SegundosDTSig;
-minutosUT<=minutosUTSig;
-minutosDT<=minutosDTSig;
-horasUT<=horasUTSig;
-horasDT<=horasDTSig;
-end
-else //Evitar warning latch
-begin
- SegundosU<=SegundosU;
-SegundosD<=SegundosD;
-minutosU<=minutosU;
-minutosD<=minutosD;
-horasU<=horasU;
-horasD<=horasD;
-fechaU<=fechaU;
-fechaD<=fechaD;
-mesU<=mesU;
-mesD<=mesD;
-anoU<=anoU;
-anoD<=anoD;
-diaSemanaU<=diaSemanaU;
-diaSemanaD<=diaSemanaD;
-numeroSemanaU<=numeroSemanaU;
-numeroSemanaD<=numeroSemanaD;
-//Temporizador
-SegundosUT<=SegundosUT;
-SegundosDT<=SegundosDT;
-minutosUT<=minutosUT;
-minutosDT<=minutosDT;
-horasUT<=horasUT;
-horasDT<=horasDT;
-end
 
 //____________________________________________________________________________________________________
 //____________________________________________________________________________________________________
@@ -499,48 +451,38 @@ Font_rom Font_memory_unit
      );
 
 
-//Tamaño de fuentes y Mux recorrido de columnas Memoria
-//bit_addr
-
-reg [2:0] f8,f16,f32;
 
 
+     //Mux columnas
+     always @(posedge clk)
+
+     if (dp==1'd1)begin
+     if (memInt==1'd1)begin
+     font_bit=1'd1;
+     end
+
+     else begin
+      //font_bit =font_word [~(bit_addr)]; //Recorre las columnas de los datos extraidos de la memoria
+
+      f8=pixelx[2:0];
+      f16=pixelx[3:1];
+      f32=pixelx[4:2];
+
+      if (font_size==2'd0)begin
+      font_bit =font_word [~f16];end
+
+      else if (font_size==2'd1)begin
+      font_bit =font_word [~f8];end
+
+      else if (font_size==2'd2)begin
+      font_bit =font_word [~f32];end
+
+      else begin
+      font_bit =font_word [~f8];end
 
 
-
-
-//assign bit_addr= pixelx[2:0];//Para poder ver la direccion de recorrido del Mux columnas
-
-//Mux columnas
-always @(posedge clk)
-
-if (dp==1'd1)begin
-if (memInt)begin
-font_bit=1;
-end
-
-else begin
- //font_bit =font_word [~(bit_addr)]; //Recorre las columnas de los datos extraidos de la memoria
-
- f8=pixelx[2:0];
- f16=pixelx[3:1];
- f32=pixelx[4:2];
-
- if (font_size==2'd0)begin
- font_bit =font_word [~f16];end
-
- else if (font_size==2'd1)begin
- font_bit =font_word [~f8];end
-
- else if (font_size==2'd2)begin
- font_bit =font_word [~f32];end
-
- else begin
- font_bit =font_word [~f8];end
-
-
- end
-end
+      end
+     end
 
 
 
@@ -553,14 +495,15 @@ case (color_addr) // combinación de colores seleccionados de acuerdo al switch,
 //         r      g    b
 //color = 0000  0000  0000
 
-4'd0: color = 12'h032;//Verde
-4'd1: color = 12'h000;//Negro
-4'd2: color = 12'hFFE;//Blanco
-4'd3: color = 12'h111;
-4'd4: color = 12'h222;
-4'd5: color = 12'h333;
-4'd6: color = 12'h032;
-4'd7: color = 12'h120;
+3'd0: color = 12'h032;//Verde
+3'd1:  color = 12'h000;//Negro
+3'd2: color = 12'hFFE;//Blanco
+3'd3: color = 12'h111;
+3'd4: color = 12'h222;
+3'd5: color = 12'h333;
+3'd6: color = 12'h032;
+3'd7: color = 12'h120;
+default: color = 12'h111;
 
 endcase
 
@@ -568,9 +511,9 @@ endcase
 
 //Salida VGA
 
-always @(posedge clk) //operación se realiza con cada pulso de reloj
-    if (font_bit==1'd1 & video_on==1'd1 & dp==1'd1)  //se encienden los LEDs solo si el bit se encuentra en 1 en memoria
-        rgb=color;
+always @* //operación se realiza con cada pulso de reloj
+    if (font_bit==1'd1 && video_on==1'd1 && dp==1'd1)  //se encienden los LEDs solo si el bit se encuentra en 1 en memoria
+        rgb<=color;
  else
     rgb <= 12'h111;
 
