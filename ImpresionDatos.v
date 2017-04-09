@@ -35,13 +35,13 @@ assign font_sizeo=font_size;
 
 //Segundos
 //Limites en el eje x
-localparam IsegundosD=10'd342;
-localparam DsegundosD=10'd349;
-localparam IsegundosU=10'd350;
-localparam DsegundosU=10'd357;
+localparam IsegundosD=10'd343;
+localparam DsegundosD=10'd351;
+localparam IsegundosU=10'd352;
+localparam DsegundosU=10'd359;
 //Limites en el eje y
-localparam ARsegundos=10'd240; //Solo 2 porque siempre van a estar a la par
-localparam ABsegundos=10'd255;
+localparam ARsegundos=10'd242; //Solo 2 porque siempre van a estar a la par
+localparam ABsegundos=10'd257;
 
 
 
@@ -73,7 +73,7 @@ localparam IfechaU=10'd599;
 localparam DfechaU=10'd606;
 //Limites en el eje y
 localparam ARfecha=10'd434; //Solo 2 porque siempre van a estar a la par
-localparam ABfecha=10'd449;
+localparam ABfecha=10'd446;
 
 //Mes
 //Limites en el eje x
@@ -83,7 +83,7 @@ localparam ImesU=10'd615;
 localparam DmesU=10'd622;
 //Limites en el eje y
 localparam ARmes=10'd450; //Solo 2 porque siempre van a estar a la par
-localparam ABmes=10'd465;
+localparam ABmes=10'd461;
 
 
 //Año
@@ -94,7 +94,7 @@ localparam IanoU=10'd607;
 localparam DanoU=10'd614;
 //Limites en el eje y
 localparam ARano=10'd418; //Solo 2 porque siempre van a estar a la par
-localparam ABano=10'd432;
+localparam ABano=10'd428;
 
 
 //Dia de la semana
@@ -105,7 +105,7 @@ localparam IdiaU=10'd583;
 localparam DdiaU=10'd590;
 //Limites en el eje y
 localparam ARdia=10'd450; //Solo 2 porque siempre van a estar a la par
-localparam ABdia=10'd465;
+localparam ABdia=10'd461;
 
 
 
@@ -117,7 +117,7 @@ localparam IsemanaU=10'd351;
 localparam DsemanaU=10'd358;
 //Limites en el eje y
 localparam ARsemana=10'd16; //Solo 2 porque siempre van a estar a la par
-localparam ABsemana=10'd31;
+localparam ABsemana=10'd29;
 
 
 

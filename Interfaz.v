@@ -21,12 +21,14 @@
 
 
 module Interfaz( //Definicion entradas y salidas
-    input wire clk,reset,
+    input wire clk,reset,resetSync,
     input wire inicioSecuencia,//Indica si se esta iniciando una secuencia de la transmision de datos
     input wire [7:0] datoRTC,//Dato proveniente del RTC
     output wire  [11:0] rgbO,
     output wire hsync,vsync,
-    output wire video_on
+    output wire video_on,
+    output wire [9:0] pixelx, pixely
+    //output reg [3:0] contGuardados
     );
 
 //_____________________________________________________________________
@@ -34,10 +36,10 @@ module Interfaz( //Definicion entradas y salidas
 //_____________________________________________________________________
 
 //SincronizadorVGA
-wire [9:0] pixelx, pixely;
+//wire [9:0] pixelx, pixely;
 
 SincronizadorVGA SincronizadorVGA_unit(
-          .clk(clk),.reset(reset),
+          .clk(clk),.reset(resetSync),
           .hsync(hsync),.vsync(vsync),.video_on(video_on),
           .pixelx(pixelx),.pixely(pixely)
           );
@@ -267,14 +269,13 @@ dirAsciiDatoD <= 7'h00;
 
 contGuardados<=4'd0;
 finalizoContar<=1'd0;
-finalizoContar<=1'b0;
 end
 
 
 
 else begin
 
-if ((contGuardados!=4'hc) && tick==1 && inicioSecuencia==1 )
+if (tick==1'd1 && inicioSecuencia==1'd1 )
 begin
 r<= 0;
 w<= 1; //Señal modo escritura
@@ -341,48 +342,48 @@ end
 else begin
 
 if (w==1 & r==0)begin
-if (contGuardados==4'd2)begin //Se empieza en el contador 4 porque antes de esto es un retardo que se utiliza para generar la direccion que se va a guardar en estos registros
+if (contGuardados==4'd4)begin //Se empieza en el contador 4 porque antes de esto es un retardo que se utiliza para generar la direccion que se va a guardar en estos registros
 SegundosU <= dirAsciiDatoSigU;
 SegundosD <= dirAsciiDatoSigD;end
 
-else if (contGuardados==4'd3)begin
+else if (contGuardados==4'd5)begin
 minutosU <= dirAsciiDatoSigU;
 minutosD <= dirAsciiDatoSigD;end
 
-else if (contGuardados==4'd4)begin
+else if (contGuardados==4'd6)begin
 horasU <= dirAsciiDatoSigU;
 horasD <= dirAsciiDatoSigD;end
 
-else if (contGuardados==4'd5)begin
+else if (contGuardados==4'd7)begin
 fechaU <= dirAsciiDatoSigU;
 fechaD <= dirAsciiDatoSigD;end
 
-else if (contGuardados==4'd6)begin
+else if (contGuardados==4'd8)begin
 mesU <= dirAsciiDatoSigU;
 mesD <= dirAsciiDatoSigD;end
 
-else if (contGuardados==4'd7)begin
+else if (contGuardados==4'd9)begin
 anoU <= dirAsciiDatoSigU;
 anoD <= dirAsciiDatoSigD;end
 
-else if (contGuardados==4'd8)begin
+else if (contGuardados==4'd10)begin
 diaSemanaU <= dirAsciiDatoSigU;
 diaSemanaD <= dirAsciiDatoSigD;end
 
-else if (contGuardados==4'd9)begin
+else if (contGuardados==4'd11)begin  
 numeroSemanaU <= dirAsciiDatoSigU;
 numeroSemanaD <= dirAsciiDatoSigD;end
 
 //Temporizador
-else if (contGuardados==4'd10)begin
+else if (contGuardados==4'd12)begin
 SegundosUT <= dirAsciiDatoSigU;
 SegundosDT <= dirAsciiDatoSigD;end
 
-else if (contGuardados==4'd11)begin
+else if (contGuardados==4'd13)begin
 minutosUT <= dirAsciiDatoSigU;
 minutosDT <= dirAsciiDatoSigD;end
 
-else if (contGuardados==4'd12)begin
+else if (contGuardados==4'd14)begin
 horasUT <= dirAsciiDatoSigU;
 horasDT <= dirAsciiDatoSigD;end
 

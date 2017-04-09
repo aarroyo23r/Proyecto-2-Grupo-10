@@ -2,7 +2,7 @@
 
 
 module tb_Interfaz();
-     reg clk,reset;
+     reg clk,reset,resetSync;
      wire hsync,vsync;
      reg inicioSecuencia;
     // reg temporizadorFin;//Indica cuando finaliza el temporizador
@@ -10,29 +10,23 @@ module tb_Interfaz();
     // reg [2:0] cursor;//Indica la posicion en la que se encuentra el cursor
      wire [11:0] rgb;
      wire font_bit;
-
+     wire [9:0] pixelx, pixely;
      reg [9:0] pixelx_tb,pixely_tb;
+     wire video_on;
      integer i,j;
      integer file;
 
  Interfaz uut(
-           .clk(clk),.reset(reset),.inicioSecuencia(inicioSecuencia),
+           .clk(clk),.reset(reset),.resetSync(resetSync),.inicioSecuencia(inicioSecuencia),
 
            .datoRTC(datoRTC),.rgbO(rgb),.hsync(hsync),
-           .vsync(vsync),.video_on(video_on)
+           .vsync(vsync),.video_on(video_on),.pixelx(pixelx),.pixely(pixely)
 
            );
 
 //155 u carga 8 datos
 initial begin
   clk=0;
-
-  reset=0;
-  #10;
-  reset=1;
-  #10;
-  reset=0;
-  #10;
 
   file= $fopen ( "Pantalla.txt", "w");   // Abre el archivo donde vamos a escribir
 
@@ -44,25 +38,35 @@ initial begin
 
 
   //#16000000; // Duración de una impresión de pantalla
- #200; //Tiempo extra
+ //#200; //Tiempo extra
 
  /*
  //Carga de datos en 0
  inicioSecuencia=0;
  datoRTC=8'd0;
  #16000000; // Duración de una impresión de pantalla
- #200; //Tiempo extra
+ #300; //Tiempo extra
  //Lectura de datos en 0
  inicioSecuencia=0;
  datoRTC=8'd2;// se cambia para comprobar que no varien los datos guardados aunque lleguen otros datos
   //Llegada de los datos
  */
+//#200; //Tiempo extra
+resetSync=0;
+reset=0;
+#10;
+resetSync=1;
+reset=1;
+#10;
+resetSync=0;
+reset=0;
 
- #15360025 //Espera  el tick
+
+ #15360025; //Espera  el tick
  datoRTC=8'd00;
 
  inicioSecuencia=8'd1;
- #10;
+ #100;
  //Cambio de datos
 
  datoRTC=8'd24;//Segundos
@@ -92,7 +96,9 @@ initial begin
  #30;//retardo inicio secuencia
   inicioSecuencia=0;
 
-
+resetSync=1;
+#10;
+resetSync=0;
 
  if (!file) begin
                                $display("Error: File,Pantalla.txt could not be opened.\nExiting Simulation.");
