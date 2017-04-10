@@ -2195,6 +2195,8 @@ module Font_rom(  //declaración de parametros
             11'h7fd: data = 8'b00000000; //
             11'h7fe: data = 8'b00000000; //
             11'h7ff: data = 8'b00000000; //
+
+            default :data = 8'b00000000
      endcase
 
 endmodule

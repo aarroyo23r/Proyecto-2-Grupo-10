@@ -93,8 +93,15 @@ reg  font_bit ;//Bit que determina si un pixel de la pantalla esta activo o no
 wire dp;
 
 
+//Mux Seleccion memoria graficos o font rom
+reg datoGraficos;
+
+reg datoMemorias;
+wire graficos;
+
 //Color
 reg [11:0] color;
+reg [11:0] colorMux;
 //Cursor ***************
 
 
@@ -370,7 +377,7 @@ else if (contGuardados==4'd10)begin
 diaSemanaU <= dirAsciiDatoSigU;
 diaSemanaD <= dirAsciiDatoSigD;end
 
-else if (contGuardados==4'd11)begin  
+else if (contGuardados==4'd11)begin
 numeroSemanaU <= dirAsciiDatoSigU;
 numeroSemanaD <= dirAsciiDatoSigD;end
 
@@ -437,17 +444,49 @@ ImpresionDatos ImpresionDatos_unit
     ,.minutosD(minutosD),.horasU(horasU),.horasD(horasD),.dpo(dp)
     ,.fechaU(fechaU),.mesU(mesU),.anoU(anoU),.diaSemanaU(diaSemanaU),
      .numeroSemanaU(numeroSemanaU),.fechaD(fechaD),.mesD(mesD),.anoD(anoD),.diaSemanaD(diaSemanaD),
-     .numeroSemanaD(numeroSemanaD),.memInto(memInt)
+     .numeroSemanaD(numeroSemanaD),.memInto(memInt),.graficosO(graficos)
     );
+
+
+
+
+
 
 
 //Memoria Ascii
 Font_rom Font_memory_unit
      (
-          .dir(rom_addr),
+          .dir(Font_rom),
           .clk(clk),
           .data(font_word)
      );
+
+
+
+MemoriaGraficos MemoriaGraficos_unit
+     (
+          .dir(Font_rom),
+          .clk(clk),
+          .data(datoGraficos)
+     );
+
+
+
+
+//Mux Seleccion memoria graficos o font rom
+
+     always @*
+
+     if (graficos)begin
+     datoMemorias=datoGraficos;
+     end
+
+     else begin
+     datoMemorias=font_word;
+     end
+
+
+
 
 
 
@@ -455,7 +494,7 @@ Font_rom Font_memory_unit
      //Mux columnas
      always @(posedge clk)
 
-     if (dp==1'd1)begin
+     if (dp==1'd1 | graficos 1'd1 )begin //******Se agrego que si graficos esta activo font_bit siempre esta activo
      if (memInt==1'd1)begin
      font_bit<=1'd1;
      end
@@ -507,12 +546,24 @@ default: color = 12'h111;
 endcase
 
 
+//Mux Salida color
+
+always @*
+
+if (graficos)begin
+colorMux=datoMemorias;
+end
+
+else begin
+colorMux=color;
+end
+
 
 //Salida VGA
 
 always @* //operación se realiza con cada pulso de reloj
     if (font_bit==1'd1 && video_on==1'd1 && dp==1'd1)  //se encienden los LEDs solo si el bit se encuentra en 1 en memoria
-        rgb=color;
+        rgb=colorMux;
  else
     rgb = 12'h111;
 

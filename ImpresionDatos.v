@@ -13,6 +13,7 @@ module ImpresionDatos
     output wire [2:0] color_addro, //Tres bits porque por ahora se van a manejar 15 colores
     output wire dpo,//Dice si va a haber un dato en pantalla
     output wire memInto//Quitar
+    output wire graficosO;
  );
 
 
@@ -25,11 +26,21 @@ reg memInt;
 reg [2:0] color_addr;
 reg [1:0] font_size;
 
+//Variables para usar la memoria de Graficos
+reg graficos=0;
+reg [5:0] contadorx;
+reg [11:0] contadory;
+reg [11:0] contadorycambio=0;
+
 
 assign dpo=dp;
 assign memInto=memInt;
 assign color_addro=color_addr;
 assign font_sizeo=font_size;
+
+
+assign contadorx=pixelx[5:0];//Los contadores son mayores que el tamaño del numero por lo que hay que tomarlo en
+assign contadory=pixely[6:0];//Cuenta a la hora de imprimir
 
 
 
@@ -990,11 +1001,131 @@ end
 
 
 
+//Modulo decodificador para poder usar las memorias de fuente y graficos
+/*
+always (posedge clk)
+
+if (graficos)begin//Solo se activa cuando se va a usar la memoria de graficos
+
+//Logica reinicio de los contadores lectura memoria
+
+  if (contadorx==6'h3a )begin//Imprime una fila
+      contadorx<=6'h0;
+
+      if (contadory==12'h65 |  contadory==12'hca | contadory==12'h12f | contadory==12'h194 | contadory==12'h1f8 | contadory==12'h25d | contadory==12'h2c2 | contadory==12'h327 | contadory==12'h38c |contadory==12'h3f2 )begin //Impresion de toda una letra
+          contadory<=6'h0;
+      end
+
+      else begin
+          contadory<=contadory;
+      end
+
+  end
+
+  else begin
+      contadorx<=contadorx;
+  end
+
+end
+
+//Logica aumento contadores lectura memoria y asignacion de direccion de grafico
+
+else begin
+
+  if (char_addr== 7'h30) begin
+    contadory<=7'd0;
+  end
 
 
 
 
-assign rom_addr = {char_addr, row_addr}; //concatena direcciones de registros y filas
 
+
+contadorx<=contadorx+1
+
+  end
+
+
+
+
+end
+
+
+*/
+
+always (posedge clk)
+
+if (graficos)begin//Solo se activa cuando se va a usar la memoria de graficos
+
+//Logica reinicio de los contadores lectura memoria
+
+  if (char_addr== 7'h30) begin
+    contadorycambio<=contadorycambio;
+  end
+
+  else if (char_addr== 7'h31) begin
+    contadorycambio<=contadorycambio+7'd101;
+  end
+
+  else if (char_addr== 7'h32) begin
+    contadorycambio<=contadorycambio+7'd203;
+  end
+
+  else if (char_addr== 7'h33) begin
+    contadorycambio<=contadorycambio+7'd304;
+  end
+
+  else if (char_addr== 7'h34) begin
+    contadorycambio<=contadorycambio+7'd405;
+  end
+
+  else if (char_addr== 7'h35) begin
+    contadorycambio<=contadorycambio+7'd505;
+  end
+
+  else if (char_addr== 7'h36) begin
+    contadorycambio<=contadorycambio+7'd606;
+  end
+
+  else if (char_addr== 7'h37) begin
+    contadorycambio<=contadorycambio+7'd707;
+  end
+
+  else if (char_addr== 7'h38) begin
+    contadorycambio<=contadorycambio+7'd808;
+  end
+
+  else if (char_addr== 7'h39) begin
+    contadorycambio<=contadorycambio+7'd910;
+  end
+
+  else begin
+    contadorycambio<=contadorycambio; //Evitar warning latch
+  end
+
+end
+
+else begin
+
+contadorycambio<=contadorycambio;//Evitar warning latch
+end
+
+//Logica direccion de memoria
+
+always @*
+
+if (graficos)begin
+rom_addr = {contadorx, contadorycambio}; //Direccion Memoria graficos
+end
+
+else begin
+//Direccion Font Rom
+rom_addr = {char_addr, row_addr}; //concatena direcciones de registros y filas
+end
+
+
+
+
+assign graficosO=graficos;
 
 endmodule
