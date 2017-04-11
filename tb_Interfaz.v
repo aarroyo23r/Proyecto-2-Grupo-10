@@ -73,10 +73,10 @@ reset=0;
   #10;//Duración del primer dato
 
 
-  datoRTC=8'd4;//Minutos
+  datoRTC=8'd0;//Minutos
   #10;
 
-  datoRTC=8'd3;//Horas
+  datoRTC=8'd0;//Horas
   #10;
 
   datoRTC=8'd23;//Fecha

@@ -1,5 +1,7 @@
 `timescale 1ns / 1ps
 
+
+
 module ImpresionDatos
     (
     input wire clk,
@@ -9,11 +11,12 @@ module ImpresionDatos
     input wire [9:0] pixelx, //posición pixel x actual
     input wire [9:0] pixely,//posición pixel y actual
     output wire [10:0] rom_addr,//Direccion en la memoria del dato
+    output wire [17:0] rom_addrGraficos,
     output wire [1:0] font_sizeo,// Tamaño de fuente
     output wire [2:0] color_addro, //Tres bits porque por ahora se van a manejar 15 colores
     output wire dpo,//Dice si va a haber un dato en pantalla
-    output wire memInto//Quitar
-    output wire graficosO;
+    output wire memInto,//Quitar
+    output wire graficosO
  );
 
 
@@ -25,12 +28,14 @@ reg dp=1'd0;
 reg memInt;
 reg [2:0] color_addr;
 reg [1:0] font_size;
+//wire [10:0] rom_addr;
+//wire [15:0] rom_addrGraficosO,
 
 //Variables para usar la memoria de Graficos
 reg graficos=0;
-reg [5:0] contadorx;
-reg [11:0] contadory;
-reg [11:0] contadorycambio=0;
+wire [5:0] contadorx;
+wire [6:0] contadory;
+reg [6:0] contadorycambio=10'h0;
 
 
 assign dpo=dp;
@@ -39,8 +44,10 @@ assign color_addro=color_addr;
 assign font_sizeo=font_size;
 
 
-assign contadorx=pixelx[5:0];//Los contadores son mayores que el tamaño del numero por lo que hay que tomarlo en
-assign contadory=pixely[6:0];//Cuenta a la hora de imprimir
+assign contadorx=(pixelx[5:0] + 6'd5) ;//Los contadores son mayores que el tamaño del numero por lo que hay que tomarlo en
+assign contadory= (pixely[6:0] - 7'd197);//Cuenta a la hora de imprimir
+
+reg [4:0] zero=5'h0;
 
 
 
@@ -68,13 +75,13 @@ localparam ABminutos=10'd255;
 
 //horas
 //Limites en el eje x
-localparam IhorasD=10'd295;
-localparam DhorasD=10'd302;
-localparam IhorasU=10'd303;
-localparam DhorasU=10'd310;
+localparam IhorasD=10'd55;
+localparam DhorasD=10'd124;//Tiene que ser mas grande para dejar el espacion en medio
+localparam IhorasU=10'd125;
+localparam DhorasU=10'd182;
 //Limites en el eje y
-localparam ARhoras=10'd240; //Solo 2 porque siempre van a estar a la par
-localparam ABhoras=10'd255;
+localparam ARhoras=10'd197; //Solo 2 porque siempre van a estar a la par
+localparam ABhoras=10'd297;
 
 //Fecha
 //Limites en el eje x
@@ -178,12 +185,14 @@ always @(posedge clk)//Se ejecuta cuando hay un cambio en pixel x o pixel y
         color_addr<=4'd2;// Color de lo que se va a imprimir
         font_size<=2'd1;//Tamaño de fuente
         memInt<=1'd0;
+        graficos<=1'd0;
         dp<=1'd1; end
 
     else if ((pixelx >= IsegundosU) && (pixelx<=DsegundosU) && (pixely >= ARsegundos) && (pixely<=ABsegundos))begin
         char_addr <= SegundosU; //direccion de lo que se va a imprimir
         color_addr<=4'd2;// Color de lo que se va a imprimir
         font_size<=1;
+        graficos<=1'd0;
         memInt<=1'd0;
         dp<=1'd1;end//Tamaño de fuente
 
@@ -192,6 +201,7 @@ always @(posedge clk)//Se ejecuta cuando hay un cambio en pixel x o pixel y
       char_addr <= minutosD; //direccion de lo que se va a imprimir
       color_addr<=4'd2;// Color de lo que se va a imprimir
       font_size<=2'd1;
+      graficos<=1'd0;
       memInt<=1'd0;
       dp<=1'd1;end//Tamaño de fuente
 
@@ -199,6 +209,7 @@ always @(posedge clk)//Se ejecuta cuando hay un cambio en pixel x o pixel y
       char_addr <= minutosU; //direccion de lo que se va a imprimir
       color_addr<=4'd2;// Color de lo que se va a imprimir
       font_size<=2'd1;
+      graficos<=1'd0;
       memInt<=1'd0;
       dp<=1'd1;end//Tamaño de fuente
 
@@ -207,7 +218,8 @@ always @(posedge clk)//Se ejecuta cuando hay un cambio en pixel x o pixel y
     char_addr <= horasD; //direccion de lo que se va a imprimir
     color_addr<=4'd2;// Color de lo que se va a imprimir
     font_size<=2'd1;
-    memInt<=1'd0;
+    memInt<=1'd1;
+    graficos<=1'd1;
     dp<=1'd1; end//Tamaño de fuente
 
 
@@ -215,8 +227,9 @@ always @(posedge clk)//Se ejecuta cuando hay un cambio en pixel x o pixel y
     else if ((pixelx >= IhorasU) && (pixelx<=DhorasU) && (pixely >= ARhoras) && (pixely<=ABhoras))begin
         char_addr <= horasU;//direccion de lo que se va a imprimir
         color_addr<=4'd2;// Color de lo que se va a imprimir
-        font_size<=2'd1;
-        memInt<=1'd0;
+        font_size<=2'd0;
+        memInt<=1'd1;
+        graficos<=1'd1;
         dp<=1'd1;end//Tamaño de fuente
 
 
@@ -246,6 +259,7 @@ always @(posedge clk)//Se ejecuta cuando hay un cambio en pixel x o pixel y
             char_addr <= 7'h53;//direccion de lo que se va a imprimir
             color_addr<=4'd2;// Color de lo que se va a imprimir
             font_size<=2'd1;
+            graficos<=1'd0;
             memInt<=1'd0;
             dp<=1'd1;end//Tamaño de fuente
 
@@ -255,6 +269,7 @@ always @(posedge clk)//Se ejecuta cuando hay un cambio en pixel x o pixel y
                 char_addr <= 7'h45;//direccion de lo que se va a imprimir
                 color_addr<=4'd2;// Color de lo que se va a imprimir
                 font_size<=2'd1;
+                graficos<=1'd0;
                 memInt<=1'd0;
                 dp<=1'd1;end
 
@@ -263,6 +278,7 @@ always @(posedge clk)//Se ejecuta cuando hay un cambio en pixel x o pixel y
                 char_addr <= 7'h4d;//direccion de lo que se va a imprimir
                 color_addr<=4'd2;// Color de lo que se va a imprimir
                 font_size<=2'd1;
+                graficos<=1'd0;
                 memInt<=1'd0;
                 dp<=1'd1;end
 
@@ -271,6 +287,7 @@ always @(posedge clk)//Se ejecuta cuando hay un cambio en pixel x o pixel y
                 char_addr <= 7'h41;//direccion de lo que se va a imprimir
                 color_addr<=4'd2;// Color de lo que se va a imprimir
                 font_size<=2'd1;
+                graficos<=1'd0;
                 memInt<=1'd0;
                 dp<=1'd1;end
 
@@ -280,6 +297,7 @@ always @(posedge clk)//Se ejecuta cuando hay un cambio en pixel x o pixel y
                 char_addr <= 7'h4e;//direccion de lo que se va a imprimir
                 color_addr<=4'd2;// Color de lo que se va a imprimir
                 font_size<=2'd1;
+                graficos<=1'd0;
                 memInt<=1'd0;
                 dp<=1'd1;end
 
@@ -289,6 +307,7 @@ always @(posedge clk)//Se ejecuta cuando hay un cambio en pixel x o pixel y
                 char_addr <= 7'h41;//direccion de lo que se va a imprimir
                 color_addr<=4'd2;// Color de lo que se va a imprimir
                 font_size<=2'd1;
+                graficos<=1'd0;
                 memInt<=1'd0;
                 dp<=1'd1;end
 
@@ -297,6 +316,7 @@ else if ((pixelx >= IsemanaU) && (pixelx<=DsemanaU) && (pixely >= ARsemana) && (
     char_addr <= numeroSemanaU;//direccion de lo que se va a imprimir
     color_addr<=4'd2;// Color de lo que se va a imprimir
     font_size<=2'd1;
+    graficos<=1'd0;
     memInt<=1'd0;
     dp<=1'd1;end//Tamaño de fuente
 
@@ -304,6 +324,7 @@ else if ((pixelx >= IsemanaU) && (pixelx<=DsemanaU) && (pixely >= ARsemana) && (
         char_addr <= numeroSemanaD;//direccion de lo que se va a imprimir
         color_addr<=4'd2;// Color de lo que se va a imprimir
         font_size<=2'd1;
+        graficos<=1'd0;
         memInt<=1'd0;
         dp<=1'd1;end//Tamaño de fuente
 
@@ -313,6 +334,7 @@ else if ((pixelx >= IsemanaU) && (pixelx<=DsemanaU) && (pixely >= ARsemana) && (
             char_addr <= diaSemanaD;//direccion de lo que se va a imprimir
             color_addr<=4'd2;// Color de lo que se va a imprimir
             font_size<=2'd1;
+            graficos<=1'd0;
             memInt<=1'd0;
             dp<=1'd1;end//Tamaño de fuente
 
@@ -320,6 +342,7 @@ else if ((pixelx >= IsemanaU) && (pixelx<=DsemanaU) && (pixely >= ARsemana) && (
                 char_addr <= diaSemanaU;//direccion de lo que se va a imprimir
                 color_addr<=4'd2;// Color de lo que se va a imprimir
                 font_size<=2'd1;
+                graficos<=1'd0;
                 memInt<=1'd0;
                 dp<=1'd1;end//Tamaño de fuente
 
@@ -329,6 +352,7 @@ else if ((pixelx >= IsemanaU) && (pixelx<=DsemanaU) && (pixely >= ARsemana) && (
                             char_addr <= fechaD;//direccion de lo que se va a imprimir
                             color_addr<=4'd2;// Color de lo que se va a imprimir
                             font_size<=2'd1;
+                            graficos<=1'd0;
                             memInt<=1'd0;
                             dp<=1'd1;end//Tamaño de fuente
 
@@ -336,6 +360,7 @@ else if ((pixelx >= IsemanaU) && (pixelx<=DsemanaU) && (pixely >= ARsemana) && (
                                 char_addr <= fechaU;//direccion de lo que se va a imprimir
                                 color_addr<=4'd2;// Color de lo que se va a imprimir
                                 font_size<=2'd1;
+                                graficos<=1'd0;
                                 memInt<=1'd0;
                                 dp<=1'd1;end//Tamaño de fuente
 
@@ -348,7 +373,8 @@ else if ((pixelx >= IsemanaU) && (pixelx<=DsemanaU) && (pixely >= ARsemana) && (
   else if ((pixelx >= 10'd591) && (pixelx<=10'd598) && (pixely >= ARano) && (pixely<=ABano))begin
   char_addr <= 7'h30;//direccion de lo que se va a imprimir
   color_addr<=4'd2;// Color de lo que se va a imprimir
-    font_size<=2'd2;
+    font_size<=2'd1;
+    graficos<=1'd0;
     memInt<=1'd0;
     dp<=1'd1;end//Tamaño de fuente
 
@@ -356,6 +382,7 @@ else if ((pixelx >= 10'd583) && (pixelx<=10'd590) && (pixely >= ARano) && (pixel
   char_addr <= 7'h32;//direccion de lo que se va a imprimir
   color_addr<=4'd2;// Color de lo que se va a imprimir
   font_size<=2'd1;
+  graficos<=1'd0;
   memInt<=1'd0;
   dp<=1'd1;end//Tamaño de fuente
 
@@ -365,6 +392,7 @@ else if ((pixelx >= 10'd583) && (pixelx<=10'd590) && (pixely >= ARano) && (pixel
                 char_addr <= anoD;//direccion de lo que se va a imprimir
                 color_addr<=4'd2;// Color de lo que se va a imprimir
                   font_size<=2'd1;
+                  graficos<=1'd0;
                   memInt<=1'd0;
                   dp=1'd1;end//Tamaño de fuente
 
@@ -372,6 +400,7 @@ else if ((pixelx >= 10'd583) && (pixelx<=10'd590) && (pixely >= ARano) && (pixel
                 char_addr <= anoU;//direccion de lo que se va a imprimir
                 color_addr<=4'd2;// Color de lo que se va a imprimir
                 font_size<=2'd1;
+                graficos<=1'd0;
                 memInt<=1'd0;
                 dp<=1'd1;end//Tamaño de fuente
 
@@ -381,6 +410,7 @@ else if ((pixelx >= 10'd583) && (pixelx<=10'd590) && (pixely >= ARano) && (pixel
                             char_addr <=mesD;//direccion de lo que se va a imprimir
                             color_addr<=4'd2;// Color de lo que se va a imprimir
                               font_size<=2'd1;
+                              graficos<=1'd0;
                               memInt<=1'd0;
                               dp<=1'd1;end//Tamaño de fuente
 
@@ -388,6 +418,7 @@ else if ((pixelx >= 10'd583) && (pixelx<=10'd590) && (pixely >= ARano) && (pixel
                             char_addr <= mesU;//direccion de lo que se va a imprimir
                             color_addr<=4'd2;// Color de lo que se va a imprimir
                             font_size<=2'd1;
+                            graficos<=1'd0;
                             memInt<=1'd0;
                             dp<=1'd1;end//Tamaño de fuente
 
@@ -398,6 +429,7 @@ if ((pixely >= 10'd0) && (pixely<=10'd140))begin
 char_addr = 7'h0a; //direccion de lo que se va a imprimir
 color_addr=4'd0;// Color de lo que se va a imprimir
 font_size=2'd1;
+graficos<=1'd0;
 memInt=1'd1;
 dp=1'd1; end//Tamaño de fuente
 
@@ -407,6 +439,7 @@ else if ((pixely >= 10'd141) && (pixely<=10'd151))begin
 char_addr = 7'h0a; //direccion de lo que se va a imprimir
 color_addr=4'd1;// Color de lo que se va a imprimir
 font_size=2'd1;
+graficos<=1'd0;
 memInt=1'd1;
 dp=1'd1; end//Tamaño de fuente
 
@@ -417,7 +450,7 @@ else if ((pixely >= 10'd152) && (pixely<=10'd338))begin
 
 //Curva superior
 if ((pixelx <=32) && (pixely == 152)) begin
-dp=1'd1;color_addr=3'd1;memInt=1'd1;end
+dp=1'd1;color_addr=3'd1;graficos<=1'd0;memInt=1'd1;end
 else if ((pixelx <=33) && (pixely == 152)) begin
 dp=1'd1;color_addr=3'd3;memInt=1'd1;end
 else if ((pixelx <=34) && (pixely == 152)) begin
@@ -659,65 +692,65 @@ dp=1'd1;color_addr=3'd4;memInt=1'd1;end
 
 //Parte constante
 else if ((pixelx <=28) && (pixely >= 159) && (pixely <= 244))begin
-dp=1'd1;color_addr=3'd1;memInt=1'd1;end
+dp=1'd1;color_addr=3'd1;graficos<=1'd0;memInt=1'd1;end
 else if ((pixelx <=29) && (pixely >= 159)  && (pixely <= 244)) begin
-dp=1'd1;color_addr=3'd5;memInt=1'd1;end
+dp=1'd1;color_addr=3'd5;graficos<=1'd0;memInt=1'd1;end
 else if ((pixelx <=212) && (pixely >= 159)  && (pixely <= 244)) begin
-dp=1'd1;color_addr=3'd3;memInt=1'd1;end
+dp=1'd1;color_addr=3'd3;graficos<=1'd0;memInt=1'd1;end
 else if ((pixelx <=213) && (pixely >= 159)  && (pixely <= 244)) begin
-dp=1'd1;color_addr=3'd5;memInt=1'd1;end
+dp=1'd1;color_addr=3'd5;graficos<=1'd0;memInt=1'd1;end
 else if ((pixelx <=228) && (pixely >= 159)  && (pixely <= 244)) begin
-dp=1'd1;color_addr=3'd1;memInt=1'd1;end
+dp=1'd1;color_addr=3'd1;graficos<=1'd0;memInt=1'd1;end
 else if ((pixelx <=229) && (pixely >= 159)  && (pixely <= 244)) begin
-dp=1'd1;color_addr=3'd5;memInt=1'd1;end
+dp=1'd1;color_addr=3'd5;graficos<=1'd0;memInt=1'd1;end
 else if ((pixelx <=412) && (pixely >= 159 ) && (pixely <= 244)) begin
-dp=1'd1;color_addr=3'd3;memInt=1'd1;end
+dp=1'd1;color_addr=3'd3;graficos<=1'd0;memInt=1'd1;end
 else if ((pixelx <=413) && (pixely >= 159)  && (pixely <= 244)) begin
-dp=1'd1;color_addr=3'd5;memInt=1'd1;end
+dp=1'd1;color_addr=3'd5;graficos<=1'd0;memInt=1'd1;end
 else if ((pixelx <=428) && (pixely >= 159)  && (pixely <= 244)) begin
-dp=1'd1;color_addr=3'd1;memInt=1'd1;end
+dp=1'd1;color_addr=3'd1;graficos<=1'd0;memInt=1'd1;end
 else if ((pixelx <=429) && (pixely >= 159)  && (pixely <= 244)) begin
-dp=1'd1;color_addr=3'd5;memInt=1'd1;end
+dp=1'd1;color_addr=3'd5;graficos<=1'd0;memInt=1'd1;end
 else if ((pixelx <=612) && (pixely >= 159)  && (pixely <= 244)) begin
-dp=1'd1;color_addr=3'd3;memInt=1'd1;end
+dp=1'd1;color_addr=3'd3;graficos<=1'd0;memInt=1'd1;end
 else if ((pixelx <=613) && (pixely >= 159)  && (pixely <= 244)) begin
-dp=1'd1;color_addr=3'd5;memInt=1'd1;end
+dp=1'd1;color_addr=3'd5;graficos<=1'd0;memInt=1'd1;end
 else if ((pixelx <=800) && (pixely >= 159)  && (pixely <= 244)) begin
-dp=1'd1;color_addr=3'd1;memInt=1'd1;end
+dp=1'd1;color_addr=3'd1;graficos<=1'd0;memInt=1'd1;end
 
 //Raya Negra
 else if (pixely >= 244  && (pixely <= 247)) begin
-dp=1'd1;color_addr=3'd1;memInt=1'd1;end
+dp=1'd1;color_addr=3'd1;graficos<=1'd0;memInt=1'd1;end
 
 
 //Segunda parte constante
 
 else if  ((pixelx <=28) && (pixely >= 248) && (pixely <= 333))begin
-dp=1'd1;color_addr=3'd1;memInt=1'd1;end
+dp=1'd1;color_addr=3'd1;graficos<=1'd0;memInt=1'd1;end
 else if ( (pixelx <=29) && (pixely >= 248) && (pixely <= 333)) begin
-dp=1'd1;color_addr=3'd5;memInt=1'd1;end
+dp=1'd1;color_addr=3'd5;graficos<=1'd0;memInt=1'd1;end
 else if ( (pixelx <=212) && (pixely >= 248) && (pixely <= 333)) begin
-dp=1'd1;color_addr=3'd3;memInt=1'd1;end
+dp=1'd1;color_addr=3'd3;graficos<=1'd0;memInt=1'd1;end
 else if ( (pixelx <=213) && (pixely >= 248) && (pixely <= 333)) begin
-dp=1'd1;color_addr=3'd5;memInt=1'd1;end
+dp=1'd1;color_addr=3'd5;graficos<=1'd0;memInt=1'd1;end
 else if ( (pixelx <=228) && (pixely >= 248) && (pixely <= 333)) begin
-dp=1'd1;color_addr=3'd1;memInt=1'd1;end
+dp=1'd1;color_addr=3'd1;graficos<=1'd0;memInt=1'd1;end
 else if ( (pixelx <=229) && (pixely >= 248) && (pixely <= 333)) begin
-dp=1'd1;color_addr=3'd5;memInt=1'd1;end
+dp=1'd1;color_addr=3'd5;graficos<=1'd0;memInt=1'd1;end
 else if ( (pixelx <=412) && (pixely >= 248) && (pixely <= 333)) begin
-dp=1'd1;color_addr=3'd3;memInt=1'd1;end
+dp=1'd1;color_addr=3'd3;graficos<=1'd0;memInt=1'd1;end
 else if ( (pixelx <=413) && (pixely >= 248) && (pixely <= 333)) begin
-dp=1'd1;color_addr=3'd5;memInt=1'd1;end
+dp=1'd1;color_addr=3'd5;graficos<=1'd0;memInt=1'd1;end
 else if ( (pixelx <=428) && (pixely >= 248) && (pixely <= 333)) begin
-dp=1'd1;color_addr=3'd1;memInt=1'd1;end
+dp=1'd1;color_addr=3'd1;graficos<=1'd0;memInt=1'd1;end
 else if ( (pixelx <=429) && (pixely >= 248) && (pixely <= 333)) begin
-dp=1'd1;color_addr=3'd5;memInt=1'd1;end
+dp=1'd1;color_addr=3'd5;graficos<=1'd0;memInt=1'd1;end
 else if ( (pixelx <612) && (pixely >= 248) && (pixely <= 333)) begin
-dp=1'd1;color_addr=3'd3;memInt=1'd1;end
+dp=1'd1;color_addr=3'd3;graficos<=1'd0;memInt=1'd1;end
 else if ( (pixelx <=613) && (pixely >= 248) && (pixely <= 333)) begin
-dp=1'd1;color_addr=3'd5;memInt=1'd1;end
+dp=1'd1;color_addr=3'd5;graficos<=1'd0;memInt=1'd1;end
 else if ( (pixelx <=800) && (pixely >= 248) && (pixely <= 333)) begin
-dp=1'd1;color_addr=3'd1;memInt=1'd1;end
+dp=1'd1;color_addr=3'd1;graficos<=1'd0;memInt=1'd1;end
 
 
 //Curva inferior
@@ -951,6 +984,7 @@ else if ((pixely >= 10'd339) && (pixely<=10'd348))begin
 char_addr <= 7'h0a; //direccion de lo que se va a imprimir
 color_addr<=4'd1;// Color de lo que se va a imprimir
 font_size<=2'd1;
+graficos<=1'd0;
 memInt<=1'd1;
 dp<=1'd1; end//Tamaño de fuente
 
@@ -960,6 +994,7 @@ else if ((pixely >= 10'd349) && (pixely<=10'd351))begin
 char_addr <= 7'h0a; //direccion de lo que se va a imprimir
 color_addr<=4'd0;// Color de lo que se va a imprimir
 font_size<=2'd1;
+graficos<=1'd0;
 memInt<=1'd1;
 dp<=1'd1; end//Tamaño de fuente
 
@@ -969,6 +1004,7 @@ else if ((pixely >= 10'd352) && (pixely<=10'd353))begin
 char_addr <= 7'h0a; //direccion de lo que se va a imprimir
 color_addr<=4'd1;// Color de lo que se va a imprimir
 font_size<=2'd1;
+graficos<=1'd0;
 memInt<=1;
 dp<=1'd1; end//Tamaño de fuente
 
@@ -977,6 +1013,7 @@ else if ((pixely >= 10'd354) && (pixely<=10'd472))begin
 char_addr <= 7'h0a; //direccion de lo que se va a imprimir
 color_addr<=4'd0;// Color de lo que se va a imprimir
 font_size<=2'd1;
+graficos<=1'd0;
 memInt<=1;
 dp<=1'd1; end//Tamaño de fuente
 
@@ -986,6 +1023,7 @@ else if ((pixely >= 10'd473) && (pixely<= 10'd480))begin
 char_addr <= 7'h0a; //direccion de lo que se va a imprimir
 color_addr<=4'd2;// Color de lo que se va a imprimir
 font_size<=2'd1;
+graficos<=1'd0;
 memInt<=1;
 dp<=1'd1; end//Tamaño de fuente
 
@@ -994,6 +1032,7 @@ else begin
 char_addr <= 7'h0a; //direccion de lo que se va a imprimir
 color_addr<=4'd0;// Color de lo que se va a imprimir
 font_size<=2'd1;
+graficos<=1'd0;
 dp<=1'd1; end//Tamaño de fuente
 
 
@@ -1053,79 +1092,75 @@ end
 
 */
 
-always (posedge clk)
+always @(posedge clk)
 
 if (graficos)begin//Solo se activa cuando se va a usar la memoria de graficos
 
 //Logica reinicio de los contadores lectura memoria
 
   if (char_addr== 7'h30) begin
-    contadorycambio<=contadorycambio;
+    contadorycambio<=contadory;
   end
 
   else if (char_addr== 7'h31) begin
-    contadorycambio<=contadorycambio+7'd101;
+    contadorycambio<=contadory+7'd101;
   end
 
   else if (char_addr== 7'h32) begin
-    contadorycambio<=contadorycambio+7'd203;
+    contadorycambio<=contadory+7'd203;
   end
 
   else if (char_addr== 7'h33) begin
-    contadorycambio<=contadorycambio+7'd304;
+    contadorycambio<=contadory+7'd304;
   end
 
   else if (char_addr== 7'h34) begin
-    contadorycambio<=contadorycambio+7'd405;
+    contadorycambio<=contadory+7'd405;
   end
 
   else if (char_addr== 7'h35) begin
-    contadorycambio<=contadorycambio+7'd505;
+    contadorycambio<=contadory+7'd505;
   end
 
   else if (char_addr== 7'h36) begin
-    contadorycambio<=contadorycambio+7'd606;
+    contadorycambio<=contadory+7'd606;
   end
 
   else if (char_addr== 7'h37) begin
-    contadorycambio<=contadorycambio+7'd707;
+    contadorycambio<=contadory+7'd707;
   end
 
   else if (char_addr== 7'h38) begin
-    contadorycambio<=contadorycambio+7'd808;
+    contadorycambio<=contadory+7'd808;
   end
 
   else if (char_addr== 7'h39) begin
-    contadorycambio<=contadorycambio+7'd910;
+    contadorycambio<=contadory+7'd910;
   end
 
   else begin
-    contadorycambio<=contadorycambio; //Evitar warning latch
+    contadorycambio<=contadory; //Evitar warning latch
   end
 
 end
 
 else begin
 
-contadorycambio<=contadorycambio;//Evitar warning latch
+contadorycambio<=contadory;//Evitar warning latch
 end
+
 
 //Logica direccion de memoria
 
-always @*
 
-if (graficos)begin
-rom_addr = {contadorx, contadorycambio}; //Direccion Memoria graficos
-end
-
-else begin
-//Direccion Font Rom
-rom_addr = {char_addr, row_addr}; //concatena direcciones de registros y filas
-end
+assign rom_addrGraficos = {contadorx, zero, contadorycambio}; //Direccion Memoria graficos
+assign rom_addr = {char_addr, row_addr}; //concatena direcciones de registros y filas
 
 
 
 
 assign graficosO=graficos;
+//assign rom_addrO=rom_addr;
+
 
 endmodule

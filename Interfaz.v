@@ -76,7 +76,8 @@ reg [6:0] SegundosDT,minutosDT,horasDT;//Inicio de registros en 0
 
 
 //Selector de Registros
-wire [10:0] rom_addr;//Almacena la direccion de memoria completa
+wire [10:0] rom_addrAscii;//Almacena la direccion de memoria completa
+wire [17:0] rom_addrGraficos;
 wire [7:0] font_word; // datos de memoria
 wire [2:0] color_addr; //Tres bits porque por ahora se van a manejar 15 colores
 
@@ -94,7 +95,7 @@ wire dp;
 
 
 //Mux Seleccion memoria graficos o font rom
-reg datoGraficos;
+wire [11:0] datoGraficos;
 
 reg datoMemorias;
 wire graficos;
@@ -438,17 +439,14 @@ end
 
 ImpresionDatos ImpresionDatos_unit
     (
-    .clk(clk),.pixelx(pixelx),.pixely(pixely),.rom_addr(rom_addr),
+    .clk(clk),.pixelx(pixelx),.pixely(pixely),.rom_addr(rom_addrAscii),
     .font_sizeo(font_size),.color_addro(color_addr),
     .SegundosU(SegundosU),.SegundosD(SegundosD),.minutosU(minutosU)
     ,.minutosD(minutosD),.horasU(horasU),.horasD(horasD),.dpo(dp)
     ,.fechaU(fechaU),.mesU(mesU),.anoU(anoU),.diaSemanaU(diaSemanaU),
      .numeroSemanaU(numeroSemanaU),.fechaD(fechaD),.mesD(mesD),.anoD(anoD),.diaSemanaD(diaSemanaD),
-     .numeroSemanaD(numeroSemanaD),.memInto(memInt),.graficosO(graficos)
+     .numeroSemanaD(numeroSemanaD),.memInto(memInt),.graficosO(graficos),.rom_addrGraficos(rom_addrGraficos)
     );
-
-
-
 
 
 
@@ -456,23 +454,24 @@ ImpresionDatos ImpresionDatos_unit
 //Memoria Ascii
 Font_rom Font_memory_unit
      (
-          .dir(Font_rom),
+          .dir(rom_addrAscii),
           .clk(clk),
           .data(font_word)
      );
 
 
 
-MemoriaGraficos MemoriaGraficos_unit
+
+MemoriaGrafica MemoriaGrafica_unit
      (
-          .dir(Font_rom),
+          .dir(rom_addrGraficos),
           .clk(clk),
-          .data(datoGraficos)
+          .dato(datoGraficos)
      );
 
 
 
-
+/*
 //Mux Seleccion memoria graficos o font rom
 
      always @*
@@ -484,7 +483,7 @@ MemoriaGraficos MemoriaGraficos_unit
      else begin
      datoMemorias=font_word;
      end
-
+*/
 
 
 
@@ -494,7 +493,7 @@ MemoriaGraficos MemoriaGraficos_unit
      //Mux columnas
      always @(posedge clk)
 
-     if (dp==1'd1 | graficos 1'd1 )begin //******Se agrego que si graficos esta activo font_bit siempre esta activo
+     if (dp==1'd1 | graficos == 1'd1 )begin //******Se agrego que si graficos esta activo font_bit siempre esta activo
      if (memInt==1'd1)begin
      font_bit<=1'd1;
      end
@@ -551,7 +550,7 @@ endcase
 always @*
 
 if (graficos)begin
-colorMux=datoMemorias;
+colorMux=datoGraficos;
 end
 
 else begin
