@@ -22,12 +22,12 @@
 
 module Interfaz( //Definicion entradas y salidas
     input wire clk,reset,resetSync,
-    input wire inicioSecuencia,//Indica si se esta iniciando una secuencia de la transmision de datos
+    input wire inicioSecuencia,ring,//Indica si se esta iniciando una secuencia de la transmision de datos
     input wire [7:0] datoRTC,//Dato proveniente del RTC
     output wire  [11:0] rgbO,
     output wire hsync,vsync,
-    output wire video_on,
-    output wire [9:0] pixelx, pixely
+    output wire video_on
+    //output wire [9:0] pixelx, pixely
     //output reg [3:0] contGuardados
     );
 
@@ -36,7 +36,7 @@ module Interfaz( //Definicion entradas y salidas
 //_____________________________________________________________________
 
 //SincronizadorVGA
-//wire [9:0] pixelx, pixely;
+wire [9:0] pixelx, pixely;
 
 SincronizadorVGA SincronizadorVGA_unit(
           .clk(clk),.reset(resetSync),
@@ -103,6 +103,11 @@ wire graficos;
 //Color
 reg [11:0] color;
 reg [11:0] colorMux;
+
+reg zero=0;// Para concatenar 0s
+
+reg alternarColor=0;
+reg [11:0] colorAlarma;
 //Cursor ***************
 
 
@@ -445,7 +450,9 @@ ImpresionDatos ImpresionDatos_unit
     ,.minutosD(minutosD),.horasU(horasU),.horasD(horasD),.dpo(dp)
     ,.fechaU(fechaU),.mesU(mesU),.anoU(anoU),.diaSemanaU(diaSemanaU),
      .numeroSemanaU(numeroSemanaU),.fechaD(fechaD),.mesD(mesD),.anoD(anoD),.diaSemanaD(diaSemanaD),
-     .numeroSemanaD(numeroSemanaD),.memInto(memInt),.graficosO(graficos),.rom_addrGraficos(rom_addrGraficos)
+     .numeroSemanaD(numeroSemanaD),.memInto(memInt),.graficosO(graficos),.rom_addrGraficos(rom_addrGraficos),
+     .SegundosUT(SegundosUT),.minutosUT(minutosUT),.horasUT(horasUT),
+     .SegundosDT(SegundosDT),.minutosDT(minutosDT),.horasDT(horasDT)
     );
 
 
@@ -544,6 +551,25 @@ default: color = 12'h111;
 
 endcase
 
+//Cambio color alarma
+always @(posedge clk)
+ if (ring && pixely==10'd525) begin
+
+if (alternarColor==1) begin
+colorAlarma<= 12'he11;
+end
+
+else begin
+colorAlarma<=color;
+end
+ end
+
+ else begin
+ colorAlarma<=color;
+
+ end
+
+
 
 //Mux Salida color
 
@@ -552,6 +578,9 @@ always @*
 if (graficos)begin
 colorMux=datoGraficos;
 end
+
+else if (ring==1  && (pixely >= 10'd473) && (pixely<= 10'd480) ) begin
+colorMux= colorAlarma; end //Cambio de color
 
 else begin
 colorMux=color;
@@ -563,8 +592,9 @@ end
 always @* //operación se realiza con cada pulso de reloj
     if (font_bit==1'd1 && video_on==1'd1 && dp==1'd1)  //se encienden los LEDs solo si el bit se encuentra en 1 en memoria
         rgb=colorMux;
+
  else
-    rgb = 12'h111;
+    rgb = 12'h032;
 
 
 assign rgbO=rgb;

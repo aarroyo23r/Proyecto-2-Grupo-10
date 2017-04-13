@@ -8,6 +8,9 @@ module ImpresionDatos
     input wire [6:0] SegundosU,SegundosD,minutosU,minutosD,horasU,horasD,
     fechaU,mesU,anoU,diaSemanaU, numeroSemanaU,fechaD,mesD,anoD,diaSemanaD,
     numeroSemanaD,
+    input wire [6:0] SegundosUT,minutosUT,horasUT,
+    input wire [6:0] SegundosDT,minutosDT,horasDT,
+
     input wire [9:0] pixelx, //posición pixel x actual
     input wire [9:0] pixely,//posición pixel y actual
     output wire [10:0] rom_addr,//Direccion en la memoria del dato
@@ -33,9 +36,9 @@ reg [1:0] font_size;
 
 //Variables para usar la memoria de Graficos
 reg graficos=0;
-wire [5:0] contadorx;
-wire [6:0] contadory;
-reg [6:0] contadorycambio=10'h0;
+reg [5:0] contadorx;
+wire [9:0] contadory;
+reg [9:0] contadorycambio=7'h0;
 
 
 assign dpo=dp;
@@ -44,54 +47,75 @@ assign color_addro=color_addr;
 assign font_sizeo=font_size;
 
 
-assign contadorx=(pixelx[5:0] + 6'd5) ;//Los contadores son mayores que el tamaño del numero por lo que hay que tomarlo en
-assign contadory= (pixely[6:0] - 7'd197);//Cuenta a la hora de imprimir
 
-reg [4:0] zero=5'h0;
+//assign contadorx=(pixelx[5:0] + 6'd5) ;//Los contadores son mayores que el tamaño del numero por lo que hay que tomarlo en
+assign contadory= pixely - 10'd197;//Cuenta a la hora de imprimir
+
+reg [1:0] zero=2'h0;
+
+//Parametros para indicar la posicion en pantalla
+
+//Parametros Textos
+localparam  cambioMozaico = 10'd8;
+localparam  alturaMozaico=10'd16;
+
+//Semana
+localparam textoSemana=10'd288;
+
+//Cronometro
+localparam textoCronometro= 10'd24 ;
 
 
+//Parametros Cronometro
 
+localparam cronoHoras=10'd104;
+localparam cronoMinutos=10'd128;
+localparam cronoSegundos=10'd152;
+
+
+//Parametros Reloj
 //Segundos
 //Limites en el eje x
-localparam IsegundosD=10'd343;
-localparam DsegundosD=10'd351;
-localparam IsegundosU=10'd352;
-localparam DsegundosU=10'd359;
+localparam IsegundosD=10'd459;
+localparam DsegundosD=10'd523;
+localparam IsegundosU=10'd524;
+localparam DsegundosU=10'd587;
 //Limites en el eje y
-localparam ARsegundos=10'd242; //Solo 2 porque siempre van a estar a la par
-localparam ABsegundos=10'd257;
+localparam ARsegundos=10'd197; //Solo 2 porque siempre van a estar a la par
+localparam ABsegundos=10'd296;
 
 
 
 //Minutos
 //Limites en el eje x
-localparam IminutosD=10'd319;
-localparam DminutosD=10'd326;
-localparam IminutosU=10'd327;
-localparam DminutosU=10'd334;
+localparam IminutosD=10'd260;
+localparam DminutosD=10'd323;
+localparam IminutosU=10'd324;
+localparam DminutosU=10'd388;
 //Limites en el eje y
-localparam ARminutos=10'd240; //Solo 2 porque siempre van a estar a la par
-localparam ABminutos=10'd255;
+localparam ARminutos=10'd197; //Solo 2 porque siempre van a estar a la par
+localparam ABminutos=10'd295;
 
 //horas
 //Limites en el eje x
-localparam IhorasD=10'd55;
-localparam DhorasD=10'd124;//Tiene que ser mas grande para dejar el espacion en medio
-localparam IhorasU=10'd125;
+localparam IhorasD=10'd58;
+localparam DhorasD=10'd122;//Tiene que ser mas grande para dejar el espacion en medio
+localparam IhorasU=10'd123;
 localparam DhorasU=10'd182;
 //Limites en el eje y
 localparam ARhoras=10'd197; //Solo 2 porque siempre van a estar a la par
-localparam ABhoras=10'd297;
+localparam ABhoras=10'd296;
 
 //Fecha
 //Limites en el eje x
-localparam IfechaD=10'd591;
-localparam DfechaD=10'd598;
-localparam IfechaU=10'd599;
-localparam DfechaU=10'd606;
+localparam IfechaD=10'd576;
+localparam DfechaD=10'd583;
+localparam IfechaU=10'd585;
+localparam DfechaU=10'd591;
 //Limites en el eje y
-localparam ARfecha=10'd434; //Solo 2 porque siempre van a estar a la par
-localparam ABfecha=10'd446;
+localparam ARfecha=10'd450; //Solo 2 porque siempre van a estar a la par
+localparam ABfecha=10'd461;
+
 
 //Mes
 //Limites en el eje x
@@ -117,13 +141,13 @@ localparam ABano=10'd428;
 
 //Dia de la semana
 //Limites en el eje x
-localparam IdiaD=10'd575;
-localparam DdiaD=10'd582;
-localparam IdiaU=10'd583;
-localparam DdiaU=10'd590;
+localparam IdiaD=10'd591;
+localparam DdiaD=10'd598;
+localparam IdiaU=10'd599;
+localparam DdiaU=10'd606;
 //Limites en el eje y
-localparam ARdia=10'd450; //Solo 2 porque siempre van a estar a la par
-localparam ABdia=10'd461;
+localparam ARdia=10'd434; //Solo 2 porque siempre van a estar a la par
+localparam ABdia=10'd446;
 
 
 
@@ -151,6 +175,28 @@ localparam ABsemana=10'd29;
 
 
 //body
+
+//Logica para impresion centrada de los numeros Grandes
+
+always @(posedge clk)
+
+ if (pixelx< 10'd212) begin
+contadorx<=(pixelx[5:0] + 6'd5);
+end
+
+else if (pixelx< 10'd412) begin
+contadorx<=(pixelx[5:0] - 6'd4);
+end
+
+else if (pixelx< 10'd640) begin
+contadorx<=(pixelx[5:0] - 6'd12);
+end
+
+else begin
+contadorx<=(pixelx[5:0] + 6'd5); //Evitar warning
+end
+
+
 //Direccion de fila
 always @(posedge clk)
 
@@ -184,16 +230,16 @@ always @(posedge clk)//Se ejecuta cuando hay un cambio en pixel x o pixel y
         char_addr <= SegundosD; //direccion de lo que se va a imprimir
         color_addr<=4'd2;// Color de lo que se va a imprimir
         font_size<=2'd1;//Tamaño de fuente
-        memInt<=1'd0;
-        graficos<=1'd0;
+        memInt<=1'd1;
+        graficos<=1'd1;
         dp<=1'd1; end
 
     else if ((pixelx >= IsegundosU) && (pixelx<=DsegundosU) && (pixely >= ARsegundos) && (pixely<=ABsegundos))begin
         char_addr <= SegundosU; //direccion de lo que se va a imprimir
         color_addr<=4'd2;// Color de lo que se va a imprimir
         font_size<=1;
-        graficos<=1'd0;
-        memInt<=1'd0;
+        memInt<=1'd1;
+        graficos<=1'd1;
         dp<=1'd1;end//Tamaño de fuente
 
 //Minutos
@@ -201,16 +247,16 @@ always @(posedge clk)//Se ejecuta cuando hay un cambio en pixel x o pixel y
       char_addr <= minutosD; //direccion de lo que se va a imprimir
       color_addr<=4'd2;// Color de lo que se va a imprimir
       font_size<=2'd1;
-      graficos<=1'd0;
-      memInt<=1'd0;
+      memInt<=1'd1;
+      graficos<=1'd1;
       dp<=1'd1;end//Tamaño de fuente
 
   else if ((pixelx >= IminutosU) && (pixelx<=DminutosU) && (pixely >= ARminutos) && (pixely<=ABminutos))begin
       char_addr <= minutosU; //direccion de lo que se va a imprimir
       color_addr<=4'd2;// Color de lo que se va a imprimir
       font_size<=2'd1;
-      graficos<=1'd0;
-      memInt<=1'd0;
+      memInt<=1'd1;
+      graficos<=1'd1;
       dp<=1'd1;end//Tamaño de fuente
 
 //Horas
@@ -234,6 +280,63 @@ always @(posedge clk)//Se ejecuta cuando hay un cambio en pixel x o pixel y
 
 
 
+///////////Cronometro
+//Horas Crono
+ else if ((pixelx >= cronoHoras) && (pixelx<cronoHoras+cambioMozaico) && (pixely >= ARmes) & (pixely<=ABmes))begin
+     char_addr <= horasDT; //direccion de lo que se va a imprimir
+     color_addr<=4'd2;// Color de lo que se va a imprimir
+     font_size<=2'd1;//Tamaño de fuente
+     memInt<=1'd0;
+     graficos<=1'd0;
+     dp<=1'd1; end
+
+ else if ((pixelx >= cronoHoras+cambioMozaico) && (pixelx<cronoHoras+ 2*cambioMozaico) && (pixely >= ARmes) && (pixely<=ABmes))begin
+     char_addr <= horasUT; //direccion de lo que se va a imprimir
+     color_addr<=4'd2;// Color de lo que se va a imprimir
+     font_size<=1;
+     memInt<=1'd0;
+     graficos<=1'd0;
+     dp<=1'd1;end//Tamaño de fuente
+
+//Minutos Crono
+else if ((pixelx >= cronoMinutos) && (pixelx<cronoMinutos+cambioMozaico) && (pixely >= ARmes) && (pixely<=ABmes))begin
+   char_addr <= minutosDT; //direccion de lo que se va a imprimir
+   color_addr<=4'd2;// Color de lo que se va a imprimir
+   font_size<=2'd1;
+   memInt<=1'd0;
+   graficos<=1'd0;
+   dp<=1'd1;end//Tamaño de fuente
+
+else if ((pixelx >= cronoMinutos+cambioMozaico ) && (pixelx<cronoMinutos+ 2*cambioMozaico) && (pixely >= ARmes) && (pixely<=ABmes))begin
+   char_addr <= minutosUT; //direccion de lo que se va a imprimir
+   color_addr<=4'd2;// Color de lo que se va a imprimir
+   font_size<=2'd1;
+   memInt<=1'd0;
+   graficos<=1'd0;
+   dp<=1'd1;end//Tamaño de fuente
+
+//Segundos crono
+else if ((pixelx >= cronoSegundos ) && (pixelx<cronoSegundos+cambioMozaico) && (pixely >= ARmes) && (pixely<=ABmes))begin
+ char_addr <= SegundosDT; //direccion de lo que se va a imprimir
+ color_addr<=4'd2;// Color de lo que se va a imprimir
+ font_size<=2'd1;
+ memInt<=1'd0;
+ graficos<=1'd0;
+ dp<=1'd1; end//Tamaño de fuente
+
+
+
+ else if ((pixelx >= cronoSegundos+cambioMozaico ) && (pixelx<cronoSegundos+ 2*cambioMozaico) && (pixely >= ARmes) && (pixely<=ABmes))begin
+     char_addr <= SegundosUT;//direccion de lo que se va a imprimir
+     color_addr<=4'd2;// Color de lo que se va a imprimir
+     font_size<=2'd1;
+     memInt<=1'd0;
+     graficos<=1'd0;
+     dp<=1'd1;end//Tamaño de fuente
+
+    /////////////////////////////---------------------------------------------
+    /////////////////////-------------
+
 
 /*
         //Rayas Amarillas
@@ -255,7 +358,7 @@ always @(posedge clk)//Se ejecuta cuando hay un cambio en pixel x o pixel y
 
         //Texto semana
         //S
-        else if ((pixelx >= 10'd287) && (pixelx<=10'd294) && (pixely >= ARsemana) && (pixely<=ABsemana))begin
+        else if ((pixelx >= textoSemana) && (pixelx<textoSemana+cambioMozaico) && (pixely >= ARsemana) && (pixely<=ABsemana))begin
             char_addr <= 7'h53;//direccion de lo que se va a imprimir
             color_addr<=4'd2;// Color de lo que se va a imprimir
             font_size<=2'd1;
@@ -265,7 +368,7 @@ always @(posedge clk)//Se ejecuta cuando hay un cambio en pixel x o pixel y
 
 
             //E
-            else if ((pixelx >= 10'd295) && (pixelx<=10'd302) && (pixely >= ARsemana) && (pixely<=ABsemana))begin
+            else if ((pixelx >= textoSemana+cambioMozaico) && (pixelx<textoSemana+ 2*cambioMozaico) && (pixely >= ARsemana) && (pixely<=ABsemana))begin
                 char_addr <= 7'h45;//direccion de lo que se va a imprimir
                 color_addr<=4'd2;// Color de lo que se va a imprimir
                 font_size<=2'd1;
@@ -274,7 +377,7 @@ always @(posedge clk)//Se ejecuta cuando hay un cambio en pixel x o pixel y
                 dp<=1'd1;end
 
                 //M
-          else if ((pixelx >= 10'd303) && (pixelx<=10'd310) && (pixely >= ARsemana) && (pixely<=ABsemana))begin
+          else if ((pixelx >= textoSemana+ 2*cambioMozaico) && (pixelx< textoSemana+ 3*cambioMozaico) && (pixely >= ARsemana) && (pixely<=ABsemana))begin
                 char_addr <= 7'h4d;//direccion de lo que se va a imprimir
                 color_addr<=4'd2;// Color de lo que se va a imprimir
                 font_size<=2'd1;
@@ -283,7 +386,7 @@ always @(posedge clk)//Se ejecuta cuando hay un cambio en pixel x o pixel y
                 dp<=1'd1;end
 
                 //A
-          else if ((pixelx >= 10'd311) && (pixelx<=10'd319) && (pixely >= ARsemana) && (pixely<=ABsemana))begin
+          else if ((pixelx >= textoSemana+ 3*cambioMozaico) && (pixelx< textoSemana+ 4*cambioMozaico) && (pixely >= ARsemana) && (pixely<=ABsemana))begin
                 char_addr <= 7'h41;//direccion de lo que se va a imprimir
                 color_addr<=4'd2;// Color de lo que se va a imprimir
                 font_size<=2'd1;
@@ -293,7 +396,7 @@ always @(posedge clk)//Se ejecuta cuando hay un cambio en pixel x o pixel y
 
 
                 //N
-          else if ((pixelx >= 10'd320) && (pixelx<=10'd327) && (pixely >= ARsemana) && (pixely<=ABsemana))begin
+          else if ((pixelx >= textoSemana+ 4*cambioMozaico ) && (pixelx< textoSemana+ 5*cambioMozaico) && (pixely >= ARsemana) && (pixely<=ABsemana))begin
                 char_addr <= 7'h4e;//direccion de lo que se va a imprimir
                 color_addr<=4'd2;// Color de lo que se va a imprimir
                 font_size<=2'd1;
@@ -303,13 +406,115 @@ always @(posedge clk)//Se ejecuta cuando hay un cambio en pixel x o pixel y
 
 
                 //A
-          else if ((pixelx >= 10'd328) && (pixelx<=10'd334) && (pixely >= ARsemana) && (pixely<=ABsemana))begin
+          else if ((pixelx >=textoSemana+ 5*cambioMozaico) && (pixelx< textoSemana+ 6*cambioMozaico) && (pixely >= ARsemana) && (pixely<=ABsemana))begin
                 char_addr <= 7'h41;//direccion de lo que se va a imprimir
                 color_addr<=4'd2;// Color de lo que se va a imprimir
                 font_size<=2'd1;
                 graficos<=1'd0;
                 memInt<=1'd0;
                 dp<=1'd1;end
+
+
+
+                //Texto Cronometro
+                //C
+                else if ((pixelx >= textoCronometro) && (pixelx<textoCronometro+cambioMozaico) && (pixely >= ARano) && (pixely<=ABano))begin
+                    char_addr <= 7'h43;//direccion de lo que se va a imprimir
+                    color_addr<=4'd2;// Color de lo que se va a imprimir
+                    font_size<=2'd1;
+                    graficos<=1'd0;
+                    memInt<=1'd0;
+                    dp<=1'd1;end//Tamaño de fuente
+
+
+                    //R
+                    else if ((pixelx >= textoCronometro+cambioMozaico) && (pixelx<textoCronometro+ 2*cambioMozaico) && (pixely >= ARano) && (pixely<=ABano))begin
+                        char_addr <= 7'h52;//direccion de lo que se va a imprimir
+                        color_addr<=4'd2;// Color de lo que se va a imprimir
+                        font_size<=2'd1;
+                        graficos<=1'd0;
+                        memInt<=1'd0;
+                        dp<=1'd1;end
+
+                        //o
+                  else if ((pixelx >= textoCronometro+ 2*cambioMozaico) && (pixelx< textoCronometro+ 3*cambioMozaico) && (pixely >= ARano) && (pixely<=ABano))begin
+                        char_addr <= 7'h4f;//direccion de lo que se va a imprimir
+                        color_addr<=4'd2;// Color de lo que se va a imprimir
+                        font_size<=2'd1;
+                        graficos<=1'd0;
+                        memInt<=1'd0;
+                        dp<=1'd1;end
+
+                        //N
+                  else if ((pixelx >= textoCronometro+ 3*cambioMozaico) && (pixelx< textoCronometro+ 4*cambioMozaico) && (pixely >= ARano) && (pixely<=ABano))begin
+                        char_addr <= 7'h4e;//direccion de lo que se va a imprimir
+                        color_addr<=4'd2;// Color de lo que se va a imprimir
+                        font_size<=2'd1;
+                        graficos<=1'd0;
+                        memInt<=1'd0;
+                        dp<=1'd1;end
+
+
+                        //o
+                  else if ((pixelx >= textoCronometro+ 4*cambioMozaico ) && (pixelx< textoCronometro+ 5*cambioMozaico) && (pixely >= ARano) && (pixely<=ABano))begin
+                        char_addr <= 7'h4f;//direccion de lo que se va a imprimir
+                        color_addr<=4'd2;// Color de lo que se va a imprimir
+                        font_size<=2'd1;
+                        graficos<=1'd0;
+                        memInt<=1'd0;
+                        dp<=1'd1;end
+
+
+                        //m
+                  else if ((pixelx >=textoCronometro+ 5*cambioMozaico) && (pixelx< textoCronometro+ 6*cambioMozaico) && (pixely >= ARano) && (pixely<=ABano))begin
+                        char_addr <= 7'h4d;//direccion de lo que se va a imprimir
+                        color_addr<=4'd2;// Color de lo que se va a imprimir
+                        font_size<=2'd1;
+                        graficos<=1'd0;
+                        memInt<=1'd0;
+                        dp<=1'd1;end
+
+                        //e
+                  else if ((pixelx >=textoCronometro+ 6*cambioMozaico) && (pixelx< textoCronometro+ 7*cambioMozaico) && (pixely >= ARano) && (pixely<=ABano))begin
+                        char_addr <= 7'h45;//direccion de lo que se va a imprimir
+                        color_addr<=4'd2;// Color de lo que se va a imprimir
+                        font_size<=2'd1;
+                        graficos<=1'd0;
+                        memInt<=1'd0;
+                        dp<=1'd1;end
+
+                        //t
+                  else if ((pixelx >=textoCronometro+ 7*cambioMozaico) && (pixelx< textoCronometro+ 8*cambioMozaico) && (pixely >= ARano) && (pixely<=ABano))begin
+                        char_addr <= 7'h54;//direccion de lo que se va a imprimir
+                        color_addr<=4'd2;// Color de lo que se va a imprimir
+                        font_size<=2'd1;
+                        graficos<=1'd0;
+                        memInt<=1'd0;
+                        dp<=1'd1;end
+
+                        //r
+                  else if ((pixelx >=textoCronometro+ 8*cambioMozaico) && (pixelx< textoCronometro+ 9*cambioMozaico) && (pixely >= ARano) && (pixely<=ABano))begin
+                        char_addr <= 7'h52;//direccion de lo que se va a imprimir
+                        color_addr<=4'd2;// Color de lo que se va a imprimir
+                        font_size<=2'd1;
+                        graficos<=1'd0;
+                        memInt<=1'd0;
+                        dp<=1'd1;end
+
+                        //o
+                  else if ((pixelx >=textoCronometro+ 9*cambioMozaico) && (pixelx< textoCronometro+ 10*cambioMozaico) && (pixely >= ARano) && (pixely<=ABano))begin
+                        char_addr <= 7'h4f;//direccion de lo que se va a imprimir
+                        color_addr<=4'd2;// Color de lo que se va a imprimir
+                        font_size<=2'd1;
+                        graficos<=1'd0;
+                        memInt<=1'd0;
+                        dp<=1'd1;end
+
+
+
+
+
+
 
 //Semana
 else if ((pixelx >= IsemanaU) && (pixelx<=DsemanaU) && (pixely >= ARsemana) && (pixely<=ABsemana))begin
@@ -329,7 +534,9 @@ else if ((pixelx >= IsemanaU) && (pixelx<=DsemanaU) && (pixely >= ARsemana) && (
         dp<=1'd1;end//Tamaño de fuente
 
 
+//**************************************************************************************************
 //Dia
+
         else if ((pixelx >= IdiaD) && (pixelx<=DdiaD) && (pixely >= ARdia) && (pixely<=ABdia))begin
             char_addr <= diaSemanaD;//direccion de lo que se va a imprimir
             color_addr<=4'd2;// Color de lo que se va a imprimir
@@ -345,6 +552,10 @@ else if ((pixelx >= IsemanaU) && (pixelx<=DsemanaU) && (pixely >= ARsemana) && (
                 graficos<=1'd0;
                 memInt<=1'd0;
                 dp<=1'd1;end//Tamaño de fuente
+
+//*****************************************************************************************************
+
+
 
 
                 //Fecha
@@ -689,6 +900,8 @@ else if ((pixelx <=611) && (pixely == 158)) begin
 dp=1'd1;color_addr=3'd3;memInt=1'd1;end
 else if ((pixelx <=613) && (pixely == 158)) begin
 dp=1'd1;color_addr=3'd4;memInt=1'd1;end
+else if ((pixelx >613) && (pixely == 158)) begin
+dp=1'd1;color_addr=3'd1;memInt=1'd1;end
 
 //Parte constante
 else if ((pixelx <=28) && (pixely >= 159) && (pixely <= 244))begin
@@ -970,6 +1183,8 @@ else if ((pixelx <=606) && (pixely == 337)) begin
 dp=1'd1;color_addr=3'd4;memInt=1'd1;end
 else if ((pixelx <=608) && (pixely == 337)) begin
 dp=1'd1;color_addr=3'd3;memInt=1'd1;end
+else if ((pixelx >608) && (pixely == 337)) begin
+dp=1'd1;color_addr=3'd1;memInt=1'd1;end
 else if (pixely == 338) begin
 dp=1;color_addr=3'd1;memInt=1;end
 else begin
@@ -1018,7 +1233,7 @@ memInt<=1;
 dp<=1'd1; end//Tamaño de fuente
 
 
-
+//Linea Blanca ring
 else if ((pixely >= 10'd473) && (pixely<= 10'd480))begin
 char_addr <= 7'h0a; //direccion de lo que se va a imprimir
 color_addr<=4'd2;// Color de lo que se va a imprimir
@@ -1103,39 +1318,39 @@ if (graficos)begin//Solo se activa cuando se va a usar la memoria de graficos
   end
 
   else if (char_addr== 7'h31) begin
-    contadorycambio<=contadory+7'd101;
+    contadorycambio<=contadory+10'd101;
   end
 
   else if (char_addr== 7'h32) begin
-    contadorycambio<=contadory+7'd203;
+    contadorycambio<=contadory+10'd203;
   end
 
   else if (char_addr== 7'h33) begin
-    contadorycambio<=contadory+7'd304;
+    contadorycambio<=contadory+10'd304;
   end
 
   else if (char_addr== 7'h34) begin
-    contadorycambio<=contadory+7'd405;
+    contadorycambio<=contadory+10'd405;
   end
 
   else if (char_addr== 7'h35) begin
-    contadorycambio<=contadory+7'd505;
+    contadorycambio<=contadory+10'd505;
   end
 
   else if (char_addr== 7'h36) begin
-    contadorycambio<=contadory+7'd606;
+    contadorycambio<=contadory+10'd606;
   end
 
   else if (char_addr== 7'h37) begin
-    contadorycambio<=contadory+7'd707;
+    contadorycambio<=contadory+10'd707;
   end
 
   else if (char_addr== 7'h38) begin
-    contadorycambio<=contadory+7'd808;
+    contadorycambio<=contadory+10'd808;
   end
 
   else if (char_addr== 7'h39) begin
-    contadorycambio<=contadory+7'd910;
+    contadorycambio<=contadory+10'd910;
   end
 
   else begin

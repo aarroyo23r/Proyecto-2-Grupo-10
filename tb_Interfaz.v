@@ -12,15 +12,15 @@ module tb_Interfaz();
      wire font_bit;
      wire [9:0] pixelx, pixely;
      reg [9:0] pixelx_tb,pixely_tb;
+     reg ring;
      wire video_on;
      integer i,j;
      integer file;
 
  Interfaz uut(
            .clk(clk),.reset(reset),.resetSync(resetSync),.inicioSecuencia(inicioSecuencia),
-
            .datoRTC(datoRTC),.rgbO(rgb),.hsync(hsync),
-           .vsync(vsync),.video_on(video_on),.pixelx(pixelx),.pixely(pixely)
+           .vsync(vsync),.video_on(video_on),.pixelx(pixelx),.pixely(pixely),.ring(ring)
 
            );
 
@@ -54,6 +54,7 @@ initial begin
 //#200; //Tiempo extra
 resetSync=0;
 reset=0;
+ring=0;
 #10;
 resetSync=1;
 reset=1;
@@ -63,7 +64,7 @@ reset=0;
 
 
  #15360025; //Espera  el tick
- datoRTC=8'd00;
+ datoRTC=8'd01;
 
  inicioSecuencia=8'd1;
  #100;
@@ -73,10 +74,10 @@ reset=0;
   #10;//Duración del primer dato
 
 
-  datoRTC=8'd0;//Minutos
+  datoRTC=8'd1;//Minutos
   #10;
 
-  datoRTC=8'd0;//Horas
+  datoRTC=8'd1;//Horas
   #10;
 
   datoRTC=8'd23;//Fecha
@@ -91,9 +92,22 @@ reset=0;
   datoRTC=8'd5;//Dia
   #10;
 
-  datoRTC=8'd4;//Semana
+  datoRTC=8'd1;//Semana
   #10;
- #30;//retardo inicio secuencia
+
+
+  //Datos Cronometro
+  datoRTC=8'd27;//Segundos Cronometro
+   #10;
+
+
+   datoRTC=8'd8;//Minutos Cronometro
+   #10;
+
+   datoRTC=8'd9;//Horas Cronometro
+   #10;
+
+ //#30;//retardo inicio secuencia
   inicioSecuencia=0;
 
 resetSync=1;
