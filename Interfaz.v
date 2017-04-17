@@ -22,7 +22,7 @@
 
 module Interfaz( //Definicion entradas y salidas
     input wire clk,reset,resetSync,
-    input wire inicioSecuencia,ring,//Indica si se esta iniciando una secuencia de la transmision de datos
+    input wire inicioSecuencia,//Indica si se esta iniciando una secuencia de la transmision de datos
     input wire [7:0] datoRTC,//Dato proveniente del RTC
     output wire  [11:0] rgbO,
     output wire hsync,vsync,
@@ -49,6 +49,8 @@ SincronizadorVGA SincronizadorVGA_unit(
 //_____________________________________________________________________
 
 reg [7:0] datoRTC_reg=8'd0;
+
+
 
 //Tick antes de refrescar la pantalla
 reg tick;//Tick para guardar datos mientras se refresca la pantalla, para que al volver a imprimir los datos esten listos para ser leidos
@@ -106,6 +108,7 @@ reg [11:0] colorMux;
 
 reg zero=0;// Para concatenar 0s
 
+reg [6:0] contadorAlarma;
 reg alternarColor=0;
 reg [11:0] colorAlarma;
 //Cursor ***************
@@ -551,12 +554,23 @@ default: color = 12'h111;
 
 endcase
 
+
+/*
 //Cambio color alarma
 always @(posedge clk)
+
  if (ring && pixely==10'd525) begin
+ if (contadorAlarma==7'd127) begin
+alternarColor<=~alternarColor;
+contadorAlarma=3'd0;
+ end
+
+ else begin
+ contadorAlarma<=contadorAlarma+1;
+end
 
 if (alternarColor==1) begin
-colorAlarma<= 12'he11;
+colorAlarma<= 12'h032;
 end
 
 else begin
@@ -565,23 +579,26 @@ end
  end
 
  else begin
- colorAlarma<=color;
+ alternarColor<=alternarColor;
 
  end
-
+*/
 
 
 //Mux Salida color
 
+
+
 always @*
+
 
 if (graficos)begin
 colorMux=datoGraficos;
 end
-
-else if (ring==1  && (pixely >= 10'd473) && (pixely<= 10'd480) ) begin
+/*
+else if (ring_reg==1  && (pixely >= 10'd473) && (pixely<= 10'd480) ) begin
 colorMux= colorAlarma; end //Cambio de color
-
+*/
 else begin
 colorMux=color;
 end

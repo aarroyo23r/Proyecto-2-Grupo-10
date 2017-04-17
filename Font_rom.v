@@ -8,18 +8,18 @@ module Font_rom(  //declaración de parametros
     output reg [7:0] data//Salida de Datos
     );
 
-    reg [10:0] dir_reg; //variable interna que guarda la direccion de memoria
-
+  //  reg [10:0] dir_reg; //variable interna que guarda la direccion de memoria
+/*
     always @(posedge clk)//se asigna el valor de la dirección deseada a la variable interna para su manejo
     dir_reg <= dir;
 
-
+*/
  always @*
 
  //Codigo Ascii
  //_____________________________________________________________________________________________________________________________________________________
 
-     case(dir_reg) //se escoge la dirección en memoria
+     case(dir) //se escoge la dirección en memoria
             11'h000: data = 8'b00000000; //
             11'h001: data = 8'b00000000; //
             11'h002: data = 8'b00000000; //
@@ -2196,8 +2196,7 @@ module Font_rom(  //declaración de parametros
             11'h7fe: data = 8'b00000000; //
             11'h7ff: data = 8'b00000000; //
 
-            default :data = 8'b00000000;
-            
+
      endcase
 
 endmodule

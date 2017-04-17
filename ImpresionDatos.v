@@ -28,14 +28,14 @@ module ImpresionDatos
 
 
 reg dp=1'd0;
-reg memInt;
+reg memInt=0;
 reg [2:0] color_addr;
 reg [1:0] font_size;
 //wire [10:0] rom_addr;
 //wire [15:0] rom_addrGraficosO,
 
 //Variables para usar la memoria de Graficos
-reg graficos=0;
+reg graficos;
 reg [5:0] contadorx;
 wire [9:0] contadory;
 reg [9:0] contadorycambio=7'h0;
@@ -641,7 +641,7 @@ char_addr = 7'h0a; //direccion de lo que se va a imprimir
 color_addr=4'd0;// Color de lo que se va a imprimir
 font_size=2'd1;
 graficos<=1'd0;
-memInt=1'd1;
+memInt=1'd0;
 dp=1'd1; end//Tamaño de fuente
 
 
@@ -651,7 +651,7 @@ char_addr = 7'h0a; //direccion de lo que se va a imprimir
 color_addr=4'd1;// Color de lo que se va a imprimir
 font_size=2'd1;
 graficos<=1'd0;
-memInt=1'd1;
+memInt=1'd0;
 dp=1'd1; end//Tamaño de fuente
 
 
@@ -1307,61 +1307,61 @@ end
 
 */
 
-always @(posedge clk)
+always @*
 
 if (graficos)begin//Solo se activa cuando se va a usar la memoria de graficos
 
 //Logica reinicio de los contadores lectura memoria
 
   if (char_addr== 7'h30) begin
-    contadorycambio<=contadory;
+    contadorycambio=contadory;
   end
 
   else if (char_addr== 7'h31) begin
-    contadorycambio<=contadory+10'd101;
+    contadorycambio=contadory+10'd101;
   end
 
   else if (char_addr== 7'h32) begin
-    contadorycambio<=contadory+10'd203;
+    contadorycambio=contadory+10'd203;
   end
 
   else if (char_addr== 7'h33) begin
-    contadorycambio<=contadory+10'd304;
+    contadorycambio=contadory+10'd304;
   end
 
   else if (char_addr== 7'h34) begin
-    contadorycambio<=contadory+10'd405;
+    contadorycambio=contadory+10'd405;
   end
 
   else if (char_addr== 7'h35) begin
-    contadorycambio<=contadory+10'd505;
+    contadorycambio=contadory+10'd505;
   end
 
   else if (char_addr== 7'h36) begin
-    contadorycambio<=contadory+10'd606;
+    contadorycambio=contadory+10'd606;
   end
 
   else if (char_addr== 7'h37) begin
-    contadorycambio<=contadory+10'd707;
+    contadorycambio=contadory+10'd707;
   end
 
   else if (char_addr== 7'h38) begin
-    contadorycambio<=contadory+10'd808;
+    contadorycambio=contadory+10'd808;
   end
 
   else if (char_addr== 7'h39) begin
-    contadorycambio<=contadory+10'd910;
+    contadorycambio=contadory+10'd910;
   end
 
   else begin
-    contadorycambio<=contadory; //Evitar warning latch
+    contadorycambio=contadory; //Evitar warning latch
   end
 
 end
 
 else begin
 
-contadorycambio<=contadory;//Evitar warning latch
+contadorycambio=contadory;//Evitar warning latch
 end
 
 
