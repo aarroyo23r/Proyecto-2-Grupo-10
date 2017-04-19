@@ -23,7 +23,7 @@ set_property IOSTANDARD LVCMOS33 [get_ports Escribir]
 set_property PACKAGE_PIN R7 [get_ports ProgramarCrono]
 set_property IOSTANDARD LVCMOS33 [get_ports ProgramarCrono]
 ##Bank = 34, Pin name = IO_L19P_T3_34,						Sch name = SW3
-#set_property PACKAGE_PIN R6 [get_ports {sw[3]}]
+#set_property PACKAGE_PIN R6 [get_ports {instrucciones}]
 #set_property IOSTANDARD LVCMOS33 [get_ports {sw[3]}]
 ##Bank = 34, Pin name = IO_L19N_T3_VREF_34,					Sch name = SW4
 #set_property PACKAGE_PIN R5 [get_ports {sw[4]}]

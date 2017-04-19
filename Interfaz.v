@@ -22,11 +22,16 @@
 
 module Interfaz( //Definicion entradas y salidas
     input wire clk,reset,resetSync,
+    input wire instrucciones,
     input wire inicioSecuencia,//Indica si se esta iniciando una secuencia de la transmision de datos
     input wire [7:0] datoRTC,//Dato proveniente del RTC
     output wire  [11:0] rgbO,
     output wire hsync,vsync,
-    output wire video_on
+    output wire video_on,
+
+    //Datos Paralelo de entrada
+    input wire [7:0] datos0,datos1,datos2,datos3,datos4,datos5,datos6,datos7,datos8,
+    datos9,datos10
     //output wire [9:0] pixelx, pixely
     //output reg [3:0] contGuardados
     );
@@ -135,6 +140,7 @@ begin
 end//Probado
 
 
+/*
 //Asignacion del codigo ascii para los datos
 always@ (posedge clk)
  datoRTC_reg<=datoRTC;
@@ -273,7 +279,7 @@ always @*
           8'd60: dirAsciiDatoSigD = 7'h36;
           default : dirAsciiDatoSigD = 7'hff;
    endcase
-
+*/
 
 always @(posedge clk, posedge reset)// Cada vez que se refresca la pantalla se guarda una secuencia de datos
 
@@ -358,50 +364,39 @@ end
 else begin
 
 if (w==1 & r==0)begin
-if (contGuardados==5'd1)begin //Se empieza en el contador 4 porque antes de esto es un retardo que se utiliza para generar la direccion que se va a guardar en estos registros
-SegundosU <= dirAsciiDatoSigU;
-SegundosD <= dirAsciiDatoSigD;end
+SegundosU <= {4'h3,datos0[3:0]};
+SegundosD <= {4'h3,datos0[7:4]};
 
-else if (contGuardados==5'd2)begin
-minutosU <= dirAsciiDatoSigU;
-minutosD <= dirAsciiDatoSigD;end
+minutosU <= {4'h3,datos1[3:0]};
+minutosD <= {4'h3,datos1[7:4]};
 
-else if (contGuardados==5'd3)begin
-horasU <= dirAsciiDatoSigU;
-horasD <= dirAsciiDatoSigD;end
+horasU <= {4'h3,datos2[3:0]};
+horasD <= {4'h3,datos2[7:4]};
 
-else if (contGuardados==5'd4)begin
-fechaU <= dirAsciiDatoSigU;
-fechaD <= dirAsciiDatoSigD;end
+fechaU <= {4'h3,datos3[3:0]};
+fechaD <= {4'h3,datos3[7:4]};
 
-else if (contGuardados==5'd5)begin
-mesU <= dirAsciiDatoSigU;
-mesD <= dirAsciiDatoSigD;end
+mesU <= {4'h3,datos4[3:0]};
+mesD <= {4'h3,datos4[7:4]};
 
-else if (contGuardados==5'd6)begin
-anoU <= dirAsciiDatoSigU;
-anoD <= dirAsciiDatoSigD;end
+anoU <= {4'h3,datos5[3:0]};
+anoD <= {4'h3,datos5[7:4]};
 
-else if (contGuardados==5'd7)begin
-diaSemanaU <= dirAsciiDatoSigU;
-diaSemanaD <= dirAsciiDatoSigD;end
+diaSemanaU <= {4'h3,datos6[3:0]};
+diaSemanaD <= {4'h3,datos6[7:4]};
 
-else if (contGuardados==5'd8)begin
-numeroSemanaU <= dirAsciiDatoSigU;
-numeroSemanaD <= dirAsciiDatoSigD;end
+numeroSemanaU <= {4'h3,datos7[3:0]};
+numeroSemanaD <= {4'h3,datos7[7:4]};
 
 //Temporizador
-else if (contGuardados==5'd9)begin
-SegundosUT <= dirAsciiDatoSigU;
-SegundosDT <= dirAsciiDatoSigD;end
+SegundosUT <= {4'h3,datos8[3:0]};
+SegundosDT <= {4'h3,datos8[7:4]};
 
-else if (contGuardados==5'd10)begin
-minutosUT <= dirAsciiDatoSigU;
-minutosDT <= dirAsciiDatoSigD;end
+minutosUT <= {4'h3,datos9[3:0]};
+minutosDT <= {4'h3,datos9[7:4]};
 
-else if (contGuardados==5'd11)begin
-horasUT <= dirAsciiDatoSigU;
-horasDT <= dirAsciiDatoSigD;end
+horasUT <= {4'h3,datos10[3:0]};
+horasDT <= {4'h3,datos10[7:4]};
 
 end
 
@@ -455,7 +450,7 @@ ImpresionDatos ImpresionDatos_unit
      .numeroSemanaU(numeroSemanaU),.fechaD(fechaD),.mesD(mesD),.anoD(anoD),.diaSemanaD(diaSemanaD),
      .numeroSemanaD(numeroSemanaD),.memInto(memInt),.graficosO(graficos),.rom_addrGraficos(rom_addrGraficos),
      .SegundosUT(SegundosUT),.minutosUT(minutosUT),.horasUT(horasUT),
-     .SegundosDT(SegundosDT),.minutosDT(minutosDT),.horasDT(horasDT)
+     .SegundosDT(SegundosDT),.minutosDT(minutosDT),.horasDT(horasDT),.instrucciones(instrucciones)
     );
 
 

@@ -13,7 +13,7 @@ module Protocolo_rtc(
 );
 
 wire [7:0]contador;
-GeneradorFunciones Gd_tbunit(.clk(clk),.IndicadorMaquina(IndicadorMaquina),.ChipSelect1(ChipSelect),.Read1(Read),.Write1(Write),.AoD1(AoD),.contador1(contador));
+GeneradorFunciones Gd_tbunit(.clk(clk),.IndicadorMaquina(IndicadorMaquina),.ChipSelect1(ChipSelect),.Read1(Read),.Write(Write),.AoD1(AoD),.contador1(contador));
 reg [7:0]Dir_Dato;
 reg [7:0]data_vga1;                                                                                                                                                
 reg bitinicio;                                                                        
@@ -37,7 +37,7 @@ assign DATA_ADDRESS =((AoD==1 && Write==0 && ChipSelect ==0 && IndicadorMaquina=
 assign DATA_ADDRESS =((AoD==0 && Write==0 && IndicadorMaquina==0 && contador>8'b10100000)|(contador>8'b11011101 && contador<8'b11011111 && IndicadorMaquina==0))? command:8'bZZZZZZZZ;
 
 //FUNCIÓN READ
-assign DATA_ADDRESS =((AoD==0 && Write==0 && IndicadorMaquina==1 && Read==1 && contador <8'b10100000)|(contador>8'b01010001 && contador<8'b01010011 && IndicadorMaquina==1))? command:8'bZZZZZZZZ;
+assign DATA_ADDRESS =((AoD==0 && Write==0 && IndicadorMaquina==1 && contador <8'b10100000)|(contador>8'b01010001 && contador<8'b01010011 && IndicadorMaquina==1))? command:8'bZZZZZZZZ;
 assign DATA_ADDRESS =((AoD==0 && Write==0 && IndicadorMaquina==1 && Read==1 && contador >8'b10100000)|(contador>8'b11011101 && contador<8'b11011111 && IndicadorMaquina==1))? address:8'bZZZZZZZZ;
 
 

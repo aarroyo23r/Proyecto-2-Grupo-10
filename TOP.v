@@ -6,6 +6,7 @@ module TOP(
     input wire push_abajo,
     input wire Reset,Escribir,
     input wire clk,ProgramarCrono,
+    input wire instrucciones, //Muestra o esconde las instrucciones
     input wire push_centro, //Push para cronometro
     inout wire [7:0] DATA_ADDRESS, //variable inout hacia y desde rtc
     output wire ChipSelect,Read,Write,AoD, //Señales de control rtc
@@ -21,6 +22,7 @@ module TOP(
 wire RW;//Variables OUTPUT MaquinaGeneral, indica cuales señales generar
 wire Crono; //Variable OUTPUT MaquinaGeneral, activa o desactiva el modulo del cronometrp
 wire Per_read; //Variable OUTPUT MaquinaGeneral, activa modulo de lectura permanente MaquinaLectura
+
 
 reg [15:0] contador3=0;
 reg Inicio1=1'b1; //Señal Incio que solo posee valor 1 al iniciar el sistema
@@ -69,6 +71,10 @@ wire [7:0]num_semana;
 wire [7:0]mes;
 wire [7:0]ano;
 wire [7:0]dia_sem;
+
+wire [7:0]datos8;
+wire [7:0]datos9;
+wire [7:0]datos10;
 
 //reg [7:0]segundos,minutos,horas,date,num_semana,mes,ano,dia_sem;
 
@@ -134,11 +140,17 @@ wire [7:0] data_out; //datos hacia controlador vga
 
 Registros Register_unit(.clk(clk),.bit_inicio1(bit_inicio1),.data_vga(data_vga_entrada),.contador(contador2),
                         .data_vga_final(data_out),.Read(READ),.contador_datos1(contador_datos1),.datos0(segundos),
-                        .datos1(minutos),.datos2(horas),.datos3(date),.datos4(mes),.datos5(ano),.datos6(dia_sem),.datos7(num_semana));
+                        .datos1(minutos),.datos2(horas),.datos3(date),.datos4(mes),.datos5(ano),.datos6(dia_sem),.datos7(num_semana),
+                        .datos8(datos8),.datos9(datos9),.datos10(datos10)
+                        );
 //reg [7:0] data_out1;
 
 
 
-Interfaz Interfaz_unit(.clk(clk),.reset(Reset),.rgbO(rgbO),.resetSync(Reset),.inicioSecuencia(bit_inicio1),.datoRTC(data_out),.hsync(hsync),.vsync(vsync),.video_on(video_on));
+Interfaz Interfaz_unit(.clk(clk),.reset(Reset),.rgbO(rgbO),.resetSync(Reset),.inicioSecuencia(bit_inicio1),.datoRTC(data_out),.hsync(hsync),.vsync(vsync),.video_on(video_on),
+                        .datos0(segundos),.datos1(minutos),.datos2(horas),.datos3(date),.datos4(mes),.datos5(ano),.datos6(dia_sem),.datos7(num_semana),
+                        .datos8(datos8),.datos9(datos9),.datos10(datos10),.instrucciones(instrucciones)
+
+                        );
 
 endmodule

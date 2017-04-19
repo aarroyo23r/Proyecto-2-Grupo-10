@@ -5,6 +5,7 @@
 module ImpresionDatos
     (
     input wire clk,
+    input wire instrucciones,
     input wire [6:0] SegundosU,SegundosD,minutosU,minutosD,horasU,horasD,
     fechaU,mesU,anoU,diaSemanaU, numeroSemanaU,fechaD,mesD,anoD,diaSemanaD,
     numeroSemanaD,
@@ -65,6 +66,16 @@ localparam textoSemana=10'd288;
 //Cronometro
 localparam textoCronometro= 10'd24 ;
 
+//Dia
+localparam textoDia=10'd559;
+
+//Instrucciones
+localparam textoInstrucciones=10'd24;
+localparam ARInstrucciones=10'd96;
+localparam ABInstrucciones=10'd112;
+
+//Posicion Instrucciones
+localparam posicionInstrucciones=10'd256;
 
 //Parametros Cronometro
 
@@ -512,6 +523,515 @@ else if ((pixelx >= cronoSegundos ) && (pixelx<cronoSegundos+cambioMozaico) && (
 
 
 
+                        //Texto dia
+
+
+                        //D
+                        else if ((pixelx >= textoDia) && (pixelx<textoDia+cambioMozaico) && (pixely >= ARdia) && (pixely<=ABdia))begin
+                            char_addr <= 7'h44;//direccion de lo que se va a imprimir
+                            color_addr<=4'd2;// Color de lo que se va a imprimir
+                            font_size<=2'd1;
+                            graficos<=1'd0;
+                            memInt<=1'd0;
+                            dp<=1'd1;end//Tamaño de fuente
+
+
+                            //I
+                            else if ((pixelx >= textoDia+cambioMozaico) && (pixelx<textoDia+ 2*cambioMozaico) && (pixely >= ARdia) && (pixely<=ABdia))begin
+                                char_addr <= 7'h49;//direccion de lo que se va a imprimir
+                                color_addr<=4'd2;// Color de lo que se va a imprimir
+                                font_size<=2'd1;
+                                graficos<=1'd0;
+                                memInt<=1'd0;
+                                dp<=1'd1;end
+
+                                //A
+                          else if ((pixelx >= textoDia+ 2*cambioMozaico) && (pixelx< textoDia+ 3*cambioMozaico) && (pixely >= ARdia) && (pixely<=ABdia))begin
+                                char_addr <= 7'h41;//direccion de lo que se va a imprimir
+                                color_addr<=4'd2;// Color de lo que se va a imprimir
+                                font_size<=2'd1;
+                                graficos<=1'd0;
+                                memInt<=1'd0;
+                                dp<=1'd1;end
+
+
+
+
+                                //Texto Instrucciones
+                                //S
+                                else if ((pixelx >= textoInstrucciones) && (pixelx<textoInstrucciones+cambioMozaico) && (pixely >= ARInstrucciones) && (pixely<=ABInstrucciones))begin
+                                    char_addr <= 7'h53;//direccion de lo que se va a imprimir
+                                    color_addr<=4'd2;// Color de lo que se va a imprimir
+                                    font_size<=2'd1;
+                                    graficos<=1'd0;
+                                    memInt<=1'd0;
+                                    dp<=1'd1;end//Tamaño de fuente
+
+
+                                    //W
+                                    else if ((pixelx >= textoInstrucciones+cambioMozaico) && (pixelx<textoInstrucciones+ 2*cambioMozaico) && (pixely >= ARInstrucciones) && (pixely<=ABInstrucciones))begin
+                                        char_addr <= 7'h57;//direccion de lo que se va a imprimir
+                                        color_addr<=4'd2;// Color de lo que se va a imprimir
+                                        font_size<=2'd1;
+                                        graficos<=1'd0;
+                                        memInt<=1'd0;
+                                        dp<=1'd1;end
+
+                                        //3
+                                  else if ((pixelx >= textoInstrucciones+ 2*cambioMozaico) && (pixelx< textoInstrucciones+ 3*cambioMozaico) && (pixely >= ARInstrucciones) && (pixely<=ABInstrucciones))begin
+                                        char_addr <= 7'h33;//direccion de lo que se va a imprimir
+                                        color_addr<=4'd2;// Color de lo que se va a imprimir
+                                        font_size<=2'd1;
+                                        graficos<=1'd0;
+                                        memInt<=1'd0;
+                                        dp<=1'd1;end
+
+                                        //ESPACIO
+                                  else if ((pixelx >= textoInstrucciones+ 3*cambioMozaico) && (pixelx< textoInstrucciones+ 4*cambioMozaico) && (pixely >= ARInstrucciones) && (pixely<=ABInstrucciones))begin
+                                        char_addr <= 7'h00;//direccion de lo que se va a imprimir
+                                        color_addr<=4'd2;// Color de lo que se va a imprimir
+                                        font_size<=2'd1;
+                                        graficos<=1'd0;
+                                        memInt<=1'd0;
+                                        dp<=1'd1;end
+
+                                        //I
+                                  else if ((pixelx >= textoInstrucciones+ 4*cambioMozaico) && (pixelx< textoInstrucciones+ 5*cambioMozaico) && (pixely >= ARInstrucciones) && (pixely<=ABInstrucciones))begin
+                                        char_addr <= 7'h49;//direccion de lo que se va a imprimir
+                                        color_addr<=4'd2;// Color de lo que se va a imprimir
+                                        font_size<=2'd1;
+                                        graficos<=1'd0;
+                                        memInt<=1'd0;
+                                        dp<=1'd1;end
+
+
+                                        //N
+                                  else if ((pixelx >= textoInstrucciones+ 5*cambioMozaico ) && (pixelx< textoInstrucciones+ 6*cambioMozaico) && (pixely >= ARInstrucciones) && (pixely<=ABInstrucciones))begin
+                                        char_addr <= 7'h4e;//direccion de lo que se va a imprimir
+                                        color_addr<=4'd2;// Color de lo que se va a imprimir
+                                        font_size<=2'd1;
+                                        graficos<=1'd0;
+                                        memInt<=1'd0;
+                                        dp<=1'd1;end
+
+
+                                        //T
+                                  else if ((pixelx >=textoInstrucciones+ 6*cambioMozaico) && (pixelx< textoInstrucciones+ 7*cambioMozaico) && (pixely >= ARInstrucciones) && (pixely<=ABInstrucciones))begin
+                                        char_addr <= 7'h54;//direccion de lo que se va a imprimir
+                                        color_addr<=4'd2;// Color de lo que se va a imprimir
+                                        font_size<=2'd1;
+                                        graficos<=1'd0;
+                                        memInt<=1'd0;
+                                        dp<=1'd1;end
+
+                                        //R
+                                  else if ((pixelx >=textoInstrucciones+ 7*cambioMozaico) && (pixelx< textoInstrucciones+ 8*cambioMozaico) && (pixely >= ARInstrucciones) && (pixely<=ABInstrucciones))begin
+                                        char_addr <= 7'h52;//direccion de lo que se va a imprimir
+                                        color_addr<=4'd2;// Color de lo que se va a imprimir
+                                        font_size<=2'd1;
+                                        graficos<=1'd0;
+                                        memInt<=1'd0;
+                                        dp<=1'd1;end
+
+                                        //U
+                                  else if ((pixelx >=textoInstrucciones+ 8*cambioMozaico) && (pixelx< textoInstrucciones+ 9*cambioMozaico) && (pixely >= ARInstrucciones) && (pixely<=ABInstrucciones))begin
+                                        char_addr <= 7'h55;//direccion de lo que se va a imprimir
+                                        color_addr<=4'd2;// Color de lo que se va a imprimir
+                                        font_size<=2'd1;
+                                        graficos<=1'd0;
+                                        memInt<=1'd0;
+                                        dp<=1'd1;end
+
+                                        //C
+                                  else if ((pixelx >=textoInstrucciones+ 9*cambioMozaico) && (pixelx< textoInstrucciones+ 10*cambioMozaico) && (pixely >= ARInstrucciones) && (pixely<=ABInstrucciones))begin
+                                        char_addr <= 7'h43;//direccion de lo que se va a imprimir
+                                        color_addr<=4'd2;// Color de lo que se va a imprimir
+                                        font_size<=2'd1;
+                                        graficos<=1'd0;
+                                        memInt<=1'd0;
+                                        dp<=1'd1;end
+
+                                        //C
+                                  else if ((pixelx >=textoInstrucciones+ 10*cambioMozaico) && (pixelx< textoInstrucciones+ 11*cambioMozaico) && (pixely >= ARInstrucciones) && (pixely<=ABInstrucciones))begin
+                                        char_addr <= 7'h43;//direccion de lo que se va a imprimir
+                                        color_addr<=4'd2;// Color de lo que se va a imprimir
+                                        font_size<=2'd1;
+                                        graficos<=1'd0;
+                                        memInt<=1'd0;
+                                        dp<=1'd1;end
+
+
+                                        //I
+                                  else if ((pixelx >=textoInstrucciones+ 11*cambioMozaico) && (pixelx< textoInstrucciones+ 12*cambioMozaico) && (pixely >= ARInstrucciones) && (pixely<=ABInstrucciones))begin
+                                        char_addr <= 7'h49;//direccion de lo que se va a imprimir
+                                        color_addr<=4'd2;// Color de lo que se va a imprimir
+                                        font_size<=2'd1;
+                                        graficos<=1'd0;
+                                        memInt<=1'd0;
+                                        dp<=1'd1;end
+
+
+
+                                        //O
+                                  else if ((pixelx >=textoInstrucciones+ 12*cambioMozaico) && (pixelx< textoInstrucciones+ 13*cambioMozaico) && (pixely >= ARInstrucciones) && (pixely<=ABInstrucciones))begin
+                                        char_addr <= 7'h4f;//direccion de lo que se va a imprimir
+                                        color_addr<=4'd2;// Color de lo que se va a imprimir
+                                        font_size<=2'd1;
+                                        graficos<=1'd0;
+                                        memInt<=1'd0;
+                                        dp<=1'd1;end
+
+
+                                        //N
+                                  else if ((pixelx >=textoInstrucciones+ 13*cambioMozaico) && (pixelx< textoInstrucciones+ 14*cambioMozaico) && (pixely >= ARInstrucciones) && (pixely<=ABInstrucciones))begin
+                                        char_addr <= 7'h4e;//direccion de lo que se va a imprimir
+                                        color_addr<=4'd2;// Color de lo que se va a imprimir
+                                        font_size<=2'd1;
+                                        graficos<=1'd0;
+                                        memInt<=1'd0;
+                                        dp<=1'd1;end
+
+
+
+                                        //E
+                                  else if ((pixelx >=textoInstrucciones+ 14*cambioMozaico) && (pixelx< textoInstrucciones+ 15*cambioMozaico) && (pixely >= ARInstrucciones) && (pixely<=ABInstrucciones))begin
+                                        char_addr <= 7'h45;//direccion de lo que se va a imprimir
+                                        color_addr<=4'd2;// Color de lo que se va a imprimir
+                                        font_size<=2'd1;
+                                        graficos<=1'd0;
+                                        memInt<=1'd0;
+                                        dp<=1'd1;end
+
+
+                                        //S
+                                  else if ((pixelx >=textoInstrucciones+ 15*cambioMozaico) && (pixelx< textoInstrucciones+ 16*cambioMozaico) && (pixely >= ARInstrucciones) && (pixely<=ABInstrucciones))begin
+                                        char_addr <= 7'h53;//direccion de lo que se va a imprimir
+                                        color_addr<=4'd2;// Color de lo que se va a imprimir
+                                        font_size<=2'd1;
+                                        graficos<=1'd0;
+                                        memInt<=1'd0;
+                                        dp<=1'd1;end
+
+
+
+                                        ////Las Instrucciones
+
+                                          ////RESET
+                                                //S
+                                                else if ((instrucciones==1) && (pixelx >= textoInstrucciones) && (pixelx<posicionInstrucciones+cambioMozaico) && (pixely >= ARInstrucciones-alturaMozaico) && (pixely<=ABInstrucciones-alturaMozaico))begin
+                                                    char_addr <= 7'h53;//direccion de lo que se va a imprimir
+                                                    color_addr<=4'd2;// Color de lo que se va a imprimir
+                                                    font_size<=2'd1;
+                                                    graficos<=1'd0;
+                                                    memInt<=1'd0;
+                                                    dp<=1'd1;end//Tamaño de fuente
+
+
+                                                    //W
+                                                    else if ((instrucciones==1) && (pixelx >= posicionInstrucciones+cambioMozaico) && (pixelx<posicionInstrucciones+ 2*cambioMozaico) && (pixely >= ARInstrucciones-alturaMozaico) && (pixely<=ABInstrucciones-alturaMozaico))begin
+                                                        char_addr <= 7'h57;//direccion de lo que se va a imprimir
+                                                        color_addr<=4'd2;// Color de lo que se va a imprimir
+                                                        font_size<=2'd1;
+                                                        graficos<=1'd0;
+                                                        memInt<=1'd0;
+                                                        dp<=1'd1;end
+
+                                                        //0
+                                                  else if ((instrucciones==1) && (pixelx >= posicionInstrucciones+ 2*cambioMozaico) && (pixelx< posicionInstrucciones+ 3*cambioMozaico) && (pixely >= ARInstrucciones-alturaMozaico) && (pixely<=ABInstrucciones-alturaMozaico))begin
+                                                        char_addr <= 7'h30;//direccion de lo que se va a imprimir
+                                                        color_addr<=4'd2;// Color de lo que se va a imprimir
+                                                        font_size<=2'd1;
+                                                        graficos<=1'd0;
+                                                        memInt<=1'd0;
+                                                        dp<=1'd1;end
+
+                                                        //ESPACIO
+                                                  else if ((instrucciones==1) && (pixelx >= posicionInstrucciones+ 3*cambioMozaico) && (pixelx< posicionInstrucciones+ 4*cambioMozaico) && (pixely >= ARInstrucciones-alturaMozaico) && (pixely<=ABInstrucciones-alturaMozaico))begin
+                                                        char_addr <= 7'h00;//direccion de lo que se va a imprimir
+                                                        color_addr<=4'd2;// Color de lo que se va a imprimir
+                                                        font_size<=2'd1;
+                                                        graficos<=1'd0;
+                                                        memInt<=1'd0;
+                                                        dp<=1'd1;end
+
+                                                        //R
+                                                  else if ((instrucciones==1) && (pixelx >= posicionInstrucciones+ 4*cambioMozaico) && (pixelx< posicionInstrucciones+ 5*cambioMozaico) && (pixely >= ARInstrucciones-alturaMozaico) && (pixely<=ABInstrucciones-alturaMozaico))begin
+                                                        char_addr <= 7'h52;//direccion de lo que se va a imprimir
+                                                        color_addr<=4'd2;// Color de lo que se va a imprimir
+                                                        font_size<=2'd1;
+                                                        graficos<=1'd0;
+                                                        memInt<=1'd0;
+                                                        dp<=1'd1;end
+
+
+                                                        //E
+                                                  else if ((instrucciones==1) && (pixelx >= posicionInstrucciones+ 5*cambioMozaico ) && (pixelx< posicionInstrucciones+ 6*cambioMozaico) && (pixely >= ARInstrucciones-alturaMozaico) && (pixely<=ABInstrucciones-alturaMozaico))begin
+                                                        char_addr <= 7'h45;//direccion de lo que se va a imprimir
+                                                        color_addr<=4'd2;// Color de lo que se va a imprimir
+                                                        font_size<=2'd1;
+                                                        graficos<=1'd0;
+                                                        memInt<=1'd0;
+                                                        dp<=1'd1;end
+
+
+                                                        //S
+                                                  else if ((instrucciones==1) && (pixelx >=posicionInstrucciones+ 6*cambioMozaico) && (pixelx< posicionInstrucciones+ 7*cambioMozaico) && (pixely >= ARInstrucciones-alturaMozaico) && (pixely<=ABInstrucciones-alturaMozaico))begin
+                                                        char_addr <= 7'h54;//direccion de lo que se va a imprimir
+                                                        color_addr<=4'd2;// Color de lo que se va a imprimir
+                                                        font_size<=2'd1;
+                                                        graficos<=1'd0;
+                                                        memInt<=1'd0;
+                                                        dp<=1'd1;end
+
+                                                        //E
+                                                  else if ((instrucciones==1) && (pixelx >=posicionInstrucciones+ 7*cambioMozaico) && (pixelx< posicionInstrucciones+ 8*cambioMozaico) && (pixely >= ARInstrucciones-alturaMozaico) && (pixely<=ABInstrucciones-alturaMozaico))begin
+                                                        char_addr <= 7'h45;//direccion de lo que se va a imprimir
+                                                        color_addr<=4'd2;// Color de lo que se va a imprimir
+                                                        font_size<=2'd1;
+                                                        graficos<=1'd0;
+                                                        memInt<=1'd0;
+                                                        dp<=1'd1;end
+
+                                                        //T
+                                                  else if ((instrucciones==1) && (pixelx >=posicionInstrucciones+ 8*cambioMozaico) && (pixelx< posicionInstrucciones+ 9*cambioMozaico) && (pixely >= ARInstrucciones-alturaMozaico) && (pixely<=ABInstrucciones-alturaMozaico))begin
+                                                        char_addr <= 7'h54;//direccion de lo que se va a imprimir
+                                                        color_addr<=4'd2;// Color de lo que se va a imprimir
+                                                        font_size<=2'd1;
+                                                        graficos<=1'd0;
+                                                        memInt<=1'd0;
+                                                        dp<=1'd1;end
+
+
+
+                                                        ///////////
+                                                        ///////////
+
+                                                        //ESCRIBIR
+
+                                                        //S
+                                                        else if ((instrucciones==1) && (pixelx >= textoInstrucciones) && (pixelx<posicionInstrucciones+cambioMozaico) && (pixely >= ARInstrucciones) && (pixely<=ABInstrucciones))begin
+                                                            char_addr <= 7'h53;//direccion de lo que se va a imprimir
+                                                            color_addr<=4'd2;// Color de lo que se va a imprimir
+                                                            font_size<=2'd1;
+                                                            graficos<=1'd0;
+                                                            memInt<=1'd0;
+                                                            dp<=1'd1;end//Tamaño de fuente
+
+
+                                                            //W
+                                                            else if ((instrucciones==1) && (pixelx >= posicionInstrucciones+cambioMozaico) && (pixelx<posicionInstrucciones+ 2*cambioMozaico) && (pixely >= ARInstrucciones) && (pixely<=ABInstrucciones))begin
+                                                                char_addr <= 7'h57;//direccion de lo que se va a imprimir
+                                                                color_addr<=4'd2;// Color de lo que se va a imprimir
+                                                                font_size<=2'd1;
+                                                                graficos<=1'd0;
+                                                                memInt<=1'd0;
+                                                                dp<=1'd1;end
+
+                                                                //1
+                                                          else if ((instrucciones==1) && (pixelx >= posicionInstrucciones+ 2*cambioMozaico) && (pixelx< posicionInstrucciones+ 3*cambioMozaico) && (pixely >= ARInstrucciones) && (pixely<=ABInstrucciones))begin
+                                                                char_addr <= 7'h31;//direccion de lo que se va a imprimir
+                                                                color_addr<=4'd2;// Color de lo que se va a imprimir
+                                                                font_size<=2'd1;
+                                                                graficos<=1'd0;
+                                                                memInt<=1'd0;
+                                                                dp<=1'd1;end
+
+                                                                //ESPACIO
+                                                          else if ((instrucciones==1) && (pixelx >= posicionInstrucciones+ 3*cambioMozaico) && (pixelx< posicionInstrucciones+ 4*cambioMozaico) && (pixely >= ARInstrucciones) && (pixely<=ABInstrucciones))begin
+                                                                char_addr <= 7'h00;//direccion de lo que se va a imprimir
+                                                                color_addr<=4'd2;// Color de lo que se va a imprimir
+                                                                font_size<=2'd1;
+                                                                graficos<=1'd0;
+                                                                memInt<=1'd0;
+                                                                dp<=1'd1;end
+
+                                                                //E
+                                                          else if ((instrucciones==1) && (pixelx >= posicionInstrucciones+ 4*cambioMozaico) && (pixelx< posicionInstrucciones+ 5*cambioMozaico) && (pixely >= ARInstrucciones) && (pixely<=ABInstrucciones))begin
+                                                                char_addr <= 7'h45;//direccion de lo que se va a imprimir
+                                                                color_addr<=4'd2;// Color de lo que se va a imprimir
+                                                                font_size<=2'd1;
+                                                                graficos<=1'd0;
+                                                                memInt<=1'd0;
+                                                                dp<=1'd1;end
+
+
+                                                                //S
+                                                          else if ((instrucciones==1) && (pixelx >= posicionInstrucciones+ 5*cambioMozaico ) && (pixelx< posicionInstrucciones+ 6*cambioMozaico) && (pixely >= ARInstrucciones) && (pixely<=ABInstrucciones))begin
+                                                                char_addr <= 7'h53;//direccion de lo que se va a imprimir
+                                                                color_addr<=4'd2;// Color de lo que se va a imprimir
+                                                                font_size<=2'd1;
+                                                                graficos<=1'd0;
+                                                                memInt<=1'd0;
+                                                                dp<=1'd1;end
+
+
+                                                                //C
+                                                          else if ((instrucciones==1) && (pixelx >=posicionInstrucciones+ 6*cambioMozaico) && (pixelx< posicionInstrucciones+ 7*cambioMozaico) && (pixely >= ARInstrucciones) && (pixely<=ABInstrucciones))begin
+                                                                char_addr <= 7'h43;//direccion de lo que se va a imprimir
+                                                                color_addr<=4'd2;// Color de lo que se va a imprimir
+                                                                font_size<=2'd1;
+                                                                graficos<=1'd0;
+                                                                memInt<=1'd0;
+                                                                dp<=1'd1;end
+
+                                                                //R
+                                                          else if ((instrucciones==1) && (pixelx >=posicionInstrucciones+ 7*cambioMozaico) && (pixelx< posicionInstrucciones+ 8*cambioMozaico) && (pixely >= ARInstrucciones) && (pixely<=ABInstrucciones))begin
+                                                                char_addr <= 7'h52;//direccion de lo que se va a imprimir
+                                                                color_addr<=4'd2;// Color de lo que se va a imprimir
+                                                                font_size<=2'd1;
+                                                                graficos<=1'd0;
+                                                                memInt<=1'd0;
+                                                                dp<=1'd1;end
+
+                                                                //I
+                                                          else if ((instrucciones==1) && (pixelx >=posicionInstrucciones+ 8*cambioMozaico) && (pixelx< posicionInstrucciones+ 9*cambioMozaico) && (pixely >= ARInstrucciones) && (pixely<=ABInstrucciones))begin
+                                                                char_addr <= 7'h49;//direccion de lo que se va a imprimir
+                                                                color_addr<=4'd2;// Color de lo que se va a imprimir
+                                                                font_size<=2'd1;
+                                                                graficos<=1'd0;
+                                                                memInt<=1'd0;
+                                                                dp<=1'd1;end
+
+                                                                //B
+                                                          else if ((instrucciones==1) && (pixelx >=posicionInstrucciones+ 9*cambioMozaico) && (pixelx< posicionInstrucciones+ 10*cambioMozaico) && (pixely >= ARInstrucciones) && (pixely<=ABInstrucciones))begin
+                                                                char_addr <= 7'h42;//direccion de lo que se va a imprimir
+                                                                color_addr<=4'd2;// Color de lo que se va a imprimir
+                                                                font_size<=2'd1;
+                                                                graficos<=1'd0;
+                                                                memInt<=1'd0;
+                                                                dp<=1'd1;end
+
+                                                                //I
+                                                          else if ((instrucciones==1) && (pixelx >=posicionInstrucciones+ 10*cambioMozaico) && (pixelx< posicionInstrucciones+ 11*cambioMozaico) && (pixely >= ARInstrucciones) && (pixely<=ABInstrucciones))begin
+                                                                char_addr <= 7'h49;//direccion de lo que se va a imprimir
+                                                                color_addr<=4'd2;// Color de lo que se va a imprimir
+                                                                font_size<=2'd1;
+                                                                graficos<=1'd0;
+                                                                memInt<=1'd0;
+                                                                dp<=1'd1;end
+
+                                                                //R
+                                                          else if ((instrucciones==1) && (pixelx >=posicionInstrucciones+ 8*cambioMozaico) && (pixelx< posicionInstrucciones+ 9*cambioMozaico) && (pixely >= ARInstrucciones) && (pixely<=ABInstrucciones))begin
+                                                                char_addr <= 7'h52;//direccion de lo que se va a imprimir
+                                                                color_addr<=4'd2;// Color de lo que se va a imprimir
+                                                                font_size<=2'd1;
+                                                                graficos<=1'd0;
+                                                                memInt<=1'd0;
+                                                                dp<=1'd1;end
+
+
+                                                                //PROGRAMAR CRONOMETRO
+
+                                                                //S
+                                                                else if ((instrucciones==1) && (pixelx >= textoInstrucciones) && (pixelx<posicionInstrucciones+cambioMozaico) && (pixely >= ARInstrucciones+alturaMozaico) && (pixely<=ABInstrucciones+alturaMozaico))begin
+                                                                    char_addr <= 7'h53;//direccion de lo que se va a imprimir
+                                                                    color_addr<=4'd2;// Color de lo que se va a imprimir
+                                                                    font_size<=2'd1;
+                                                                    graficos<=1'd0;
+                                                                    memInt<=1'd0;
+                                                                    dp<=1'd1;end//Tamaño de fuente
+
+
+                                                                    //W
+                                                                    else if ((instrucciones==1) && (pixelx >= posicionInstrucciones+cambioMozaico) && (pixelx<posicionInstrucciones+ 2*cambioMozaico) && (pixely >= ARInstrucciones+alturaMozaico) && (pixely<=ABInstrucciones+alturaMozaico))begin
+                                                                        char_addr <= 7'h57;//direccion de lo que se va a imprimir
+                                                                        color_addr<=4'd2;// Color de lo que se va a imprimir
+                                                                        font_size<=2'd1;
+                                                                        graficos<=1'd0;
+                                                                        memInt<=1'd0;
+                                                                        dp<=1'd1;end
+
+                                                                        //2
+                                                                  else if ((instrucciones==1) && (pixelx >= posicionInstrucciones+ 2*cambioMozaico) && (pixelx< posicionInstrucciones+ 3*cambioMozaico) && (pixely >= ARInstrucciones+alturaMozaico) && (pixely<=ABInstrucciones+alturaMozaico))begin
+                                                                        char_addr <= 7'h32;//direccion de lo que se va a imprimir
+                                                                        color_addr<=4'd2;// Color de lo que se va a imprimir
+                                                                        font_size<=2'd1;
+                                                                        graficos<=1'd0;
+                                                                        memInt<=1'd0;
+                                                                        dp<=1'd1;end
+
+                                                                        //ESPACIO
+                                                                  else if ((instrucciones==1) && (pixelx >= posicionInstrucciones+ 3*cambioMozaico) && (pixelx< posicionInstrucciones+ 4*cambioMozaico) && (pixely >= ARInstrucciones+alturaMozaico) && (pixely<=ABInstrucciones+alturaMozaico))begin
+                                                                        char_addr <= 7'h00;//direccion de lo que se va a imprimir
+                                                                        color_addr<=4'd2;// Color de lo que se va a imprimir
+                                                                        font_size<=2'd1;
+                                                                        graficos<=1'd0;
+                                                                        memInt<=1'd0;
+                                                                        dp<=1'd1;end
+
+                                                                        //P
+                                                                  else if ((instrucciones==1) && (pixelx >= posicionInstrucciones+ 4*cambioMozaico) && (pixelx< posicionInstrucciones+ 5*cambioMozaico) && (pixely >= ARInstrucciones+alturaMozaico) && (pixely<=ABInstrucciones+alturaMozaico))begin
+                                                                        char_addr <= 7'h50;//direccion de lo que se va a imprimir
+                                                                        color_addr<=4'd2;// Color de lo que se va a imprimir
+                                                                        font_size<=2'd1;
+                                                                        graficos<=1'd0;
+                                                                        memInt<=1'd0;
+                                                                        dp<=1'd1;end
+
+
+                                                                        //R
+                                                                  else if ((instrucciones==1) && (pixelx >= posicionInstrucciones+ 5*cambioMozaico ) && (pixelx< posicionInstrucciones+ 6*cambioMozaico) && (pixely >= ARInstrucciones+alturaMozaico) && (pixely<=ABInstrucciones+alturaMozaico))begin
+                                                                        char_addr <= 7'h52;//direccion de lo que se va a imprimir
+                                                                        color_addr<=4'd2;// Color de lo que se va a imprimir
+                                                                        font_size<=2'd1;
+                                                                        graficos<=1'd0;
+                                                                        memInt<=1'd0;
+                                                                        dp<=1'd1;end
+
+
+                                                                        //ESPACIO
+                                                                  else if ((instrucciones==1) && (pixelx >=posicionInstrucciones+ 6*cambioMozaico) && (pixelx< posicionInstrucciones+ 7*cambioMozaico) && (pixely >= ARInstrucciones+alturaMozaico) && (pixely<=ABInstrucciones+alturaMozaico))begin
+                                                                        char_addr <= 7'h00;//direccion de lo que se va a imprimir
+                                                                        color_addr<=4'd2;// Color de lo que se va a imprimir
+                                                                        font_size<=2'd1;
+                                                                        graficos<=1'd0;
+                                                                        memInt<=1'd0;
+                                                                        dp<=1'd1;end
+
+                                                                        //C
+                                                                  else if ((instrucciones==1) && (pixelx >=posicionInstrucciones+ 7*cambioMozaico) && (pixelx< posicionInstrucciones+ 8*cambioMozaico) && (pixely >= ARInstrucciones+alturaMozaico) && (pixely<=ABInstrucciones+alturaMozaico))begin
+                                                                        char_addr <= 7'h43;//direccion de lo que se va a imprimir
+                                                                        color_addr<=4'd2;// Color de lo que se va a imprimir
+                                                                        font_size<=2'd1;
+                                                                        graficos<=1'd0;
+                                                                        memInt<=1'd0;
+                                                                        dp<=1'd1;end
+
+                                                                        //R
+                                                                  else if ((instrucciones==1) && (pixelx >=posicionInstrucciones+ 8*cambioMozaico) && (pixelx< posicionInstrucciones+ 9*cambioMozaico) && (pixely >= ARInstrucciones+alturaMozaico) && (pixely<=ABInstrucciones+alturaMozaico))begin
+                                                                        char_addr <= 7'h52;//direccion de lo que se va a imprimir
+                                                                        color_addr<=4'd2;// Color de lo que se va a imprimir
+                                                                        font_size<=2'd1;
+                                                                        graficos<=1'd0;
+                                                                        memInt<=1'd0;
+                                                                        dp<=1'd1;end
+
+                                                                        //O
+                                                                  else if ((instrucciones==1) && (pixelx >=posicionInstrucciones+ 9*cambioMozaico) && (pixelx< posicionInstrucciones+ 10*cambioMozaico) && (pixely >= ARInstrucciones+alturaMozaico) && (pixely<=ABInstrucciones+alturaMozaico))begin
+                                                                        char_addr <= 7'h4f;//direccion de lo que se va a imprimir
+                                                                        color_addr<=4'd2;// Color de lo que se va a imprimir
+                                                                        font_size<=2'd1;
+                                                                        graficos<=1'd0;
+                                                                        memInt<=1'd0;
+                                                                        dp<=1'd1;end
+
+                                                                        //N
+                                                                  else if ((instrucciones==1) && (pixelx >=posicionInstrucciones+ 10*cambioMozaico) && (pixelx< posicionInstrucciones+ 11*cambioMozaico) && (pixely >= ARInstrucciones+alturaMozaico) && (pixely<=ABInstrucciones+alturaMozaico))begin
+                                                                        char_addr <= 7'h4e;//direccion de lo que se va a imprimir
+                                                                        color_addr<=4'd2;// Color de lo que se va a imprimir
+                                                                        font_size<=2'd1;
+                                                                        graficos<=1'd0;
+                                                                        memInt<=1'd0;
+                                                                        dp<=1'd1;end
+
+                                                                        //O
+                                                                  else if ((instrucciones==1) && (pixelx >=posicionInstrucciones+ 8*cambioMozaico) && (pixelx< posicionInstrucciones+ 9*cambioMozaico) && (pixely >= ARInstrucciones+alturaMozaico) && (pixely<=ABInstrucciones+alturaMozaico))begin
+                                                                        char_addr <= 7'h4f;//direccion de lo que se va a imprimir
+                                                                        color_addr<=4'd2;// Color de lo que se va a imprimir
+                                                                        font_size<=2'd1;
+                                                                        graficos<=1'd0;
+                                                                        memInt<=1'd0;
+                                                                        dp<=1'd1;end
 
 
 
