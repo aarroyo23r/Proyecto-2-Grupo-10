@@ -3,7 +3,7 @@
 module MaquinaCrono(
     input wire Reset,clk,
     input wire ProgramarCrono,FinalizoCrono,InicioCrono,
-    output reg CronoActivo,Ring,
+    output reg CronoActivo,Ring
     );
  //declaracion de estados
 localparam[1:0] s0 = 2'b00, //Estado Programar Cronometro
@@ -17,7 +17,7 @@ localparam [11:0] limit = 12'h100;
 //registro de estados
 always @(posedge clk,posedge Reset)begin//Logica de reset y estado siguiente
     if(Reset)begin
-        s_actual <=s0
+        s_actual <=s0;
     end
     else
         s_actual <=s_next;

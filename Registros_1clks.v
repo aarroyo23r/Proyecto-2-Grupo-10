@@ -6,7 +6,7 @@ module Registros(
     input wire [7:0] contador,
     output wire [7:0] data_vga_final,
     input wire Read,
-    output wire [3:0] contador_datos1, 
+    output wire [3:0] contador_datos1,
     output wire [7:0] datos0,
     output wire [7:0] datos1,
     output wire [7:0] datos2,
@@ -20,7 +20,7 @@ module Registros(
     output wire [7:0] datos10
     );
 
-reg[3:0]contador_datos=8'b00000000;
+reg[4:0]contador_datos=5'd0;
 reg [7:0]data_write;
 reg [7:0]data_0;reg [7:0]data_1;reg [7:0]data_2;
 reg [7:0]data_3;reg [7:0]data_4;reg [7:0]data_5;reg [7:0]data_6;
@@ -46,48 +46,51 @@ end
 
 always@(posedge clk)begin
 
-    if(contador_datos==4'b0001 && Read == 0 && contador>8'b10011000)begin
-      data_0<=data_vga;
-       //data_0<=1;
+    if(contador_datos==5'd1 && Read == 0 && contador>8'b10011000)begin
+      //data_0<=data_vga;
+       data_0<=11;
 
     end
-    if(contador_datos==4'b0010  && Read ==0 && contador>8'b10011000)begin
-        data_1<=data_vga;
-        //data_1<=2;
+    if(contador_datos==5'd3  && Read ==0 && contador>8'b10011000)begin
+        //data_1<=data_vga;
+        data_1<=22;
 
     end
-    if(contador_datos==4'b0011 && Read == 0 && contador>8'b10011000 )begin
-        data_2<=data_vga;
-        //data_2<=3;
+    if(contador_datos==5'd5 && Read == 0 && contador>8'b10011000 )begin
+        //data_2<=data_vga;
+        data_2<=33;
     end
-    if(contador_datos==4'b0100 && Read ==0 && contador>8'b10011000)begin
-        data_3<=data_vga;
-        //data_3<=4;
+    if(contador_datos==5'd7 && Read ==0 && contador>8'b10011000)begin
+       // data_3<=data_vga;
+        data_3<=44;
     end
-    if(contador_datos==4'b0101 && Read ==0 && contador>8'b10011000)begin
-        data_4<=data_vga;
-        //data_4<=5;
+    if(contador_datos==5'd9 && Read ==0 && contador>8'b10011000)begin
+        //data_4<=data_vga;
+        data_4<=55;
     end
-    if(contador_datos==4'b0110  && Read ==0 && contador>8'b10011000)begin
-         data_5<=data_vga;
-         //data_5<=6;
+    if(contador_datos==5'd11  && Read ==0 && contador>8'b10011000)begin
+        // data_5<=data_vga;
+         data_5<=66;
     end
-    if(contador_datos==4'b0111 && Read ==0 && contador>8'b10011000)begin
-         data_6<=data_vga;
-         //data_6<=7;
+    if(contador_datos==5'd13 && Read ==0 && contador>8'b10011000)begin
+         //data_6<=data_vga;
+         data_6<=77;
     end
-    if(contador_datos==4'b1000 && Read ==0 && contador>8'b10011000)begin
-         data_7<=data_vga;
-         //data_7<=8;
+    if(contador_datos==5'd15 && Read ==0 && contador>8'b10011000)begin
+        // data_7<=data_vga;
+         data_7<=88;
     end
-    if(contador_datos==4'b1001 && Read ==0 && contador>8'b10011000)begin
-         data_8<=data_vga;
+    if(contador_datos==5'd17 && Read ==0 && contador>8'b10011000)begin
+         //data_8<=data_vga;
+         data_8<=23;
     end
-    if(contador_datos==4'b1010 && Read ==0 && contador>8'b10011000)begin
-         data_9<=data_vga;     
+    if(contador_datos==5'd19 && Read ==0 && contador>8'b10011000)begin
+         //data_9<=data_vga;
+           data_9<=40;
     end
-    if(contador_datos==4'b1011 && Read ==0 && contador>8'b10011000)begin
-         data_10<=data_vga;
+    if(contador_datos==5'd21 && Read ==0 && contador>8'b10011000)begin
+         //data_10<=data_vga;
+           data_10<=15;
     end
     else begin
     end
@@ -97,8 +100,8 @@ end
 
 always @(posedge clk)begin
     contador_clks<=contador_clks +1'b1;
-    if(contador_clks==4'b1100)begin
-        contador_clks<=4'b0000;
+    if(contador_clks==5'd22)begin
+        contador_clks<=5'd0;
     end
 end
 assign data_vga_final = (contador_clks==4'b0001)? data_0 :8'bZZZZZZZZ;
@@ -128,7 +131,7 @@ assign data_vga_final = (contador_clks==4'b1011)? data_10:8'bZZZZZZZZ;
 //assign data_vga_final = (contador_clks==4'b0000)? 4'b0000:8'bZZZZZZZZ;
 
 
-assign bit_inicio1 =(contador_clks==4'b1100)? 1'b0: 1'b1;
+assign bit_inicio1 =(contador_clks==4'd22)? 1'b0: 1'b1;
 
 
 endmodule

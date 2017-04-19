@@ -2,17 +2,19 @@
 
 module TOP_tb();
    reg Reset,clk,Inicio,Escribir,ProgramarCrono;
-   wire ChipSelect,Read,Write,AoD; //Señales de control rtc
+   wire ChipSelect,Read,Write,AoD,bit_inicio; //Señales de control rtc
 
- TOP unit(
-           .clk(clk),.Reset1(Reset),.ProgramarCrono(ProgramarCrono)
-           ,.Escribir(Escribir),.Inicio1(Inicio),
-           .ChipSelect(ChipSelect),.Read(Read),.Write(Write),.AoD(AoD));
- 
+ TOP  uut(
+           .clk(clk),.Reset(Reset),.ProgramarCrono(ProgramarCrono)
+           ,.Escribir(Escribir),
+           .ChipSelect(ChipSelect),.Read(Read),.Write(Write),.AoD(AoD), .bit_inicio1(bit_inicio)
+);
+
  initial
  begin
  clk=1;
  Reset=0;
+ //bit_inicio=0;
  Inicio=1;
  Escribir=0;
  ProgramarCrono=0;
@@ -33,9 +35,9 @@ module TOP_tb();
  #40000;
 Escribir=1;
  #40000;
- 
+
  end
- 
+
 
  always
  begin
@@ -45,4 +47,3 @@ clk=~clk;
 
 
  endmodule
-

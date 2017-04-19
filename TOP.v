@@ -11,11 +11,12 @@ module TOP(
     output wire ChipSelect,Read,Write,AoD, //Señales de control rtc
     output wire hsync,vsync,
     output wire  [11:0] rgbO,
+    output wire bit_inicio1,
     output wire video_on
 
 
     );
- wire bit_inicio1; //Bit de inicio hacia controlador vga
+ //wire bit_inicio1; //Bit de inicio hacia controlador vga
 
 wire RW;//Variables OUTPUT MaquinaGeneral, indica cuales señales generar
 wire Crono; //Variable OUTPUT MaquinaGeneral, activa o desactiva el modulo del cronometrp
@@ -111,7 +112,7 @@ always@(posedge clk)
        else
        data_mod2<=data_mod;
     end
-                            
+
 Protocolo_rtc Proto_unit(.clk(clk),.bit_crono(Crono),.address(address2),.DATA_WRITE(data_mod2),.IndicadorMaquina(RW),
                          .ChipSelect(ChipSelect),.Read(Read),.Write(Write),.AoD(AoD),.DATA_ADDRESS(DATA_ADDRESS),
                          .data_vga(data_intermedia),.contador2(contador2));
@@ -134,13 +135,10 @@ wire [7:0] data_out; //datos hacia controlador vga
 Registros Register_unit(.clk(clk),.bit_inicio1(bit_inicio1),.data_vga(data_vga_entrada),.contador(contador2),
                         .data_vga_final(data_out),.Read(READ),.contador_datos1(contador_datos1),.datos0(segundos),
                         .datos1(minutos),.datos2(horas),.datos3(date),.datos4(mes),.datos5(ano),.datos6(dia_sem),.datos7(num_semana));
-reg [7:0] data_out1;
+//reg [7:0] data_out1;
 
-always@(posedge clk)
-begin
-    data_out1<=data_out;
-end
 
-Interfaz Interfaz_unit(.clk(clk),.reset(Reset),.rgbO(rgbO),.resetSync(Reset),.inicioSecuencia(bit_inicio1),.ring(),.datoRTC(data_out1),.hsync(hsync),.vsync(vsync),.video_on(video_on));    
-    
+
+Interfaz Interfaz_unit(.clk(clk),.reset(Reset),.rgbO(rgbO),.resetSync(Reset),.inicioSecuencia(bit_inicio1),.datoRTC(data_out),.hsync(hsync),.vsync(vsync),.video_on(video_on));
+
 endmodule

@@ -9,6 +9,8 @@ set_property PACKAGE_PIN E3 [get_ports clk]
 set_property IOSTANDARD LVCMOS33 [get_ports clk]
 create_clock -period 10.000 -name clk -waveform {0.000 5.000} [get_ports clk]
 
+set_property  CFGBVS VCCO [current_design]
+set_property  CONFIG_VOLTAGE  3.3  [current_design]
 
 ## Switches
 ##Bank = 34, Pin name = IO_L21P_T3_DQS_34,					Sch name = SW0
@@ -260,8 +262,8 @@ set_property IOSTANDARD LVCMOS33 [get_ports AoD]
 #set_property PACKAGE_PIN T9 [get_ports {JB[6]}]
 #set_property IOSTANDARD LVCMOS33 [get_ports {JB[6]}]
 ##Bank = 14, Pin name = IO_L19N_T3_A09_D25_VREF_14,			Sch name = JB10
-#set_property PACKAGE_PIN U11 [get_ports {JB[7]}]
-#set_property IOSTANDARD LVCMOS33 [get_ports {JB[7]}]
+set_property PACKAGE_PIN U11 [get_ports {bit_inicio1}]
+set_property IOSTANDARD LVCMOS33 [get_ports {bit_inicio1}]
 
 
 

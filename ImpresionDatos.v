@@ -1309,8 +1309,6 @@ end
 
 always @*
 
-if (graficos)begin//Solo se activa cuando se va a usar la memoria de graficos
-
 //Logica reinicio de los contadores lectura memoria
 
   if (char_addr== 7'h30) begin
@@ -1357,12 +1355,6 @@ if (graficos)begin//Solo se activa cuando se va a usar la memoria de graficos
     contadorycambio=contadory; //Evitar warning latch
   end
 
-end
-
-else begin
-
-contadorycambio=contadory;//Evitar warning latch
-end
 
 
 //Logica direccion de memoria
