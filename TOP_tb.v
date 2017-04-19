@@ -45,7 +45,7 @@ Escribir=1;
 
  always
  begin
-clk=~clk;
+clk=~clk; 
 #5;
  end
 
