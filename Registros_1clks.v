@@ -38,8 +38,8 @@ assign datos10=data_10;
 always @(posedge clk)begin
    if(Read==0 && contador==8'b11101100)begin
    contador_datos <= contador_datos + 1'b1;
-   if(contador_datos==4'b1011)begin                //contador indica cuando han pasado los 11 datos
-        contador_datos<=4'b0000;
+   if(contador_datos==5'd23)begin                //contador indica cuando han pasado los 11 datos
+        contador_datos<=5'd0;
    end
    end
 end
