@@ -310,7 +310,7 @@ w<= 0;
 dirAsciiDatoU<=dirAsciiDatoU;
 dirAsciiDatoU<=dirAsciiDatoU;
 
-if (contGuardados==5'he)//Para que finalizoContar se active unicamente  cuando esto es cierto
+if (contGuardados==5'hb)//Para que finalizoContar se active unicamente  cuando esto es cierto
 begin
 finalizoContar<=1;
 contGuardados<=0;
@@ -358,48 +358,48 @@ end
 else begin
 
 if (w==1 & r==0)begin
-if (contGuardados==5'd4)begin //Se empieza en el contador 4 porque antes de esto es un retardo que se utiliza para generar la direccion que se va a guardar en estos registros
+if (contGuardados==5'd1)begin //Se empieza en el contador 4 porque antes de esto es un retardo que se utiliza para generar la direccion que se va a guardar en estos registros
 SegundosU <= dirAsciiDatoSigU;
 SegundosD <= dirAsciiDatoSigD;end
 
-else if (contGuardados==5'd5)begin
+else if (contGuardados==5'd2)begin
 minutosU <= dirAsciiDatoSigU;
 minutosD <= dirAsciiDatoSigD;end
 
-else if (contGuardados==5'd6)begin
+else if (contGuardados==5'd3)begin
 horasU <= dirAsciiDatoSigU;
 horasD <= dirAsciiDatoSigD;end
 
-else if (contGuardados==5'd7)begin
+else if (contGuardados==5'd4)begin
 fechaU <= dirAsciiDatoSigU;
 fechaD <= dirAsciiDatoSigD;end
 
-else if (contGuardados==5'd8)begin
+else if (contGuardados==5'd5)begin
 mesU <= dirAsciiDatoSigU;
 mesD <= dirAsciiDatoSigD;end
 
-else if (contGuardados==5'd9)begin
+else if (contGuardados==5'd6)begin
 anoU <= dirAsciiDatoSigU;
 anoD <= dirAsciiDatoSigD;end
 
-else if (contGuardados==5'd10)begin
+else if (contGuardados==5'd7)begin
 diaSemanaU <= dirAsciiDatoSigU;
 diaSemanaD <= dirAsciiDatoSigD;end
 
-else if (contGuardados==5'd11)begin
+else if (contGuardados==5'd8)begin
 numeroSemanaU <= dirAsciiDatoSigU;
 numeroSemanaD <= dirAsciiDatoSigD;end
 
 //Temporizador
-else if (contGuardados==5'd12)begin
+else if (contGuardados==5'd9)begin
 SegundosUT <= dirAsciiDatoSigU;
 SegundosDT <= dirAsciiDatoSigD;end
 
-else if (contGuardados==5'd13)begin
+else if (contGuardados==5'd10)begin
 minutosUT <= dirAsciiDatoSigU;
 minutosDT <= dirAsciiDatoSigD;end
 
-else if (contGuardados==5'd14)begin
+else if (contGuardados==5'd11)begin
 horasUT <= dirAsciiDatoSigU;
 horasDT <= dirAsciiDatoSigD;end
 
