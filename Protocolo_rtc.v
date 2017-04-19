@@ -37,17 +37,17 @@ assign DATA_ADDRESS =((AoD==1 && Write==0 && ChipSelect ==0 && IndicadorMaquina=
 assign DATA_ADDRESS =((AoD==0 && Write==0 && IndicadorMaquina==0 && contador>8'b10100000)|(contador>8'b11011101 && contador<8'b11011111 && IndicadorMaquina==0))? command:8'bZZZZZZZZ;
 
 //FUNCIÓN READ
-assign DATA_ADDRESS =((AoD==0 && Write==0 && IndicadorMaquina==1 && contador <8'b10100000)|(contador>8'b01010001 && contador<8'b01010011 && IndicadorMaquina==1))? command:8'bZZZZZZZZ;
-assign DATA_ADDRESS =((AoD==0 && Write==0 && IndicadorMaquina==1 && Read==1 && contador >8'b10100000)|(contador>8'b11011101 && contador<8'b11011111 && IndicadorMaquina==1))? address:8'bZZZZZZZZ;
+assign DATA_ADDRESS =(!AoD && IndicadorMaquina && contador <8'h60)? command:8'bZZZZZZZZ;
+assign DATA_ADDRESS =(!AoD && IndicadorMaquina && contador>8'h60)? address:8'bZZZZZZZZ;
 
 
 always@(posedge clk)
 begin
-    if(AoD==1 && IndicadorMaquina==1 && Read==0 && contador>8'b10100000)
+    if(IndicadorMaquina==1 && contador>=8'hf6 &&contador<=8'hfd)
     begin
     data_vga<=DATA_ADDRESS;
     end
     else
-    data_vga<=data_vga;
+    data_vga<=8'h00;
 end
 endmodule
