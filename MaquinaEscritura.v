@@ -12,7 +12,7 @@ module MaquinaEscritura(
     );
 reg [32:0]contador=32'h00000000;
 reg[3:0]c_dir=0;
-localparam [11:0] limit = 12'h100;            
+localparam [11:0] limit = 12'h04a;            
 localparam [3:0] s0 = 4'h0, //inicialización
                  s1 = 4'h2, //segundos 
                  s2 = 4'h3, //minutos
@@ -98,7 +98,7 @@ begin
     contador2<=contador2 +1'b1;
     activa<=0;
 end
-if(contador2==12'h300)
+if(contador2==12'd222)
 begin
     activa<=1;
 end
@@ -114,7 +114,7 @@ begin
     contador3<=contador3 +1'b1;
     activa2<=0;
 end
-if(contador3==12'h800)
+if(contador3==12'd592)
 begin
     activa2<=1;
 end
