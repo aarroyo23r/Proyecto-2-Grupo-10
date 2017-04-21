@@ -15,7 +15,7 @@ module MaquinaGeneral(
 localparam[1:0] s0 = 2'b00, //Estado Escribir
                 s1 = 2'b01, //Estado Leer
                 s2 = 2'b10; //Estado Programar Crono    
-localparam [11:0] limit = 12'h100;            
+localparam [7:0] limit = 8'h4a;            
  //señales de estado
  reg[1:0]s_actual=s0;
  reg [1:0]s_next; 
@@ -45,6 +45,9 @@ always @(posedge clk)
         activa<=1;
         end
     end
+    
+    
+    
 always@(posedge clk)
 begin
 if(!Reset && !Inicio && !ProgramarCrono && !Escribir)
@@ -55,6 +58,10 @@ else begin
 Per_read<=0;
 end
 end    
+  
+  
+  
+  
     
 always @(posedge activa)
 begin
