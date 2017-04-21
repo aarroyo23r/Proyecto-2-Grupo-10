@@ -5,7 +5,7 @@ module MaquinaLectura(
     input wire RW,Per_read,
     output reg [7:0] address
     ); 
-localparam [11:0] limit = 12'h100; //tiempo en el que la dirección se mantiene             
+localparam [11:0] limit = 12'h04a; //tiempo en el que la dirección se mantiene             
 reg [11:0] contador=0;  
 reg reset;
 reg [3:0] c_dir=0;
