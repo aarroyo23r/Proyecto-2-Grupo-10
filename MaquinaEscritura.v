@@ -1,5 +1,3 @@
-`timescale 1ns / 1ps
-
 module MaquinaEscritura(
     input wire Inicio,Reset,Crono,Escribir,
     input wire clk,Per_read,
@@ -12,7 +10,7 @@ module MaquinaEscritura(
     );
 reg [32:0]contador=32'h00000000;
 reg[3:0]c_dir=0;
-localparam [11:0] limit = 12'h04a;            
+localparam [11:0] limit = 12'd1;            
 localparam [3:0] s0 = 4'h0, //inicialización
                  s1 = 4'h2, //segundos 
                  s2 = 4'h3, //minutos
@@ -98,7 +96,7 @@ begin
     contador2<=contador2 +1'b1;
     activa<=0;
 end
-if(contador2==12'd222)
+if(contador2==12'h04a)
 begin
     activa<=1;
 end
@@ -114,7 +112,7 @@ begin
     contador3<=contador3 +1'b1;
     activa2<=0;
 end
-if(contador3==12'd592)
+if(contador3==12'h250)
 begin
     activa2<=1;
 end
@@ -124,7 +122,7 @@ end
 
 ///maquina de estados de escritura
 
-always @*
+always @(posedge clk)
 begin
 if(!RW |Escribir |Inicio |reset2)
 begin
@@ -544,5 +542,3 @@ data_mod = data_mod; //salida default de leer
      
   endcase
 end
-end
-endmodule
