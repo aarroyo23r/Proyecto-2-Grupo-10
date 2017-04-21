@@ -113,7 +113,7 @@ always@(posedge clk)begin
                                             //data_1<=2;
 
                                         end
-
+ 
     else begin
           data_0<=data_0;
           data_1<=data_1;
