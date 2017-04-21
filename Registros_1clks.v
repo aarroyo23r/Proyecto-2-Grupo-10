@@ -1,15 +1,15 @@
 `timescale 1ns / 1ps
 module Registros(
     input wire clk,
-    output wire bit_inicio1,
 
     input wire IndicadorMaquina,
     input wire [7:0] contador,
+    input wire Write,AoD,
 
     input wire Read,
-    output wire [3:0] contador_datos1,
 
 
+    input wire [6:0] contador_todo,
     input wire [7:0] data_vga,
     input wire [7:0]address,
     output wire [7:0] datos0,
@@ -25,90 +25,75 @@ module Registros(
     output wire [7:0] datos10
     );
 
-reg[3:0]contador_datos=8'b00000000;
-reg [7:0]data_write;
 reg [7:0]data_0;reg [7:0]data_1;reg [7:0]data_2;
 reg [7:0]data_3;reg [7:0]data_4;reg [7:0]data_5;reg [7:0]data_6;
 reg [7:0]data_7;reg [7:0]data_8;reg [7:0]data_9;reg [7:0]data_10;
-reg[3:0]contador_clks=8'b00000000;           //contador para manda el dato a 1 clk por segundo
-reg data_pre_vga=8'b00000000;
-reg [3:0] contador_unico=4'b0000;
 
-assign contador_datos1 = contador_datos;
+//reg [7:0] address_reg;
+
 assign datos0=data_0; assign datos1=data_1;assign datos2=data_2;assign datos3=data_3;assign datos4=data_4;
 assign datos5=data_5;assign datos6=data_6;assign datos7=data_7;assign datos8=data_8;assign datos9=data_9;
 assign datos10=data_10;
 
-reg [7:0]contador2;
-always @(negedge Read)
-begin
-   if(contador>8'd37 && IndicadorMaquina)
-   begin
-   contador_datos = contador_datos + 1'b1;
-   if(contador_datos==4'b1011)begin                //contador indica cuando han pasado los 11 datos
-        contador_datos<=4'b0000;
-   end
-end
-
-end
 
 
 
 always@(posedge clk)begin
+    //address_reg<=address;
 
-    if(address==8'h21 && (!Read | !Write) && AoD)begin
+    if(address==8'h21 && !AoD)begin
       data_0<=data_vga;
        //data_0<=1;
 
     end
-    else if(address==8'h22 && (!Read | !Write) && AoD)begin
+    else if(address==8'h22 && !AoD)begin
         data_1<=data_vga;
         //data_1<=2;
 
     end
-    else if(address==8'h23 && (!Read | !Write) && AoD)begin
+    else if(address==8'h23 && !AoD)begin
             data_2<=data_vga;
             //data_1<=2;
 
         end
-    else if(address==8'h24 && (!Read | !Write) && AoD)begin
+    else if(address==8'h24 && !AoD )begin
                 data_3<=data_vga;
                 //data_1<=2;
 
             end
-    else if(address==8'h25 && (!Read | !Write) && AoD)begin
+    else if(address==8'h25 && !AoD)begin
                     data_4<=data_vga;
                     //data_1<=2;
 
                 end
-    else if(address==8'h26 && (!Read | !Write) && AoD)begin
+    else if(address==8'h26 && !AoD)begin
                         data_5<=data_vga;
                         //data_1<=2;
 
                     end
-    else if(address==8'h27 && (!Read | !Write) && AoD)begin
+    else if(address==8'h27 && !AoD)begin
                             data_6<=data_vga;
                             //data_1<=2;
 
                         end
-    else if(address==8'h28 && (!Read | !Write) && AoD)begin
+    else if(address==8'h28 &&!AoD)begin
                                 data_7<=data_vga;
                                 //data_1<=2;
 
                             end
 
     //Cronometro
-    else if(address==8'h41 && (!Read | !Write) && AoD)begin
+    else if(address==8'h41 && !AoD)begin
                                     data_8<=data_vga;
                                     //data_1<=2;
 
                                 end
-    else if(address==8'h42 && (!Read | !Write) && AoD)begin
+    else if(address==8'h42 && !AoD)begin
                                         data_9<=data_vga;
                                         //data_1<=2;
 
                                     end
-    else if(address==8'h43 && (!Read | !Write) && AoD)begin
+    else if(address==8'h43 &&  !AoD)begin
                                             data_10<=data_vga;
                                             //data_1<=2;
 
@@ -133,38 +118,5 @@ end
 
 
 
-always @(posedge clk)begin
-    contador_clks<=contador_clks +1'b1;
-    if(contador_clks==4'b1100)begin
-        contador_clks<=4'b0000;
-    end
-end
-assign data_vga_final = (contador_clks==4'b0001)? data_0 :8'bZZZZZZZZ;
-assign data_vga_final = (contador_clks==4'b0010)? data_1 :8'bZZZZZZZZ;
-assign data_vga_final = (contador_clks==4'b0011)? data_2 :8'bZZZZZZZZ;
-assign data_vga_final = (contador_clks==4'b0100)? data_3 :8'bZZZZZZZZ;
-assign data_vga_final = (contador_clks==4'b0101)? data_4:8'bZZZZZZZZ;
-assign data_vga_final = (contador_clks==4'b0110)? data_5:8'bZZZZZZZZ;
-assign data_vga_final = (contador_clks==4'b1000)? data_7 :8'bZZZZZZZZ;
-assign data_vga_final = (contador_clks==4'b1001)? data_8:8'bZZZZZZZZ;
-assign data_vga_final = (contador_clks==4'b1010)? data_9:8'bZZZZZZZZ;
-assign data_vga_final = (contador_clks==4'b1011)? data_10:8'bZZZZZZZZ;
-
-//assign data_vga_final = (contador_clks==4'b0001)? 4'b0001 :8'bZZZZZZZZ;
-//assign data_vga_final = (contador_clks==4'b0010)? 4'b0010 :8'bZZZZZZZZ;
-//assign data_vga_final = (contador_clks==4'b0011)? 4'b0011 :8'bZZZZZZZZ;
-//assign data_vga_final = (contador_clks==4'b0100)? 4'b0100 :8'bZZZZZZZZ;
-//assign data_vga_final = (contador_clks==4'b0101)? 4'b0101:8'bZZZZZZZZ;
-//assign data_vga_final = (contador_clks==4'b0110)? 4'b0110:8'bZZZZZZZZ;
-//assign data_vga_final = (contador_clks==4'b0111)? 4'b0111:8'bZZZZZZZZ;
-//assign data_vga_final = (contador_clks==4'b1000)? 4'b1000 :8'bZZZZZZZZ;
-//assign data_vga_final = (contador_clks==4'b1001)? 4'b1001:8'bZZZZZZZZ;
-//assign data_vga_final = (contador_clks==4'b1010)? 4'b1010:8'bZZZZZZZZ;
-//assign data_vga_final = (contador_clks==4'b1011)? 4'b1011:8'bZZZZZZZZ;
-
-//assign data_vga_final = (contador_clks==4'b0000)? 4'b0000:8'bZZZZZZZZ;
-
-
-assign bit_inicio1 =(contador_clks==4'b1100)? 1'b0: 1'b1;
 
 endmodule

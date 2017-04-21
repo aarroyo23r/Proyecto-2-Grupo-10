@@ -39,7 +39,7 @@ assign DATA_ADDRESS =(!AoD && IndicadorMaquina && contador_todo>8'd37)? address:
 
 
 always @(posedge clk)
-if (contador_todo>=8'h3d && contador_todo<=8'h44 && AoD) begin
+if (contador_todo>=8'h40 && contador_todo<=8'h43 && (!Read | !Write) && AoD) begin
 data_vga_reg<=DATA_ADDRESS;
 end
 

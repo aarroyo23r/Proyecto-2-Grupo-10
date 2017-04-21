@@ -95,6 +95,10 @@ reg [7:0] data_mod2;
 
 always@(posedge clk)
 begin
+    if(Inicio1)
+    begin
+    address2<=address_inicio;
+    end
     if((Escribir|(reset3 |!RW)) && (!Inicio1))
         begin
         address2<=ADDRESS_write;
@@ -126,7 +130,7 @@ always@(posedge clk)
     if(Inicio1)
         begin
         data_mod2<=data_inicio;
-        end    
+        end
     end
 
 Protocolo_rtc Proto_unit(.clk(clk),.address(address2),.DATA_WRITE(data_mod2),.IndicadorMaquina(RW),
@@ -147,10 +151,10 @@ end
 wire [3:0] contador_datos1;
 
 
-Registros Register_unit(.clk(clk),.bit_inicio1(bit_inicio1),.data_vga(data_intermedia),.contador(contador2),
-                            .Read(READ),.contador_datos1(contador_datos1),.datos0(segundos),
+Registros Register_unit(.clk(clk),.data_vga(data_intermedia),.contador(contador2),
+                            .Read(READ),.datos0(segundos),
                         .datos1(minutos),.datos2(horas),.datos3(date),.datos4(mes),.datos5(ano),.datos6(dia_sem),.datos7(num_semana),
-                        .datos8(datos8),.datos9(datos9),.datos10(datos10),.IndicadorMaquina(RW),.address(address2)
+                        .datos8(datos8),.datos9(datos9),.datos10(datos10),.IndicadorMaquina(RW),.address(DATA_ADDRESS),.Write(Write),.AoD(AoD)
                         );
 //reg [7:0] data_out1;
 

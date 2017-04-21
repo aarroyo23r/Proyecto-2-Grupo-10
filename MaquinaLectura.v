@@ -18,7 +18,7 @@ begin
     contador<=contador + 1'b1;
     if(contador==limit)
     begin
-        contador<=0;
+        contador<=1;
         c_dir<=c_dir +1'b1;
         if(c_dir==4'b1010)
             begin
