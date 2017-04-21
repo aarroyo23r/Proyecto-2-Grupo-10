@@ -3,151 +3,97 @@
 module GeneradorFunciones(     //Definicion entradas y salidas
     input wire clk,  //variable que reinicia los contadores, se reinicia con un 1
     input wire IndicadorMaquina,  //Señal que indica acción que se esta realizando // En cero ejecuta señales Write y en 1 señales read
-    output wire ChipSelect1,Read1,Write,AoD1, //Señales de entrada del RTC
-    output wire [7:0] contador1
+    output reg ChipSelect,Read,Write,AoD, //Señales de entrada del RTC
+    output reg [6:0] contador2,contador
     );
        
-reg [4:0] contador = 4'b00000;   //Contador general del modulo (10ns)
-reg ChipSelect,Read,AoD;
-reg [2:0] limitador = 0; //limitador para señal ChipSelecr
-reg [2:0] limitador2 = 0; //limitador para señal Read
-reg [2:0] limitador3 = 0; //limitador para señal write
-reg [2:0] limitador4 = 0; //limitador para señal AoD
-reg reset=0;
-reg [7:0] contador2 = 0;
 
 
-assign contador1 = contador2; //Permite ver el progreso del contador
-assign ChipSelect1 =ChipSelect;
-assign Read1=Read;
-assign AoD1= AoD; 
+assign contador1=contador2;           
+always @(posedge clk)
+   begin
+      contador2<=contador2 +6'd1; //contador para general señal
+      if(contador2==6'd37)
+        begin
+        contador2<=6'd01;
+        end
+   end
+   
+   
+   always @(posedge clk)
+      begin
+         contador<=contador +6'd1; //contador para modulo cuenta el doble del anterior
+         if(contador==8'h4a)
+           begin
+           contador<=8'h01;
+           end
+      end
+
+
 
 always @(posedge clk)
-        begin
-        if((contador2>=8'h00 && contador2<=8'h47)| (contador2>=8'h88 && contador2<=8'hd3))
-        begin
-        reset<=1;end
-        else 
-        begin
-        reset<=0;end
-        end
-           
-always @(posedge clk)begin
-          if(reset==1)begin  //Condición de Reset
-          contador=0;
-          contador2 <=contador2+1;end
-          else
-          contador <= contador + 1'b1;          //Suma 1 cada 10 ns //Este es el contador general para todo el modulo                          
-          contador2 <= contador2 + 1;end
-          
-                                                   
-always @(posedge clk)     
 begin
-    ChipSelect<=1;             
-    if(!reset)
+  if(IndicadorMaquina)
     begin
-    if((contador >=5'b00000 & contador<=5'b00111) )begin
-        ChipSelect <= 0;end
-        else
+    if((contador2>=6'd01 && contador2<=6'd8)|(contador2>=6'd20 && contador2<=6'd27))
         begin
+        ChipSelect<=0;
+        end
+        else begin
         ChipSelect<=1;
         end
-     end
-     else begin
-     ChipSelect<=1;
-     end
-end
-
-
-
-reg Write1;
-reg Write2;
-reg [3:0]conta=0;     
-
-assign Write = (IndicadorMaquina)?Write1:Write2;
-
-          
-always @(posedge clk)     
-begin
- Write1<=1;             
- if(!reset && IndicadorMaquina)
-    begin
-     if(!ChipSelect && Read)
+    if((contador2>=6'd01 && contador2<=6'd8))
         begin
-        conta=conta+1;
-        if(conta>1 && conta<7)
+        AoD<=0;
+        end
+        else begin
+        AoD<=1;
+        end
+     if((contador2>=6'd02 && contador2<=6'd7))
         begin
-        Write1<=0;
+        Write<=0;
         end
+        else begin
+        Write<=1;
         end
+     if((contador2>=6'd21 && contador2<=6'd26))
+        begin
+        Read<=0;
+        end
+        else begin
+        Read<=1;
+        end            
     end
-  if(reset && IndicadorMaquina)
+    else
     begin
-    conta<=0;
+    if((contador2>=6'd01 && contador2<=6'd8)|(contador2>=6'd20 && contador2<=6'd27))
+        begin
+        ChipSelect<=0;
+        end
+        else begin
+        ChipSelect<=1;
+        end
+    if((contador2>=6'd01 && contador2<=6'd8))
+        begin
+        AoD<=0;
+        end
+        else begin
+        AoD<=1;
+        end
+    if((contador2>=6'd02 && contador2<=6'd7)|(contador2>=6'd21 && contador2<=6'd26))
+        begin
+        Write<=0;
+        end
+        else begin
+        Write<=1;
+        end
+     if((contador2>=6'd21 && contador2<=6'd26))
+        begin
+        Read<=1;
+        end
+        else begin
+        Read<=1;
+        end            
     end
 end   
-   
-   
-        
-                
-
-
-       
-always @(posedge clk)     
-        begin 
-        //para funcion write
-        if(!IndicadorMaquina &&!reset)
-        begin
-        
-            if((contador >=5'b00001 & contador<=5'b00110) )begin
-                Write2 <= 0;end
-                else
-                
-            
-             begin
-             Write2<=1;
-             end
-        end
-          //para funcion read
-          Read<=1;
-          if(IndicadorMaquina && !reset)
-          begin
-          if(contador>5'b00001 & contador<=5'b00110 && AoD)begin
-                Read<=0;end
-                else
-                begin
-                Read<=1;
-                end
-         
-          end
-            
-
-end
-        
-        
-       
-         
-        reg conta2=0;
-       
-always @(posedge clk)     
-         begin 
-         AoD<=1;            
-             if(!reset)
-             begin
-             if((contador >=5'b00000 & contador<=5'b00111) && limitador4 <8 && !conta2 )begin
-                limitador4<=limitador4 + 1;
-                 AoD <= 0;
-                 end
-                 else
-                 begin
-                 conta2<=1;
-                 AoD<=1;
-                 end
-              end
-              else begin
-              AoD<=1;
-              conta2<=0;
-              end
-          end   
-         
- endmodule
+endmodule
