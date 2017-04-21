@@ -1504,6 +1504,7 @@ else if ((pixelx >= cronoSegundos ) && (pixelx<cronoSegundos+cambioMozaico) && (
                                                                                                                                                                         color_addr<=4'd2;// Color de lo que se va a imprimir
                                                                                                                                                                         font_size<=2'd1;
                                                                                                                                                                         graficos<=1'd0;
+
                                                                                                                                                                         memInt<=1'd0;
                                                                                                                                                                         dp<=1'd1;end
 
@@ -1795,6 +1796,8 @@ else if ((pixelx <=608) && (pixely == 152)) begin
 dp=1'd1;color_addr=3'd5;memInt=1'd1;end
 else if ((pixelx <=609) && (pixely == 152)) begin
 dp=1'd1;color_addr=3'd3;memInt=1'd1;end
+else if ((pixelx >609) && (pixely == 152)) begin
+dp=1'd1;color_addr=3'd1;memInt=1'd1;end
 else if ((pixelx <=30) && (pixely == 153)) begin
 dp=1'd1;color_addr=3'd1;memInt=1'd1;end
 else if ((pixelx <=31) && (pixely == 153)) begin
@@ -1831,6 +1834,8 @@ else if ((pixelx <=610) && (pixely == 153)) begin
 dp=1'd1;color_addr=3'd4;memInt=1'd1;end
 else if ((pixelx <=611) && (pixely == 153)) begin
 dp=1'd1;color_addr=3'd3;memInt=1'd1;end
+else if ((pixelx >611) && (pixely == 153)) begin
+dp=1'd1;color_addr=3'd1;memInt=1'd1;end
 else if ((pixelx <=30) && (pixely == 154)) begin
 dp=1'd1;color_addr=3'd1;memInt=1'd1;end
 else if ((pixelx <=32) && (pixely == 154)) begin
@@ -1855,6 +1860,8 @@ else if ((pixelx <=609) && (pixely == 154)) begin
 dp=1'd1;color_addr=3'd3;memInt=1'd1;end
 else if ((pixelx <=611) && (pixely == 154)) begin
 dp=1'd1;color_addr=3'd4;memInt=1'd1;end
+else if ((pixelx >611) && (pixely == 154)) begin
+dp=1'd1;color_addr=3'd1;memInt=1'd1;end
 else if ((pixelx <=29) && (pixely == 155)) begin
 dp=1'd1;color_addr=3'd1;memInt=1'd1;end
 else if ((pixelx <=30) && (pixely == 155)) begin
@@ -1891,6 +1898,8 @@ else if ((pixelx <=611) && (pixely == 155)) begin
 dp=1'd1;color_addr=3'd4;memInt=1'd1;end
 else if ((pixelx <=612) && (pixely == 155)) begin
 dp=1'd1;color_addr=3'd3;memInt=1'd1;end
+else if ((pixelx >612) && (pixely == 155)) begin
+dp=1'd1;color_addr=3'd1;memInt=1'd1;end
 else if ((pixelx <=28) && (pixely == 156)) begin
 dp=1'd1;color_addr=3'd1;memInt=1'd1;end
 else if ((pixelx <=29) && (pixely == 156)) begin
@@ -1927,6 +1936,8 @@ else if ((pixelx <=612) && (pixely == 156)) begin
 dp=1'd1;color_addr=3'd5;memInt=1'd1;end
 else if ((pixelx <=613) && (pixely == 156)) begin
 dp=1'd1;color_addr=3'd3;memInt=1'd1;end
+else if ((pixelx >613) && (pixely == 156)) begin
+dp=1'd1;color_addr=3'd1;memInt=1'd1;end
 else if ((pixelx <=28) && (pixely == 157)) begin
 dp=1'd1;color_addr=3'd1;memInt=1'd1;end
 else if ((pixelx <=29) && (pixely == 157)) begin
@@ -1963,6 +1974,8 @@ else if ((pixelx <=612) && (pixely == 157)) begin
 dp=1'd1;color_addr=3'd4;memInt=1'd1;end
 else if ((pixelx <=613) && (pixely == 157)) begin
 dp=1'd1;color_addr=3'd3;memInt=1'd1;end
+else if ((pixelx >613) && (pixely == 157)) begin
+dp=1'd1;color_addr=3'd1;memInt=1'd1;end
 else if ((pixelx <=28) && (pixely == 158)) begin
 dp=1'd1;color_addr=3'd1;memInt=1'd1;end
 else if ((pixelx <=30) && (pixely == 158)) begin
@@ -2090,6 +2103,8 @@ else if ((pixelx <=612) && (pixely == 332)) begin
 dp=1'd1;color_addr=3'd5;memInt=1'd1;end
 else if ((pixelx <=613) && (pixely == 332)) begin
 dp=1'd1;color_addr=3'd4;memInt=1'd1;end
+else if ((pixelx >613) && (pixely == 332)) begin
+dp=1'd1;color_addr=3'd1;memInt=1'd1;end
 else if ((pixelx <=29) && (pixely == 333)) begin
 dp=1'd1;color_addr=3'd1;memInt=1'd1;end
 else if ((pixelx <=30) && (pixely == 333)) begin
@@ -2126,6 +2141,8 @@ else if ((pixelx <=611) && (pixely == 333)) begin
 dp=1'd1;color_addr=3'd4;memInt=1'd1;end
 else if ((pixelx <=612) && (pixely == 333)) begin
 dp=1'd1;color_addr=3'd3;memInt=1'd1;end
+else if ((pixelx >612) && (pixely == 333)) begin
+dp=1'd1;color_addr=3'd1;memInt=1'd1;end
 else if ((pixelx <=30) && (pixely == 334)) begin
 dp=1'd1;color_addr=3'd1;memInt=1'd1;end
 else if ((pixelx <=32) && (pixely == 334)) begin
@@ -2150,6 +2167,8 @@ else if ((pixelx <=609) && (pixely == 334)) begin
 dp=1'd1;color_addr=3'd3;memInt=1'd1;end
 else if ((pixelx <=611) && (pixely == 334)) begin
 dp=1'd1;color_addr=3'd4;memInt=1'd1;end
+else if ((pixelx >611) && (pixely == 334)) begin
+dp=1'd1;color_addr=3'd1;memInt=1'd1;end
 else if ((pixelx <=30) && (pixely == 335)) begin
 dp=1'd1;color_addr=3'd1;memInt=1'd1;end
 else if ((pixelx <=31) && (pixely == 335)) begin
@@ -2186,6 +2205,8 @@ else if ((pixelx <=610) && (pixely == 335)) begin
 dp=1'd1;color_addr=3'd4;memInt=1'd1;end
 else if ((pixelx <=611) && (pixely == 335)) begin
 dp=1'd1;color_addr=3'd3;memInt=1'd1;end
+else if ((pixelx >611) && (pixely == 335)) begin
+dp=1'd1;color_addr=3'd1;memInt=1'd1;end
 else if ((pixelx <=32) && (pixely == 336)) begin
 dp=1'd1;color_addr=3'd1;memInt=1'd1;end
 else if ((pixelx <=33) && (pixely == 336)) begin
@@ -2234,6 +2255,8 @@ else if ((pixelx <=608) && (pixely == 336)) begin
 dp=1'd1;color_addr=3'd5;memInt=1'd1;end
 else if ((pixelx <=609) && (pixely == 336)) begin
 dp=1'd1;color_addr=3'd3;memInt=1'd1;end
+else if ((pixelx >609) && (pixely == 336)) begin
+dp=1'd1;color_addr=3'd1;memInt=1'd1;end
 else if ((pixelx <=33) && (pixely == 337)) begin
 dp=1'd1;color_addr=3'd1;memInt=1'd1;end
 else if ((pixelx <=35) && (pixely == 337)) begin
