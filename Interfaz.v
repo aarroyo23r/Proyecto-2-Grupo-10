@@ -280,7 +280,7 @@ always @*
           default : dirAsciiDatoSigD = 7'hff;
    endcase
 */
-
+/*
 always @(posedge clk, posedge reset)// Cada vez que se refresca la pantalla se guarda una secuencia de datos
 
 if (reset) begin
@@ -297,7 +297,7 @@ end
 
 else begin
 
-if (tick==1'd1 && inicioSecuencia==1'd1 )
+if (tick==1'd1 && )
 begin
 r<= 0;
 w<= 1; //Señal modo escritura
@@ -328,7 +328,7 @@ finalizoContar<=0;
 end
 end
 end
-
+*/
 
 
 
@@ -363,7 +363,7 @@ end
 
 else begin
 
-if (w==1 & r==0)begin
+if (tick)begin
 SegundosU <= {4'h3,datos0[3:0]};
 SegundosD <= {4'h3,datos0[7:4]};
 

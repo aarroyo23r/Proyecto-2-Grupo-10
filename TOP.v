@@ -151,7 +151,9 @@ Registros Register_unit(.clk(clk),.bit_inicio1(bit_inicio1),.data_vga(data_inter
 
 
 
-//Interfaz Interfaz_unit(.clk(clk),.reset(Reset),.rgbO(rgbO),.resetSync(Reset),.inicioSecuencia(bit_inicio1),.datoRTC(data_out),.hsync(hsync),.vsync(vsync),.video_on(video_on),
-                       // .datos0(segundos),.datos1(minutos),.datos2(horas),.datos3(date),.datos4(mes),.datos5(ano),.datos6(dia_sem),.datos7(num_semana),
-                        //.datos8(datos8),.datos9(datos9),.datos10(datos10),.instrucciones(instrucciones)
+Interfaz Interfaz_unit(.clk(clk),.reset(Reset),.rgbO(rgbO),.resetSync(Reset),.inicioSecuencia(bit_inicio1),.datoRTC(data_out),.hsync(hsync),.vsync(vsync),.video_on(video_on),
+                        .datos0(segundos),.datos1(minutos),.datos2(horas),.datos3(date),.datos4(mes),.datos5(ano),.datos6(dia_sem),.datos7(num_semana),
+                        .datos8(datos8),.datos9(datos9),.datos10(datos10),.instrucciones(instrucciones)
+                        );
 
+endmodule

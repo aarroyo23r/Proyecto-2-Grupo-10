@@ -10,8 +10,8 @@ module Protocolo_rtc(
     output wire [7:0] data_vga,
     output wire [6:0] contador_todo
 );
-wire contador;
-
+wire  [6:0] contador;
+reg [7:0] data_vga_reg;
 //wire  ChipSelect;
 
 GeneradorFunciones GeneradorFunciones_unit(
@@ -27,7 +27,7 @@ reg [7:0]data_write;
 
 //Función Write
 assign DATA_ADDRESS =((AoD==0 && Write==0 && IndicadorMaquina==0 && contador_todo<8'd37)) ? address:8'bZZZZZZZZ;
-assign DATA_ADDRESS =((AoD==1 && Write==0 && IndicadorMaquina==0 && contador_todo<8'd37))?data_write:8'bZZZZZZZZ;
+assign DATA_ADDRESS =((AoD==1 && Write==0 && IndicadorMaquina==0 && contador_todo<8'd37))?DATA_WRITE:8'bZZZZZZZZ;
 assign DATA_ADDRESS =((AoD==0 && Write==0 && IndicadorMaquina==0 && contador_todo>8'd37))?command:8'bZZZZZZZZ;
 
 
@@ -38,8 +38,13 @@ assign DATA_ADDRESS =(!AoD && IndicadorMaquina && contador_todo <8'd37)? command
 assign DATA_ADDRESS =(!AoD && IndicadorMaquina && contador_todo>8'd37)? address:8'bZZZZZZZZ;
 
 
-assign data_vga= (contador_todo>=8'h3d && contador_todo<=8'h44 && Read==0 && AoD)? DATA_ADDRESS:8'hZZ;
+always @(posedge clk)
+if (contador_todo>=8'h3d && contador_todo<=8'h44 && AoD) begin
+data_vga_reg<=DATA_ADDRESS;
+end
+else begin
+data_vga_reg<=data_vga;
+end
 
-
-
+assign data_vga=data_vga_reg;
 endmodule
