@@ -1,11 +1,11 @@
-   `timescale 1ns / 1ps
+`timescale 1ns / 1ps
 module Registros(
     input wire clk,
     output wire bit_inicio1,
     input wire [7:0] data_vga,
     input wire IndicadorMaquina,
     input wire [7:0] contador,
-    output wire [7:0] data_vga_final,
+    input wire [7:0]address,
     input wire Read,
     output wire [3:0] contador_datos1, 
     output wire [7:0] datos0,
@@ -36,63 +36,76 @@ assign datos5=data_5;assign datos6=data_6;assign datos7=data_7;assign datos8=dat
 assign datos10=data_10;
 
 reg [7:0]contador2;
-always @(posedge clk)begin
-    contador2<=contador;
-   if(Read==0 && contador==8'b11101100)begin
-   contador_datos <= contador_datos + 1'b1;
+always @(negedge Read)
+begin
+   if(contador>8'd37 && IndicadorMaquina)
+   begin
+   contador_datos = contador_datos + 1'b1;
    if(contador_datos==4'b1011)begin                //contador indica cuando han pasado los 11 datos
         contador_datos<=4'b0000;
    end
-   end
+end
+   
 end
 
 always@(posedge clk)begin
 
-    if(contador_datos==4'b0001 && Read == 0 && contador>8'h80 && IndicadorMaquina)begin
+    if(contador>=8'h18 && contador<=8'h1e && contador_datos==4'd1)begin
       data_0<=data_vga;
        //data_0<=1;
 
     end
-    if(contador_datos==4'b0010  && Read ==0 && contador>8'h80 &&IndicadorMaquina)begin
+    if(contador>=8'h18 && contador<=8'h1e  && contador_datos==4'd2)begin
         data_1<=data_vga;
         //data_1<=2;
 
     end
-    if(contador_datos==4'b0011 && Read == 0 && contador>8'h80 &&IndicadorMaquina)begin
-        data_2<=data_vga;
-        //data_2<=3;
-    end
-    if(contador_datos==4'b0100 && Read ==0 && contador>8'h80&&IndicadorMaquina)begin
-        data_3<=data_vga;
-        //data_3<=4;
-    end
-    if(contador_datos==4'b0101 && Read ==0 && contador>8'h80&&IndicadorMaquina)begin
-        data_4<=data_vga;
-        //data_4<=5;
-    end
-    if(contador_datos==4'b0110  && Read ==0 && contador>8'h80 &&IndicadorMaquina)begin
-         data_5<=data_vga;
-         //data_5<=6;
-    end
-    if(contador_datos==4'b0111 && Read ==0 && contador>8'h80 &&IndicadorMaquina)begin
-         data_6<=data_vga;
-         //data_6<=7;
-    end
-    if(contador_datos==4'b1000 && Read ==0 && contador>8'h80&&IndicadorMaquina)begin
-         data_7<=data_vga;
-         //data_7<=8;
-    end
-    if(contador_datos==4'b1001 && Read ==0 && contador>8'h80 &&IndicadorMaquina)begin
-         data_8<=data_vga;
-    end
-    if(contador_datos==4'b1010 && Read ==0 && contador>8'h80 &&IndicadorMaquina)begin
-         data_9<=data_vga;     
-    end
-    if(contador_datos==4'b1011 && Read ==0 && contador>8'h80 &IndicadorMaquina)begin
-         data_10<=data_vga;
-    end
-    else begin
-    end
+    if(contador_datos==4'd3 && contador>=8'h18 && contador<=8'h1e)begin
+            data_2<=data_vga;
+            //data_1<=2;
+    
+        end
+    if(contador_datos==4'd4 && contador>=8'h18 && contador<=8'h1e)begin
+                data_3<=data_vga;
+                //data_1<=2;
+        
+            end
+    if(contador_datos==4'd5 && contador>=8'h18 && contador<=8'h1e)begin
+                    data_4<=data_vga;
+                    //data_1<=2;
+            
+                end
+    if(contador_datos==4'd6 && contador>=8'h18 && contador<=8'h1e)begin
+                        data_5<=data_vga;
+                        //data_1<=2;
+                
+                    end
+    if(contador_datos ==4'd7 && contador>=8'h18 && contador<=8'h1e)begin
+                            data_6<=data_vga;
+                            //data_1<=2;
+                    
+                        end
+    if(contador_datos==4'd8 && contador>=8'h18 && contador<=8'h1e)begin
+                                data_7<=data_vga;
+                                //data_1<=2;
+                        
+                            end
+    if(contador_datos==4'd9 && contador>=8'h18 && contador<=8'h1e)begin
+                                    data_8<=data_vga;
+                                    //data_1<=2;
+                            
+                                end
+    if(contador_datos == 4'd10&& contador>=8'h18 && contador<=8'h1e)begin
+                                        data_9<=data_vga;
+                                        //data_1<=2;
+                                
+                                    end
+    if(contador_datos==4'd11 && contador>=8'h18 && contador<=8'h1e)begin
+                                            data_10<=data_vga;
+                                            //data_1<=2;
+                                    
+                                        end
+   
 end
 
 
@@ -130,6 +143,3 @@ assign data_vga_final = (contador_clks==4'b1011)? data_10:8'bZZZZZZZZ;
 
 
 assign bit_inicio1 =(contador_clks==4'b1100)? 1'b0: 1'b1;
-
-
-endmodule
