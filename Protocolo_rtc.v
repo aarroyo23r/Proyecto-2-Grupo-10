@@ -42,6 +42,7 @@ always @(posedge clk)
 if (contador_todo>=8'h3d && contador_todo<=8'h44 && AoD) begin
 data_vga_reg<=DATA_ADDRESS;
 end
+
 else begin
 data_vga_reg<=data_vga;
 end

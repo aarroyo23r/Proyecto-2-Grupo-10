@@ -82,7 +82,7 @@ wire [7:0]contador2;
 MaquinaEscritura Escritura_unit(.clk(clk),.RW(RW),.Crono(Crono),.Inicio(Inicio1),.Reset(Reset),.push_arriba(push_arriba),
                                 .push_abajo(push_abajo),.push_izquierda(push_izquierda),.push_derecha(push_derecha),.address(ADDRESS_write),
                                 .data_mod(data_mod),.reset2(reset3),.segundos(segundos),.minutos(minutos),.horas(horas),.date(date),
-                                .num_semana(num_semana),.mes(mes),.ano(ano),.dia_sem(dia_sem),.Per_read(Per_read),.Escribir(Escribir),.contador_todo(contador2)); //falta ingresar datos
+                                .num_semana(num_semana),.mes(mes),.ano(ano),.dia_sem(dia_sem),.Per_read(Per_read),.Escribir(Escribir) ); //falta ingresar datos
 wire [7:0]address;
 reg [7:0] address2;
 wire [7:0] data_inicio;
@@ -131,7 +131,7 @@ always@(posedge clk)
 
 Protocolo_rtc Proto_unit(.clk(clk),.address(address2),.DATA_WRITE(data_mod2),.IndicadorMaquina(RW),
                          .ChipSelect(ChipSelect),.Read(Read),.Write(Write),.AoD(AoD),.DATA_ADDRESS(DATA_ADDRESS),
-                         .data_vga(data_intermedia),.contador_todo(contador2),.Inicio1(Inicio1));
+                         .data_vga(data_intermedia),.contador_todo(contador2) );
 
 //REGISTROS PARA ENTREGAR DATA A CONTROLADOR VGA
 reg [7:0] data_vga_entrada;
@@ -159,10 +159,7 @@ Registros Register_unit(.clk(clk),.bit_inicio1(bit_inicio1),.data_vga(data_inter
 Interfaz Interfaz_unit(.clk(clk),.reset(Reset),.rgbO(rgbO),.resetSync(Reset),.inicioSecuencia(bit_inicio1),.datoRTC(data_out),.hsync(hsync),.vsync(vsync),.video_on(video_on),
                         .datos0(segundos),.datos1(minutos),.datos2(horas),.datos3(date),.datos4(mes),.datos5(ano),.datos6(dia_sem),.datos7(num_semana),
                         .datos8(datos8),.datos9(datos9),.datos10(datos10),.instrucciones(instrucciones)
-<<<<<<< HEAD
-=======
 
->>>>>>> c083f6b7feac6d1197099e7d4616efd29269a4c8
                         );
 
 endmodule
