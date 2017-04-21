@@ -30,7 +30,7 @@ reg Inicio1=1'b1; //Señal Incio que solo posee valor 1 al iniciar el sistema
 always@(posedge clk)
 begin
 contador3<=contador3 + 1'b1;
-if(contador3==16'h0200 && Inicio1)  //Se le asigna el valor correspondiente  a Inicio
+if(contador3==16'd110 && Inicio1)  //Se le asigna el valor correspondiente  a Inicio
     begin
     Inicio1<=1'b0;
     end
@@ -68,7 +68,7 @@ wire [7:0]minutos;
 wire [7:0]horas;
 wire [7:0]date;
 wire [7:0]num_semana;
-wire [7:0]mes;
+wire[7:0]mes;
 wire [7:0]ano;
 wire [7:0]dia_sem;
 
@@ -106,7 +106,7 @@ begin
 
 wire [7:0] data_vga; //datos hacia controlador_vga
 wire [7:0]contador2;
-wire [7:0]data_intermedia;
+wire [7:0] data_intermedia;
 reg [7:0] data_mod2;
 
 always@(posedge clk)
@@ -117,11 +117,16 @@ always@(posedge clk)
        end
        else
        data_mod2<=data_mod;
+    if(!RW |Escribir |Inicio1 |reset3)
+       data_mod2<=data_mod;
+    begin
+    
+    end
     end
 
-Protocolo_rtc Proto_unit(.clk(clk),.bit_crono(Crono),.address(address2),.DATA_WRITE(data_mod2),.IndicadorMaquina(RW),
+Protocolo_rtc Proto_unit(.clk(clk),.address(address2),.DATA_WRITE(data_mod2),.IndicadorMaquina(RW),
                          .ChipSelect(ChipSelect),.Read(Read),.Write(Write),.AoD(AoD),.DATA_ADDRESS(DATA_ADDRESS),
-                         .data_vga(data_intermedia),.contador2(contador2));
+                         .data_vga(data_intermedia),.contador_todo(contador2));
 
 //REGISTROS PARA ENTREGAR DATA A CONTROLADOR VGA
 reg [7:0] data_vga_entrada;
@@ -135,22 +140,18 @@ begin
 end
 
 wire [3:0] contador_datos1;
-wire [7:0] data_out; //datos hacia controlador vga
 
 
-Registros Register_unit(.clk(clk),.bit_inicio1(bit_inicio1),.data_vga(data_vga_entrada),.contador(contador2),
-                        .data_vga_final(data_out),.Read(READ),.contador_datos1(contador_datos1),.datos0(segundos),
+Registros Register_unit(.clk(clk),.bit_inicio1(bit_inicio1),.data_vga(data_intermedia),.contador(contador2),
+                            .Read(READ),.contador_datos1(contador_datos1),.datos0(segundos),
                         .datos1(minutos),.datos2(horas),.datos3(date),.datos4(mes),.datos5(ano),.datos6(dia_sem),.datos7(num_semana),
-                        .datos8(datos8),.datos9(datos9),.datos10(datos10)
+                        .datos8(datos8),.datos9(datos9),.datos10(datos10),.IndicadorMaquina(RW),.address(address2)
                         );
 //reg [7:0] data_out1;
 
 
 
-Interfaz Interfaz_unit(.clk(clk),.reset(Reset),.rgbO(rgbO),.resetSync(Reset),.inicioSecuencia(bit_inicio1),.datoRTC(data_out),.hsync(hsync),.vsync(vsync),.video_on(video_on),
-                        .datos0(segundos),.datos1(minutos),.datos2(horas),.datos3(date),.datos4(mes),.datos5(ano),.datos6(dia_sem),.datos7(num_semana),
-                        .datos8(datos8),.datos9(datos9),.datos10(datos10),.instrucciones(instrucciones)
+//Interfaz Interfaz_unit(.clk(clk),.reset(Reset),.rgbO(rgbO),.resetSync(Reset),.inicioSecuencia(bit_inicio1),.datoRTC(data_out),.hsync(hsync),.vsync(vsync),.video_on(video_on),
+                       // .datos0(segundos),.datos1(minutos),.datos2(horas),.datos3(date),.datos4(mes),.datos5(ano),.datos6(dia_sem),.datos7(num_semana),
+                        //.datos8(datos8),.datos9(datos9),.datos10(datos10),.instrucciones(instrucciones)
 
-                        );
-
-endmodule
