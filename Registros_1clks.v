@@ -56,64 +56,64 @@ end
 
 always@(posedge clk)begin
 
-    if(address==8'h21)begin
+    if(address==8'h21 && (!Read | !Write) && AoD)begin
       data_0<=data_vga;
        //data_0<=1;
 
     end
-    else if(address==8'h22)begin
+    else if(address==8'h22 && (!Read | !Write) && AoD)begin
         data_1<=data_vga;
         //data_1<=2;
 
     end
-    else if(address==8'h23)begin
+    else if(address==8'h23 && (!Read | !Write) && AoD)begin
             data_2<=data_vga;
             //data_1<=2;
 
         end
-    else if(address==8'h24)begin
+    else if(address==8'h24 && (!Read | !Write) && AoD)begin
                 data_3<=data_vga;
                 //data_1<=2;
 
             end
-    else if(address==8'h25)begin
+    else if(address==8'h25 && (!Read | !Write) && AoD)begin
                     data_4<=data_vga;
                     //data_1<=2;
 
                 end
-    else if(address==8'h26)begin
+    else if(address==8'h26 && (!Read | !Write) && AoD)begin
                         data_5<=data_vga;
                         //data_1<=2;
 
                     end
-    else if(address==8'h27)begin
+    else if(address==8'h27 && (!Read | !Write) && AoD)begin
                             data_6<=data_vga;
                             //data_1<=2;
 
                         end
-    else if(address==8'h28)begin
+    else if(address==8'h28 && (!Read | !Write) && AoD)begin
                                 data_7<=data_vga;
                                 //data_1<=2;
 
                             end
 
     //Cronometro
-    else if(address==8'h41)begin
+    else if(address==8'h41 && (!Read | !Write) && AoD)begin
                                     data_8<=data_vga;
                                     //data_1<=2;
 
                                 end
-    else if(address==8'h42)begin
+    else if(address==8'h42 && (!Read | !Write) && AoD)begin
                                         data_9<=data_vga;
                                         //data_1<=2;
 
                                     end
-    else if(address==8'h43)begin
+    else if(address==8'h43 && (!Read | !Write) && AoD)begin
                                             data_10<=data_vga;
                                             //data_1<=2;
 
                                         end
- 
+
     else begin
           data_0<=data_0;
           data_1<=data_1;
