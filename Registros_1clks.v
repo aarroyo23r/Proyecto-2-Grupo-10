@@ -143,3 +143,5 @@ assign data_vga_final = (contador_clks==4'b1011)? data_10:8'bZZZZZZZZ;
 
 
 assign bit_inicio1 =(contador_clks==4'b1100)? 1'b0: 1'b1;
+    
+endmodule
