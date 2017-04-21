@@ -1464,7 +1464,7 @@ else if ((pixelx >= cronoSegundos ) && (pixelx<cronoSegundos+cambioMozaico) && (
 
 
                                                                                                                                                                 //A
-                                                                                                                                                          else if ((instrucciones==1) && (pixelx >=posicionPush2+ 9*cambioMozaico) && (pixelx< posicionPush2+ 10*cambioMozaico) && (pixely >= ARInstrucciones-alturaMozaico) && (pixely<=ABInstrucciones-alturaMozaico))begin
+                                                                                                                                                          else if ((instrucciones==1) && (pixelx >=posicionPush2+ 10*cambioMozaico) && (pixelx< posicionPush2+ 11*cambioMozaico) && (pixely >= ARInstrucciones-alturaMozaico) && (pixely<=ABInstrucciones-alturaMozaico))begin
                                                                                                                                                                 char_addr <= 7'h41;//direccion de lo que se va a imprimir
                                                                                                                                                                 color_addr<=4'd2;// Color de lo que se va a imprimir
                                                                                                                                                                 font_size<=2'd1;
@@ -1500,7 +1500,7 @@ else if ((pixelx >= cronoSegundos ) && (pixelx<cronoSegundos+cambioMozaico) && (
 
                                                                                                                                                                         //CENTRO
                                                                                                                                                                   else if ((instrucciones==1) && (pixelx >= posicionPush2+ 2*cambioMozaico) && (pixelx< posicionPush2+ 3*cambioMozaico) && (pixely >= ARInstrucciones) && (pixely<=ABInstrucciones))begin
-                                                                                                                                                                        char_addr <= 7'h1d;//direccion de lo que se va a imprimir
+                                                                                                                                                                        char_addr <= 7'h09;//direccion de lo que se va a imprimir
                                                                                                                                                                         color_addr<=4'd2;// Color de lo que se va a imprimir
                                                                                                                                                                         font_size<=2'd1;
                                                                                                                                                                         graficos<=1'd0;

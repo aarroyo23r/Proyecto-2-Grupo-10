@@ -11,7 +11,13 @@ module Protocolo_rtc(
     output wire [6:0] contador_todo
 );
 wire contador;
-GeneradorFunciones Gd_tbunit(.clk(clk),.IndicadorMaquina(IndicadorMaquina),.ChipSelect(ChipSelect),.Read(Read),.Write(Write),.AoD(AoD),.contador(contador_todo),.contador2(contador));
+
+//wire  ChipSelect;
+
+GeneradorFunciones GeneradorFunciones_unit(
+  .clk(clk),.IndicadorMaquina(IndicadorMaquina),.ChipSelect(ChipSelect),
+.Read(Read),.Write(Write),.AoD(AoD),.contador(contador_todo),.contador2(contador)
+);
 
 
 reg [7:0]command = 8'b11110000;
@@ -32,7 +38,7 @@ assign DATA_ADDRESS =(!AoD && IndicadorMaquina && contador_todo <8'd37)? command
 assign DATA_ADDRESS =(!AoD && IndicadorMaquina && contador_todo>8'd37)? address:8'bZZZZZZZZ;
 
 
-assign data_vga= (contador_todo>=8'h3d && contador_todo<=8'h44 && IndicadorMaquina)? DATA_ADDRESS:8'hZZ;
+assign data_vga= (contador_todo>=8'h3d && contador_todo<=8'h44 && Read==0 && AoD)? DATA_ADDRESS:8'hZZ;
 
 
 

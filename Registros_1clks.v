@@ -2,12 +2,16 @@
 module Registros(
     input wire clk,
     output wire bit_inicio1,
-    input wire [7:0] data_vga,
+
     input wire IndicadorMaquina,
     input wire [7:0] contador,
-    input wire [7:0]address,
+
     input wire Read,
-    output wire [3:0] contador_datos1, 
+    output wire [3:0] contador_datos1,
+
+
+    input wire [7:0] data_vga,
+    input wire [7:0]address,
     output wire [7:0] datos0,
     output wire [7:0] datos1,
     output wire [7:0] datos2,
@@ -45,67 +49,86 @@ begin
         contador_datos<=4'b0000;
    end
 end
-   
+
 end
+
+
 
 always@(posedge clk)begin
 
-    if(contador>=8'h18 && contador<=8'h1e && contador_datos==4'd1)begin
+    if(address==8'h21)begin
       data_0<=data_vga;
        //data_0<=1;
 
     end
-    if(contador>=8'h18 && contador<=8'h1e  && contador_datos==4'd2)begin
+    else if(address==8'h22)begin
         data_1<=data_vga;
         //data_1<=2;
 
     end
-    if(contador_datos==4'd3 && contador>=8'h18 && contador<=8'h1e)begin
+    else if(address==8'h23)begin
             data_2<=data_vga;
             //data_1<=2;
-    
+
         end
-    if(contador_datos==4'd4 && contador>=8'h18 && contador<=8'h1e)begin
+    else if(address==8'h24)begin
                 data_3<=data_vga;
                 //data_1<=2;
-        
+
             end
-    if(contador_datos==4'd5 && contador>=8'h18 && contador<=8'h1e)begin
+    else if(address==8'h25)begin
                     data_4<=data_vga;
                     //data_1<=2;
-            
+
                 end
-    if(contador_datos==4'd6 && contador>=8'h18 && contador<=8'h1e)begin
+    else if(address==8'h26)begin
                         data_5<=data_vga;
                         //data_1<=2;
-                
+
                     end
-    if(contador_datos ==4'd7 && contador>=8'h18 && contador<=8'h1e)begin
+    else if(address==8'h27)begin
                             data_6<=data_vga;
                             //data_1<=2;
-                    
+
                         end
-    if(contador_datos==4'd8 && contador>=8'h18 && contador<=8'h1e)begin
+    else if(address==8'h28)begin
                                 data_7<=data_vga;
                                 //data_1<=2;
-                        
+
                             end
-    if(contador_datos==4'd9 && contador>=8'h18 && contador<=8'h1e)begin
+
+    //Cronometro
+    else if(address==8'h41)begin
                                     data_8<=data_vga;
                                     //data_1<=2;
-                            
+
                                 end
-    if(contador_datos == 4'd10&& contador>=8'h18 && contador<=8'h1e)begin
+    else if(address==8'h42)begin
                                         data_9<=data_vga;
                                         //data_1<=2;
-                                
+
                                     end
-    if(contador_datos==4'd11 && contador>=8'h18 && contador<=8'h1e)begin
+    else if(address==8'h43)begin
                                             data_10<=data_vga;
                                             //data_1<=2;
-                                    
+
                                         end
-   
+
+    else begin
+          data_0<=data_0;
+          data_1<=data_1;
+          data_2<=data_2;
+          data_3<=data_3;
+          data_4<=data_4;
+          data_5<=data_5;
+          data_6<=data_6;
+          data_7<=data_7;
+          data_8<=data_8;
+          data_9<=data_9;
+          data_10<=data_10;
+
+    end
+
 end
 
 
@@ -143,5 +166,5 @@ assign data_vga_final = (contador_clks==4'b1011)? data_10:8'bZZZZZZZZ;
 
 
 assign bit_inicio1 =(contador_clks==4'b1100)? 1'b0: 1'b1;
-    
+
 endmodule

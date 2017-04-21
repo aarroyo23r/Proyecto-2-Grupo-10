@@ -119,7 +119,7 @@ always@(posedge clk)
        data_mod2<=data_mod;
     end
 
-Protocolo_rtc Proto_unit(.clk(clk),.bit_crono(Crono),.address(address2),.DATA_WRITE(data_mod2),.IndicadorMaquina(RW),
+Protocolo_rtc Proto_unit(.clk(clk),.address(address2),.DATA_WRITE(data_mod2),.IndicadorMaquina(RW),
                          .ChipSelect(ChipSelect),.Read(Read),.Write(Write),.AoD(AoD),.DATA_ADDRESS(DATA_ADDRESS),
                          .data_vga(data_intermedia),.contador2(contador2));
 
