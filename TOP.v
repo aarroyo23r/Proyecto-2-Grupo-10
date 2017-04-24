@@ -176,10 +176,10 @@ Registros Register_unit(.clk(clk),.data_vga(data_vga_entrada),.contador(contador
 //reg [7:0]segundos2; //para escritura de salida
 
 wire CronoActivo,Ring;
-wire  horasSal,minutosSal,segundosSal;
+wire  [7:0] horasSal,minutosSal,segundosSal;
 
-wire address_crono;
-wire data_crono;
+wire [7:0] address_crono;
+wire [7:0] data_crono;
 wire IniciaCronometro;
 
 MaquinaCrono MaquinaCrono_unit(

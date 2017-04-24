@@ -98,7 +98,7 @@ end
 
 
 always @(posedge clk) begin
- if (horas==horasSal && minutos==minutosSal && segundos==segundosSal) begin
+ if (horas==horasSal && minutos==minutosSal && segundos==segundosSal && horas!=8'h00 && minutos!=8'h00 && segundos!=8'h00) begin
 FinalizoCrono<=1;
 end
 
