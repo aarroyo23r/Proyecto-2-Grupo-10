@@ -130,6 +130,10 @@ always@(posedge clk)
        begin
        data_mod2<=data_reset;
        end
+
+       if (IniciaCronometro)begin
+         data_mod2<=data_crono;
+       end
     if((!RW |Escribir |reset3)& !Inicio1)
         begin
        data_mod2<=data_mod;
