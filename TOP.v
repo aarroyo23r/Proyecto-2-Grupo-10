@@ -77,7 +77,34 @@ wire [7:0]datos9;
 wire [7:0]datos10;
 
 
+//Variables Crono
 
+wire CronoActivo,Ring;
+wire  [7:0] horasSal,minutosSal,segundosSal;
+
+wire [7:0] address_crono;
+wire [7:0] data_crono;
+wire IniciaCronometro;
+
+
+
+
+//Mux datos Cronometro y cursor
+reg [7:0] horaCrono,minutosCrono,segundosCrono;
+wire [7:0] Cursor;
+reg [7:0] CursorTop;
+
+
+
+MaquinaCrono MaquinaCrono_unit(
+    .Reset(ResetCrono),.clk(clk),
+    .ProgramarCrono(ProgramarCrono),.PushInicioCrono(push_centro),
+    .horas(datos10),.minutos(datos9),.segundos(datos8),
+    .arriba(push_arriba),.abajo(push_abajo),.izquierda(push_izquierda),.derecha(push_derecha),
+    .CronoActivo(CronoActivo),.Ring(Ring),
+    .horasSal(horasSal),.minutosSal(minutosSal),.segundosSal(segundosSal),.Cursor(Cursor)
+    ,.address(address_crono),.data_crono(data_crono),.IniciaCronometro(IniciaCronometro)
+    );
 
 //reg [7:0]segundos,minutos,horas,date,num_semana,mes,ano,dia_sem;
 wire [7:0]contador2;
@@ -175,28 +202,7 @@ Registros Register_unit(.clk(clk),.data_vga(data_vga_entrada),.contador(contador
 //reg [7:0] data_out1;
 //reg [7:0]segundos2; //para escritura de salida
 
-wire CronoActivo,Ring;
-wire  [7:0] horasSal,minutosSal,segundosSal;
 
-wire [7:0] address_crono;
-wire [7:0] data_crono;
-wire IniciaCronometro;
-
-MaquinaCrono MaquinaCrono_unit(
-    .Reset(ResetCrono),.clk(clk),
-    .ProgramarCrono(ProgramarCrono),.PushInicioCrono(push_centro),
-    .horas(datos10),.minutos(datos9),.segundos(datos8),
-    .arriba(push_arriba),.abajo(push_abajo),.izquierda(push_izquierda),.derecha(push_derecha),
-    .CronoActivo(CronoActivo),.Ring(Ring),
-    .horasSal(horasSal),.minutosSal(minutosSal),.segundosSal(segundosSal),.Cursor(Cursor)
-    ,.address(address_crono),.data_mod(data_crono),.IniciaCronometro(IniciaCronometro)
-    );
-
-
-//Mux datos Cronometro y cursor
-reg [7:0] horaCrono,minutosCrono,segundosCrono;
-wire [7:0] Cursor;
-reg [7:0] CursorTop;
 
 always @*
 if (ProgramarCrono && !CronoActivo) begin
@@ -207,9 +213,9 @@ CursorTop=Cursor;
 end
 
 else begin
-horaCrono=datos8;
+horaCrono=datos10;
 minutosCrono=datos9;
-segundosCrono=datos10;
+segundosCrono=datos8;
 CursorTop=address2;
 end
 

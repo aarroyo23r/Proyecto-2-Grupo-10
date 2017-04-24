@@ -7,7 +7,7 @@ module MaquinaCrono(
     input wire arriba,abajo,izquierda,derecha,
     output reg CronoActivo,Ring,
     output reg [7:0] Cursor,
-    output reg[7:0] data_mod,
+    output reg[7:0] data_crono,
     output reg [7:0] address,
     output reg IniciaCronometro,
     output wire [7:0] horasSal,minutosSal,segundosSal
@@ -131,23 +131,50 @@ always @(posedge clk)
     end
 */
 
+reg [3:0] unidadesSegundos,unidadesMinutos,unidadesHoras;
+reg [3:0] decenasSegundos,decenasMinutos,decenasHoras;
 //Sumador y restador
 
 always @(posedge clk) begin
 
 //sumador
 if(suma && !resta) begin
+unidadesSegundos<=segundosReg[3:0];
+unidadesMinutos<=minutosReg[3:0];
+unidadesHoras<=horasReg[3:0];
+
 
 if (registro==2'd1)begin
-segundosReg<=segundosReg + 1;
+
+if (unidadesSegundos==4'h9) begin
+segundosReg<=segundosReg+7;
 end
 
+else begin
+segundosReg<=segundosReg+1;
+end
+end
+
+
 else if (registro==2'd2)begin
-minutosReg<=minutosReg + 1;
+
+if (unidadesMinutos==4'h9) begin
+minutosReg<=minutosReg+7;
+end
+
+else begin
+minutosReg<=minutosReg+1;
+end
 end
 
 else if (registro==2'd3)begin
-horasReg<=horasReg + 1;
+if (unidadesHoras==4'h9) begin
+horasReg<=horasReg+7;
+end
+
+else begin
+horasReg<=horasReg+1;
+end
 end
 
 else begin
@@ -161,17 +188,41 @@ end
 
 //Restador
 else if(!suma && resta) begin
+decenasHoras<=horasReg[7:4];
+decenasMinutos<=minutosReg[7:4];
+decenasSegundos<=segundosReg[7:4];
 
 if (registro==2'd1)begin
-segundosReg<=segundosReg - 8'd1;
+
+if (decenasSegundos==4'h1) begin
+segundosReg<=segundosReg-7;
+end
+
+else begin
+segundosReg<=segundosReg-1;
+end
 end
 
 else if (registro==2'd2)begin
-minutosReg<=minutosReg - 8'd1;
+
+if (decenasMinutos==4'h1) begin
+minutosReg<=minutosReg-7;
+end
+
+else begin
+minutosReg<=minutosReg-1;
+end
 end
 
 else if (registro==2'd3)begin
-horasReg<=horasReg - 8'd1;
+
+if (decenasHoras==4'h1) begin
+horasReg<=horasReg-7;
+end
+
+else begin
+horasReg<=horasReg-1;
+end
 end
 
 else begin
@@ -564,15 +615,28 @@ end
 
 localparam [11:0] limit = 12'd36; //tiempo en el que la dirección se mantiene
     reg [11:0] contador=0;
-    reg c_dir=0;
+    reg c_dir=1;
 
 
     always @(posedge clk)
     begin
-        if(CronoActivo)
+        if(CronoActivo && !ProgramarCrono && InicioCrono)
         begin
         contador<=contador + 1'b1;
-        IniciaCronometro<=0;
+        IniciaCronometro<=1;
+        c_dir<=0;
+        if(contador==limit)
+        begin
+            contador<=0;
+            IniciaCronometro<=0;
+            c_dir<=1;
+        end
+
+        if(!CronoActivo && !ProgramarCrono && !InicioCrono)
+        begin
+        contador<=contador + 1'b1;
+        IniciaCronometro<=1;
+        c_dir<=0;
         if(contador==limit)
         begin
             contador<=0;
@@ -589,7 +653,9 @@ localparam [11:0] limit = 12'd36; //tiempo en el que la dirección se mantiene
 
         end
     end
+end
 
+//Activar Cronometro RTC
 
     always @(posedge clk)
     begin
@@ -599,19 +665,39 @@ localparam [11:0] limit = 12'd36; //tiempo en el que la dirección se mantiene
         1'b0:
             begin
             address<=8'h00;
-            data_mod<=8'h10;
+            data_crono<=8'h10;
             end
          1'b1:
             begin
             address<=8'hZZ;
-            data_mod<=8'hZZ;
+            data_crono<=8'hZZ;
             end
          default:address<=8'hZZ;
     endcase
     end
+
+    else if (!CronoActivo) begin
+    case(c_dir)
+        1'b0:
+            begin
+            address<=8'h00;
+            data_crono<=8'h00;
+            end
+         1'b1:
+            begin
+            address<=8'hZZ;
+            data_crono<=8'hZZ;
+            end
+         default:address<=8'hZZ;
+    endcase
+    end
+
+
     else
+    data_crono<=8'hZZ;
     address<=8'hZZ;
     end
+
 
 
 

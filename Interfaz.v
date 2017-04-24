@@ -540,7 +540,7 @@ case (color_addr) // combinación de colores seleccionados de acuerdo al switch,
 //         r      g    b
 //color = 0000  0000  0000
 
-3'd0: color = 12'h032;//Verde
+3'd0: color = 12'h233;//Verde
 3'd1:  color = 12'h000;//Negro
 3'd2: color = 12'hFFE;//Blanco
 3'd3: color = 12'h111;
@@ -609,7 +609,7 @@ always @* //operación se realiza con cada pulso de reloj
         rgb=colorMux;
 
  else
-    rgb = 12'h032;
+    rgb = 12'h233;
 
 
 assign rgbO=rgb;
