@@ -4,7 +4,7 @@ module TOP(
     input wire push_derecha,
     input wire push_arriba,  //Push Buttons (Para escribir)
     input wire push_abajo,
-    input wire Reset,Escribir,
+    input wire Reset,Escribir,ResetCrono,
     input wire clk,ProgramarCrono,
     input wire instrucciones, //Muestra o esconde las instrucciones
     input wire push_centro, //Push para cronometro
@@ -102,6 +102,10 @@ begin
     begin
     address2<=address_inicio;
     end
+
+    if (IniciaCronometro)begin
+      address2<=address_crono;
+    end
     if((Escribir|(reset3 |!RW)) && (!Inicio1))
         begin
         address2<=ADDRESS_write;
@@ -149,11 +153,11 @@ reg [7:0] contador;
 reg READ;
 always@(posedge clk)
 begin
-   
+
     data_vga_entrada<=data_intermedia;
     contador<=contador2;
     READ<=Read;
-    
+
 end
 
 wire [3:0] contador_datos1;
@@ -167,12 +171,53 @@ Registros Register_unit(.clk(clk),.data_vga(data_vga_entrada),.contador(contador
 //reg [7:0] data_out1;
 //reg [7:0]segundos2; //para escritura de salida
 
+wire CronoActivo,Ring;
+wire  horasSal,minutosSal,segundosSal;
+
+wire address_crono;
+wire data_crono;
+wire IniciaCronometro;
+
+MaquinaCrono MaquinaCrono_unit(
+    .Reset(ResetCrono),.clk(clk),
+    .ProgramarCrono(ProgramarCrono),.PushInicioCrono(push_centro),
+    .horas(datos10),.minutos(datos9),.segundos(datos8),
+    .arriba(push_arriba),.abajo(push_abajo),.izquierda(push_izquierda),.derecha(push_derecha),
+    .CronoActivo(CronoActivo),.Ring(Ring),
+    .horasSal(horasSal),.minutosSal(minutosSal),.segundosSal(segundosSal),.Cursor(Cursor)
+    ,.address(address_crono),.data_mod(data_crono),.IniciaCronometro(IniciaCronometro)
+    );
+
+
+//Mux datos Cronometro y cursor
+reg horaCrono,minutosCrono,segundosCrono;
+wire [7:0] Cursor;
+reg [7:0] CursorTop;
+
+always @*
+if (ProgramarCrono && !CronoActivo) begin
+horaCrono=horasSal;
+minutosCrono=minutosSal;
+segundosCrono=segundosSal;
+CursorTop=Cursor;
+end
+
+else begin
+horaCrono=datos8;
+minutosCrono=datos9;
+segundosCrono=datos10;
+CursorTop=address2;
+end
+
+
+
 
 
 
 
 Interfaz Interfaz_unit(.clk(clk),.reset(Reset),.rgbO(rgbO),.resetSync(Reset),.inicioSecuencia(bit_inicio1),.datoRTC(data_out),.hsync(hsync),.vsync(vsync),.video_on(video_on),
                  .datos0(segundos),.datos1(minutos),.datos2(horas),.datos3(date),.datos4(mes),.datos5(ano),.datos6(dia_sem),.datos7(num_semana),
-                     .datos8(datos8),.datos9(datos9),.datos10(datos10),.instrucciones(instrucciones),.Escribir(Escribir),.cursor(address2));
-                     
+                     .datos8(segundosCrono),.datos9(minutosCrono),.datos10(horaCrono),.instrucciones(instrucciones),.Escribir(Escribir),.cursor(Cursor),.ProgramarCrono(ProgramarCrono)
+                     );
+
 endmodule

@@ -5,7 +5,7 @@
 module ImpresionDatos
     (
     input wire clk,
-    input wire instrucciones,
+    input wire instrucciones,ProgramarCrono,
     input wire [6:0] SegundosU,SegundosD,minutosU,minutosD,horasU,horasD,
     fechaU,mesU,anoU,diaSemanaU, numeroSemanaU,fechaD,mesD,anoD,diaSemanaD,
     numeroSemanaD,
@@ -259,7 +259,7 @@ always @(posedge clk)//Se ejecuta cuando hay un cambio en pixel x o pixel y
 
     //Cursor Segundos
 
-    else if ((cursor==8'h22) &&( Escribir) && (pixelx >= IsegundosD) && (pixelx<=DsegundosU) && (pixely >= ABsegundos + 10'd4) && (pixely<=ABsegundos+ 10'd6))begin
+    else if ((cursor==8'h21) &&( Escribir) && (pixelx >= IsegundosD) && (pixelx<=DsegundosU) && (pixely >= ABsegundos + 10'd4) && (pixely<=ABsegundos+ 10'd6))begin
         char_addr <= 7'h0a; //direccion de lo que se va a imprimir
         color_addr<=4'd2;// Color de lo que se va a imprimir
         font_size<=1;
@@ -286,7 +286,7 @@ always @(posedge clk)//Se ejecuta cuando hay un cambio en pixel x o pixel y
 
       //Cursor Minutos
 
-      else if ((cursor==8'h23) &&( Escribir) && (pixelx >= IminutosD) && (pixelx<=DminutosU) && (pixely >= ABminutos + 10'd4) && (pixely<=ABminutos+ 10'd6))begin
+      else if ((cursor==8'h22) &&( Escribir) && (pixelx >= IminutosD) && (pixelx<=DminutosU) && (pixely >= ABminutos + 10'd4) && (pixely<=ABminutos+ 10'd6))begin
       char_addr <= 7'h0a; //direccion de lo que se va a imprimir
       color_addr<=4'd2;// Color de lo que se va a imprimir
       font_size<=1;
@@ -316,7 +316,7 @@ always @(posedge clk)//Se ejecuta cuando hay un cambio en pixel x o pixel y
 
         //Cursor Horas
 
-     else if ((cursor==8'h24) &&( Escribir) && (pixelx >= IhorasD) && (pixelx<=DhorasU) && (pixely >= ABhoras + 10'd4) && (pixely<=ABhoras+ 10'd6))begin
+     else if ((cursor==8'h23) &&( Escribir) && (pixelx >= IhorasD) && (pixelx<=DhorasU) && (pixely >= ABhoras + 10'd4) && (pixely<=ABhoras+ 10'd6))begin
      char_addr <= 7'h0a; //direccion de lo que se va a imprimir
      color_addr<=4'd2;// Color de lo que se va a imprimir
      font_size<=1;
@@ -344,7 +344,7 @@ always @(posedge clk)//Se ejecuta cuando hay un cambio en pixel x o pixel y
 
      //Cursor Horas Crono
 
-     else if ((cursor==8'h42) &&( Escribir) && (pixelx >= cronoHoras) && (pixelx<=cronoHoras+ 2*cambioMozaico) && (pixely >= ABmes + 10'd2) && (pixely<=ABmes+ 10'd3))begin
+     else if ((cursor==8'h43) &&( Escribir|ProgramarCrono) && (pixelx >= cronoHoras) && (pixelx<=cronoHoras+ 2*cambioMozaico) && (pixely >= ABmes + 10'd2) && (pixely<=ABmes+ 10'd3))begin
      char_addr <= 7'h0a; //direccion de lo que se va a imprimir
      color_addr<=4'd2;// Color de lo que se va a imprimir
      font_size<=1;
@@ -371,7 +371,7 @@ else if ((pixelx >= cronoMinutos+cambioMozaico ) && (pixelx<cronoMinutos+ 2*camb
    dp<=1'd1;end//Tamaño de fuente
 
 
-   else if ((cursor==8'h43) &&( Escribir) && (pixelx >= cronoMinutos) && (pixelx<=cronoMinutos+ 2*cambioMozaico) && (pixely >= ABmes + 10'd2) && (pixely<=ABmes+ 10'd3))begin
+   else if ((cursor==8'h42) && ( Escribir|ProgramarCrono) && (pixelx >= cronoMinutos) && (pixelx<=cronoMinutos+ 2*cambioMozaico) && (pixely >= ABmes + 10'd2) && (pixely<=ABmes+ 10'd3))begin
    char_addr <= 7'h0a; //direccion de lo que se va a imprimir
    color_addr<=4'd2;// Color de lo que se va a imprimir
    font_size<=1;
@@ -399,7 +399,7 @@ else if ((pixelx >= cronoSegundos ) && (pixelx<cronoSegundos+cambioMozaico) && (
      dp<=1'd1;end//Tamaño de fuente
 
 
-     else if ((cursor==8'h21) &&( Escribir) && (pixelx >= cronoSegundos) && (pixelx<=cronoSegundos+ 2*cambioMozaico) && (pixely >= ABmes + 10'd2) && (pixely<=ABmes+ 10'd3))begin
+     else if ((cursor==8'h41) &&( Escribir|ProgramarCrono) && (pixelx >= cronoSegundos) && (pixelx<=cronoSegundos+ 2*cambioMozaico) && (pixely >= ABmes + 10'd2) && (pixely<=ABmes+ 10'd3))begin
      char_addr <= 7'h0a; //direccion de lo que se va a imprimir
      color_addr<=4'd2;// Color de lo que se va a imprimir
      font_size<=1;
@@ -1682,8 +1682,8 @@ else if ((pixelx >= IsemanaU) && (pixelx<=DsemanaU) && (pixely >= ARsemana) && (
         dp<=1'd1;end//Tamaño de fuente
 
 
-        //Cursor Dia
-        else if ((cursor==8'h41) &&( Escribir) && (pixelx >= IsemanaD) && (pixelx<=DsemanaU) && (pixely >= ABsemana + 10'd2) && (pixely<=ABsemana + 10'd3))begin
+        //Cursor Semana
+        else if ((cursor==8'h28) &&( Escribir) && (pixelx >= IsemanaD) && (pixelx<=DsemanaU) && (pixely >= ABsemana + 10'd2) && (pixely<=ABsemana + 10'd3))begin
         char_addr <= 7'h0a; //direccion de lo que se va a imprimir
         color_addr<=4'd2;// Color de lo que se va a imprimir
         font_size<=1;
@@ -1713,7 +1713,7 @@ else if ((pixelx >= IsemanaU) && (pixelx<=DsemanaU) && (pixely >= ARsemana) && (
 
 
                 //Cursor Dia
-                else if ((cursor==8'h28) &&( Escribir) && (pixelx >= IdiaD) && (pixelx<=DdiaU) && (pixely >= ABdia + 10'd2) && (pixely<=ABdia + 10'd3))begin
+                else if ((cursor==8'h27) &&( Escribir) && (pixelx >= IdiaD) && (pixelx<=DdiaU) && (pixely >= ABdia + 10'd2) && (pixely<=ABdia + 10'd3))begin
                 char_addr <= 7'h0a; //direccion de lo que se va a imprimir
                 color_addr<=4'd2;// Color de lo que se va a imprimir
                 font_size<=1;
@@ -1746,7 +1746,7 @@ else if ((pixelx >= IsemanaU) && (pixelx<=DsemanaU) && (pixely >= ARsemana) && (
                                 dp<=1'd1;end//Tamaño de fuente
 
 
-                                else if ((cursor==8'h25) &&( Escribir) && (pixelx >= IfechaD) && (pixelx<=DfechaU) && (pixely >= ABfecha + 10'd2) && (pixely<=ABfecha+ 10'd3))begin
+                                else if ((cursor==8'h24) &&( Escribir) && (pixelx >= IfechaD) && (pixelx<=DfechaU) && (pixely >= ABfecha + 10'd2) && (pixely<=ABfecha+ 10'd3))begin
                                 char_addr <= 7'h0a; //direccion de lo que se va a imprimir
                                 color_addr<=4'd2;// Color de lo que se va a imprimir
                                 font_size<=1;
@@ -1793,7 +1793,7 @@ else if ((pixelx >= 10'd583) && (pixelx<=10'd590) && (pixely >= ARano) && (pixel
                 dp<=1'd1;end//Tamaño de fuente
 
                 //Cursor Año
-                else if ((cursor==8'h27) &&( Escribir) && (pixelx >= IanoD) && (pixelx<=DanoU) && (pixely >= ABano + 10'd2) && (pixely<=ABano + 10'd3))begin
+                else if ((cursor==8'h26) &&( Escribir) && (pixelx >= IanoD) && (pixelx<=DanoU) && (pixely >= ABano + 10'd2) && (pixely<=ABano + 10'd3))begin
                 char_addr <= 7'h0a; //direccion de lo que se va a imprimir
                 color_addr<=4'd2;// Color de lo que se va a imprimir
                 font_size<=1;
@@ -1821,7 +1821,7 @@ else if ((pixelx >= 10'd583) && (pixelx<=10'd590) && (pixely >= ARano) && (pixel
 
 
                             //Cursor Mes
-                            else if ((cursor==8'h26) &&( Escribir) && (pixelx >= ImesD) && (pixelx<=DmesU) && (pixely >= ABmes + 10'd2) && (pixely<=ABmes + 10'd3))begin
+                            else if ((cursor==8'h25) &&( Escribir) && (pixelx >= ImesD) && (pixelx<=DmesU) && (pixely >= ABmes + 10'd2) && (pixely<=ABmes + 10'd3))begin
                             char_addr <= 7'h0a; //direccion de lo que se va a imprimir
                             color_addr<=4'd2;// Color de lo que se va a imprimir
                             font_size<=1;

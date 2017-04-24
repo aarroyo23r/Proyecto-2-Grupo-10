@@ -6,8 +6,14 @@ module MaquinaCrono(
     input wire [7:0] horas,minutos,segundos,
     input wire arriba,abajo,izquierda,derecha,
     output reg CronoActivo,Ring,
+    output reg [7:0] Cursor,
+    output reg[7:0] data_mod,
+    output reg [7:0] address,
+    output reg IniciaCronometro,
     output wire [7:0] horasSal,minutosSal,segundosSal
     );
+
+
 
     //MaquinaCrono
 
@@ -23,9 +29,9 @@ localparam[1:0] s0 = 2'b00, //Estado Programar Cronometro
  reg[1:0]s_actual,s_next;
   reg[1:0]s_actualcrono,s_sig;
 
- reg [11:0] contador=0;
+ //reg [11:0] contador=0;
 
-reg FinalizoCrono=0;
+reg FinalizoCrono;
 //registro de estados
 
 //Detector de flancos
@@ -90,18 +96,18 @@ end
 
 end
 
-/*
-always @* begin
+
+always @(posedge clk) begin
  if (horas==horasSal && minutos==minutosSal && segundos==segundosSal) begin
-FinalizoCrono=1;
+FinalizoCrono<=1;
 end
 
 else begin
-FinalizoCrono=0;
+FinalizoCrono<=0;
 end
 
 end
-*/
+
 
 always @(posedge clk,posedge Reset)begin//Logica de Reset y estado siguiente
     if(Reset)begin
@@ -209,12 +215,18 @@ begin*/
                  Ring <=1'b0;
                  s_next<=s1;
                  end
-             if( (ProgramarCrono && !Reset ) | Reset | (FinalizoCrono==1 && Reset==0))
+             if( (ProgramarCrono && !Reset ) | Reset)
                  begin
                  CronoActivo <=1'b0;  //Para protocolo read
                  Ring <=1'b0;
                  s_next<=s_actual;
                  end
+             if ((FinalizoCrono==1 && Reset==0))
+                  begin
+                  CronoActivo <=1'b0;  //Para protocolo read
+                  Ring <=1'b1;
+                  s_next<=s3;
+             end
 
 
             end
@@ -231,7 +243,7 @@ begin*/
                 Ring <=1'b0;
                 s_next<=s2;
                 end
-             if(Reset==0 && FinalizoCrono ==1 && ProgramarCrono==0)
+             if(Reset==0 && FinalizoCrono ==1)
                 begin
                 CronoActivo <=1'b0;  //Para protocolo read
                 Ring <=1'b1;
@@ -252,7 +264,7 @@ begin*/
                 Ring <=1'b0;
                 s_next<=s_actual;
                 end
-            if(Reset==0 && FinalizoCrono ==1 && ProgramarCrono==0)
+            if(Reset==0 && FinalizoCrono ==1 )
                 begin
                 CronoActivo <=1'b0;  //Para protocolo read
                 Ring <=1'b1;
@@ -275,12 +287,19 @@ begin*/
 
 end
         s3: begin
-            if(Reset==1 | (Reset==0 && FinalizoCrono ==0) | (Reset==0 && FinalizoCrono ==0 && ProgramarCrono==1 && InicioCrono==0))
+            if(Reset==1 | (Reset==0 && FinalizoCrono ==0 && ProgramarCrono==1 && InicioCrono==0))
                 begin
-                CronoActivo <=1'b1;  //Para protocolo read
+                CronoActivo <=1'b0;  //Para protocolo read
                 Ring <=1'b0;
                 s_next<=s0;
                 end
+                if(Reset==0)
+                    begin
+                    CronoActivo <=1'b0;  //Para protocolo read
+                    Ring <=1'b1;
+                    s_next<=s_actual;
+                    end
+
                 end
           default: s_next<=s0;
     endcase
@@ -295,7 +314,7 @@ end
 
 
 //Programar el Cronometro
-reg horasReg=0,minutosReg=0,segundosReg=0;
+reg [7:0] horasReg=0,minutosReg=0,segundosReg=0;
 
 
 localparam [3:0] ss = 4'h0, //inicialización
@@ -321,6 +340,7 @@ case (s_actualcrono)
         if(!Reset && !PushInicioCrono && !FinalizoCrono  && ProgramarCrono && !ar && !ab && !iz && !de)
             begin
             registro<=2'd0;
+            Cursor<=8'h42;
             suma<=0;
             resta<=0;
             //segundosReg<=segundosReg;
@@ -329,6 +349,7 @@ case (s_actualcrono)
         if( (ar) && !Reset && !PushInicioCrono && !FinalizoCrono && ProgramarCrono)
             begin
             registro<=2'd1;
+            Cursor<=8'h42;
             suma<=1;
             resta<=0;
              //segundosReg<=segundosReg + 8'd1;
@@ -337,6 +358,7 @@ case (s_actualcrono)
          if((ab) && !Reset && !PushInicioCrono && !FinalizoCrono && ProgramarCrono)
              begin
              registro<=2'd1;
+             Cursor<=8'h42;
              resta<=1;
              suma<=0;
              //segundosReg<=segundosReg - 8'd1;
@@ -346,6 +368,7 @@ case (s_actualcrono)
              if( (iz) && !Reset && !PushInicioCrono && !FinalizoCrono && ProgramarCrono)
                  begin
                  registro<=2'd0;
+                 Cursor<=8'h43;
                  suma<=0;
                  resta<=0;
                   //segundosReg<=segundosReg;
@@ -354,6 +377,7 @@ case (s_actualcrono)
               if((de) && !Reset && !PushInicioCrono && !FinalizoCrono && ProgramarCrono)
                   begin
                   registro<=2'd0;
+                  Cursor<=8'h42;
                   suma<=0;
                   resta<=0;
                   //segundosReg<=segundosReg;
@@ -362,6 +386,7 @@ case (s_actualcrono)
                   if( Reset) //Estado
                       begin
                       registro<=2'd0;
+                      Cursor<=8'h42;
                       suma<=0;
                       resta<=0;
                       s_sig<=ss;
@@ -370,6 +395,7 @@ case (s_actualcrono)
                        if(!ProgramarCrono | PushInicioCrono)
                            begin
                            registro<=2'd0;
+                           Cursor<=8'h00;
                            suma<=0;
                            resta<=0;
                            s_sig<=sc;
@@ -382,6 +408,7 @@ case (s_actualcrono)
     if(!Reset && !PushInicioCrono && !FinalizoCrono  && ProgramarCrono && !ar && !ab && !iz && !de)
         begin
         registro<=2'd0;
+        Cursor<=8'h43;
         suma<=0;
         resta<=0;
         //minutosReg<=minutosReg;
@@ -390,6 +417,7 @@ case (s_actualcrono)
     if( (ar) && !Reset && !PushInicioCrono && !FinalizoCrono && ProgramarCrono)
         begin
         registro<=2'd2;
+        Cursor<=8'h43;
         suma<=1;
         resta<=0;
          //minutosReg<=minutosReg + 8'd1;
@@ -398,6 +426,7 @@ case (s_actualcrono)
      if((ab) && !Reset && !PushInicioCrono && !FinalizoCrono && ProgramarCrono)
          begin
          registro<=2'd2;
+         Cursor<=8'h43;
          suma<=0;
          resta<=1;
          //minutosReg<=minutosReg - 8'd1;
@@ -407,6 +436,7 @@ case (s_actualcrono)
          if( (iz) && !Reset && !PushInicioCrono && !FinalizoCrono && ProgramarCrono)
              begin
              registro<=2'd0;
+             Cursor<=8'h21;
              suma<=0;
              resta<=0;
               //minutosReg<=minutosReg;
@@ -415,6 +445,7 @@ case (s_actualcrono)
           if((de) && !Reset && !PushInicioCrono && !FinalizoCrono && ProgramarCrono)
               begin
               registro<=2'd0;
+              Cursor<=8'h42;
               suma<=0;
               resta<=0;
               //minutosReg<=minutosReg;
@@ -424,6 +455,7 @@ case (s_actualcrono)
               if( Reset) //Estado
                   begin
                   registro<=2'd0;
+                  Cursor<=8'h42;
                   suma<=0;
                   resta<=0;
                   s_sig<=ss;
@@ -433,6 +465,7 @@ case (s_actualcrono)
                    if(!ProgramarCrono  | PushInicioCrono)
                        begin
                        registro<=2'd0;
+                       Cursor<=8'h00;
                        suma<=0;
                        resta<=0;
                        s_sig<=sc;
@@ -442,13 +475,15 @@ case (s_actualcrono)
    if((!ProgramarCrono | PushInicioCrono)  && !Reset)
        begin
        registro<=2'd0;
+       Cursor<=8'h00;
        suma<=0;
        resta<=0;
        s_sig<=s_actualcrono;
        end
-   if( Reset) //Estado
+   if( Reset | ProgramarCrono) //Estado
        begin
        registro<=2'd0;
+       Cursor<=8'h00;
        suma<=0;
        resta<=0;
        s_sig<=ss;
@@ -460,6 +495,7 @@ end
              if(!Reset && !PushInicioCrono && !FinalizoCrono && !ar && !ab && !iz && !de )
                  begin
                  registro<=2'd0;
+                 Cursor<=8'h21;
                  suma<=0;
                  resta<=0;
                  //horasReg<=horasReg;
@@ -468,6 +504,7 @@ end
              if( (ar) && !Reset && !PushInicioCrono && !FinalizoCrono)
                  begin
                  registro<=2'd3;
+                 Cursor<=8'h21;
                  suma<=1;
                  resta<=0;
                   //horasReg<=horasReg + 8'd1;
@@ -476,6 +513,7 @@ end
               if((ab) && !Reset && !PushInicioCrono && !FinalizoCrono)
                   begin
                   registro<=2'd3;
+                  Cursor<=8'h21;
                   suma<=0;
                   resta<=1;
                   //horasReg<=horasReg - 8'd1;
@@ -485,6 +523,7 @@ end
                   if( (iz) && !Reset && !PushInicioCrono && !FinalizoCrono)
                       begin
                       registro<=2'd0;
+                      Cursor<=8'h43;
                       suma<=0;
                       resta<=0;
                        //horasReg<=horasReg;
@@ -493,6 +532,7 @@ end
                    if((de) && !Reset && !PushInicioCrono && !FinalizoCrono)
                        begin
                        registro<=2'd0;
+                       Cursor<=8'h21;
                        suma<=0;
                        resta<=0;
                        //horasReg<=horasReg;
@@ -502,6 +542,7 @@ end
                        if( Reset) //Estado
                            begin
                            registro<=2'd0;
+                           Cursor<=8'h42;
                            suma<=0;
                            resta<=0;
                            s_sig<=ss;
@@ -510,6 +551,8 @@ end
                             if(!ProgramarCrono | PushInicioCrono)
                                 begin
                                 registro<=2'd0;
+                                Cursor<=8'h00;
+                                s_sig<=sc;
                                 suma<=0;
                                 resta<=0;
                                 end
@@ -518,6 +561,59 @@ end
 endcase
 
 end
+
+localparam [11:0] limit = 12'd36; //tiempo en el que la dirección se mantiene
+    reg [11:0] contador=0;
+    reg c_dir=0;
+
+
+    always @(posedge clk)
+    begin
+        if(CronoActivo)
+        begin
+        contador<=contador + 1'b1;
+        IniciaCronometro<=0;
+        if(contador==limit)
+        begin
+            contador<=0;
+            IniciaCronometro<=0;
+            c_dir<=1;
+        end
+
+        if(Reset)
+            begin
+            c_dir<=0;
+            contador<=0;
+            IniciaCronometro<=0;
+            end
+
+        end
+    end
+
+
+    always @(posedge clk)
+    begin
+    if(CronoActivo)
+    begin
+    case(c_dir)
+        1'b0:
+            begin
+            address<=8'h00;
+            data_mod<=8'h10;
+            end
+         1'b1:
+            begin
+            address<=8'hZZ;
+            data_mod<=8'hZZ;
+            end
+         default:address<=8'hZZ;
+    endcase
+    end
+    else
+    address<=8'hZZ;
+    end
+
+
 
 assign horasSal=horasReg;
 assign minutosSal=minutosReg;

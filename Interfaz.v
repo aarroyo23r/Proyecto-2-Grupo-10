@@ -22,7 +22,7 @@
 
 module Interfaz( //Definicion entradas y salidas
     input wire clk,reset,resetSync,
-    input wire instrucciones,
+    input wire instrucciones,ProgramarCrono,
     input wire inicioSecuencia,//Indica si se esta iniciando una secuencia de la transmision de datos
     input wire [7:0] datoRTC,//Dato proveniente del RTC
     input wire [7:0] cursor,
@@ -453,7 +453,7 @@ ImpresionDatos ImpresionDatos_unit
      .numeroSemanaD(numeroSemanaD),.memInto(memInt),.graficosO(graficos),.rom_addrGraficos(rom_addrGraficos),
      .SegundosUT(SegundosUT),.minutosUT(minutosUT),.horasUT(horasUT),
      .SegundosDT(SegundosDT),.minutosDT(minutosDT),.horasDT(horasDT),.instrucciones(instrucciones),.cursor(cursor)
-     ,.Escribir(Escribir)
+     ,.Escribir(Escribir),.ProgramarCrono(ProgramarCrono)
     );
 
 

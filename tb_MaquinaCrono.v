@@ -1,3 +1,5 @@
+`timescale 1ns / 1ps
+
 module tb_MaquinaCrono();
 
    reg Reset,clk;
@@ -6,6 +8,7 @@ module tb_MaquinaCrono();
     reg arriba,abajo,izquierda,derecha;
     wire CronoActivo,Ring;
     wire [7:0] horasSal,minutosSal,segundosSal;
+    wire FinalizoCrono;
 
     always
     begin
@@ -20,7 +23,7 @@ module tb_MaquinaCrono();
         .arriba(arriba),.abajo(abajo),.izquierda(izquierda),.derecha(derecha),
         .CronoActivo(CronoActivo),.Ring(Ring),
         .horasSal(horasSal),.minutosSal(minutosSal),.segundosSal(segundosSal)
-        ,.horas(horas),.minutos(minutos),.segundos(segundos)
+        ,.horas(horas),.minutos(minutos),.segundos(segundos),.FinalizoCrono(FinalizoCrono)
         );
 
 
@@ -86,6 +89,13 @@ arriba=1;
 ProgramarCrono=0;
 PushInicioCrono=1;
 #70;
+PushInicioCrono=0;
+ProgramarCrono=1;
+arriba=0;
+#30;
+
+arriba=1;
+#30;
 
 $finish;
 
