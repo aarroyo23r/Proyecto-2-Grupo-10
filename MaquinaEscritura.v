@@ -10,9 +10,9 @@ module MaquinaEscritura(
     );
 reg [32:0]contador=32'h00000000;
 reg[3:0]c_dir=0;
-localparam [11:0] limit = 12'd1;            
+localparam [11:0] limit = 12'd1;
 localparam [3:0] s0 = 4'h0, //inicialización
-                 s1 = 4'h2, //segundos 
+                 s1 = 4'h2, //segundos
                  s2 = 4'h3, //minutos
                  s3 = 4'h4, //horas
                  s4 = 4'h5, //date
@@ -22,7 +22,7 @@ localparam [3:0] s0 = 4'h0, //inicialización
                  s8 = 4'h9, //#de semana
                  sY = 4'h1; //estado 12/24hrs
 
-reg [3:0] s_next; 
+reg [3:0] s_next;
 reg [3:0] s_actual=sY;
 reg push_ar=0, push_ab=0, push_i=0, push_d=0; //salida del detector de flancos
 
@@ -31,7 +31,7 @@ reg push_ar=0, push_ab=0, push_i=0, push_d=0; //salida del detector de flancos
 
 
 
-//MAQUINA ESCRITURA Y INICIALIZACIOÓN
+//MAQUINA ESCRITURA e INICIALIZACIOÓN
 //registro de estados
 always @(posedge clk)begin
     if(Inicio)begin
@@ -43,7 +43,7 @@ end
 
 //DETECTOR DE FLANCOS
 always@(posedge clk)
-begin   
+begin
   if((push_arriba |push_abajo | push_izquierda | push_derecha))
   begin
   contador<=contador+1'b1;
@@ -57,7 +57,7 @@ end
 
 always@(posedge clk)
 begin
-   if(contador<limit) 
+   if(contador==limit)
    begin
     if(push_arriba)
         begin
@@ -74,9 +74,9 @@ begin
      if(push_derecha)
         begin
         push_d<=1'b1;
-        end 
+        end
    end
-   if((contador>limit) && (push_arriba |push_abajo | push_izquierda | push_derecha))
+   else
    begin
     push_d<=0;
     push_i<=0;
@@ -89,7 +89,7 @@ end
 //CONTADOR PARA DURACIÓN DE ESTADO DE INICIALIZACIÓN
 reg [11:0] contador2=0;
 reg activa=0;
-always @(posedge clk)                 
+always @(posedge clk)
 begin
 if(!Inicio && !Reset)
 begin
@@ -105,7 +105,7 @@ end
 //CONTADOR PARA RESET
 reg [11:0] contador3=0;
 reg activa2=0;
-always @(posedge clk)                 
+always @(posedge clk)
 begin
 if(Reset)
 begin
@@ -130,26 +130,33 @@ s_next=s_actual; //siguiente estado default el actual
 address =8'h00;  //salida default de leer
 data_mod = data_mod; //salida default de leer
         case(s_actual)
-        s0 : begin
+        s0 : begin //Inicializacion
              if((Inicio|Reset))
                 begin
                     reset2=1'b1;
-                    s_next=s0; 
-                    address=8'h02;
-                    data_mod=8'h10;
+                    s_next=s0;
+                    address=8'h02; //Status 2
+                    data_mod=8'h10;//Bit de inicializacion
                     end
                  if(!Inicio && !Reset)
                    begin
                     address=8'h02;
-                    data_mod=8'h00;
-                    s_next=s0;
-                    if(activa)   
+                    data_mod=8'h00;//Termina inicializacion
+
+                    if(activa)
                     begin
                     reset2=1'b0;
                     s_next=sY;
                     end
-                    end       
+
+                    else begin
+                    s_next=s0;
+                    end
+
+                    end
                 end
+
+
         sY : begin  // varía formato 24 o 12 hrs
                 if(((Reset) && (!RW|Escribir)))
                        begin
@@ -159,17 +166,23 @@ data_mod = data_mod; //salida default de leer
                            if(activa2)
                            begin
                            s_next=sY;
-            end 
-            end     
-            if(!Inicio && !Reset && (!RW|Escribir))  
+            end
+            end
+            if(!Inicio && !Reset && (!RW|Escribir))
             begin
              reset2=1'b0;
-             address=8'h00;
+             address=8'h00;//Direccion status 1 para modificar el bit 24 o 12h
+
              if(push_ar && !push_ab)
              begin
                 data_mod= 8'h10;
              end
-        
+
+             if(!push_ar && push_ab)
+             begin
+                data_mod= 8'h00;
+             end
+
              if(push_d && !push_i)
              begin
                 s_next=s1;
@@ -184,8 +197,8 @@ data_mod = data_mod; //salida default de leer
              end
            end
           end
-             
-             
+
+
         s1: begin           //estado escritura de segundos
             if((Reset) && (!RW|Escribir))
                 begin
@@ -196,8 +209,8 @@ data_mod = data_mod; //salida default de leer
                     begin
                     s_next=sY;
                     end
-                end 
-            if(!Inicio && !Reset && (!RW|Escribir))  
+                end
+            if(!Inicio && !Reset && (!RW|Escribir))
                 begin
                     reset2=1'b0;
                     address=8'h21;
@@ -213,7 +226,7 @@ data_mod = data_mod; //salida default de leer
                             begin
                             data_mod=segundos;  //dejo el dato igual
                             end
-                        if(push_d && !push_i) 
+                        if(push_d && !push_i)
                             begin
                             s_next=s2;
                             address=8'h22;
@@ -226,9 +239,9 @@ data_mod = data_mod; //salida default de leer
                          if(!push_d && !push_i)
                             begin
                             s_next=s_actual;
-                            end                        
+                            end
                 end
-            
+
             end
          s2: begin
                        if((Reset) && (!RW|Escribir))
@@ -240,8 +253,8 @@ data_mod = data_mod; //salida default de leer
                                begin
                                s_next=sY;
                                end
-                           end 
-                       if(!Inicio && !Reset && (!RW|Escribir))  
+                           end
+                       if(!Inicio && !Reset && (!RW|Escribir))
                            begin
                                reset2=1'b0;
                                address=8'h22;
@@ -257,23 +270,21 @@ data_mod = data_mod; //salida default de leer
                                        begin
                                        data_mod=minutos;  //dejo el dato igual
                                        end
-                                   if(push_d && !push_i) 
+                                   if(push_d && !push_i)
                                        begin
                                        s_next=s3;
-                                       address=8'h23;
                                        end
                                    if(!push_d && push_i)
                                        begin
                                        s_next=s1;
-                                       address=8'h21;
                                        end
                                     if(!push_d && !push_i)
                                        begin
                                        s_next=s_actual;
-                                       end                        
+                                       end
                            end
-                       
-                       end   
+
+                       end
           s3:begin
                        if((Reset) && (!RW|Escribir))
                         begin
@@ -284,9 +295,9 @@ data_mod = data_mod; //salida default de leer
                         begin
                         s_next=sY;
                         end
-                        end 
-                        
-                       if(!Inicio && !Reset && (!RW|Escribir))  
+                        end
+
+                       if(!Inicio && !Reset && (!RW|Escribir))
                          begin
                           reset2=1'b0;
                           address=8'h23;
@@ -302,23 +313,21 @@ data_mod = data_mod; //salida default de leer
                                     begin
                                     data_mod=horas;  //dejo el dato horas
                                     end
-                                if(push_d && !push_i) 
+                                if(push_d && !push_i)
                                      begin
                                      s_next=s4;
-                                     address=8'h24;
                                      end
                                 if(!push_d && push_i)
                                      begin
                                      s_next=s2;
-                                     address=8'h22;
                                      end
                                 if(!push_d && !push_i)
                                      begin
                                      s_next=s_actual;
-                                     end                        
+                                     end
                           end
-                                              
-                 end  
+
+                 end
         s4:begin
                         if((Reset) && (!RW|Escribir))
                            begin
@@ -329,8 +338,8 @@ data_mod = data_mod; //salida default de leer
                            begin
                            s_next<=sY;
                            end
-                           end 
-                           if(!Inicio && !Reset && (!RW|Escribir))  
+                           end
+                           if(!Inicio && !Reset && (!RW|Escribir))
                               begin
                               reset2=1'b0;
                               address=8'h24;
@@ -346,20 +355,18 @@ data_mod = data_mod; //salida default de leer
                                    begin
                                    data_mod=date;     //dejo el dato igual dia
                                    end
-                                if(push_d && !push_i) 
+                                if(push_d && !push_i)
                                    begin
                                    s_next=s5;
-                                   address=8'h25;
                                    end
                                 if(!push_d && push_i)
                                     begin
                                     s_next=s3;
-                                    address=8'h23;
                                     end
                                  if(!push_d && !push_i)
                                      begin
                                      s_next=s_actual;
-                                      end                        
+                                      end
                               end
             end
          s5:begin
@@ -372,8 +379,8 @@ data_mod = data_mod; //salida default de leer
              begin
              s_next=sY;
              end
-             end 
-             if(!Inicio && !Reset && (!RW|Escribir))  
+             end
+             if(!Inicio && !Reset && (!RW|Escribir))
                 begin
                 reset2=1'b0;
                 address=8'h25;
@@ -389,20 +396,18 @@ data_mod = data_mod; //salida default de leer
                      begin
                      data_mod=mes;     //dejo el dato igual mes
                      end
-                     if(push_d && !push_i) 
+                     if(push_d && !push_i)
                      begin
                      s_next=s6;
-                     address=8'h26;
                      end
                   if(!push_d && push_i)
                      begin
                      s_next=s4;
-                     address=8'h24;
                      end
                    if(!push_d && !push_i)
                      begin
                      s_next=s_actual;
-                     end                        
+                     end
             end
     end
         s6:begin
@@ -415,8 +420,8 @@ data_mod = data_mod; //salida default de leer
                     begin
                     s_next=sY;
                     end
-                    end 
-                        if(!Inicio && !Reset && (!RW|Escribir))  
+                    end
+                        if(!Inicio && !Reset && (!RW|Escribir))
                                   begin
                                   reset2=1'b0;
                                   address=8'h26;
@@ -432,22 +437,20 @@ data_mod = data_mod; //salida default de leer
                                        begin
                                        data_mod=ano;     //dejo el dato igual año
                                        end
-                                    if(push_d && !push_i) 
+                                    if(push_d && !push_i)
                                        begin
                                        s_next<=s7;
-                                       address=8'h27;
                                        end
                                     if(!push_d && push_i)
                                         begin
                                         s_next=s5;
-                                        address=8'h25;
                                         end
                                      if(!push_d && !push_i)
                                          begin
                                          s_next=s_actual;
-                                          end                        
+                                          end
                                   end
-                end    
+                end
   s7:begin
                if((Reset) && (!RW|Escribir))
                    begin
@@ -458,8 +461,8 @@ data_mod = data_mod; //salida default de leer
                    begin
                    s_next=sY;
                    end
-                   end 
-               if(!Inicio && !Reset && (!RW|Escribir))  
+                   end
+               if(!Inicio && !Reset && (!RW|Escribir))
                    begin
                    reset2=1'b0;
                    address =8'h27;
@@ -475,24 +478,22 @@ data_mod = data_mod; //salida default de leer
                              begin
                              data_mod=dia_sem;     //dejo el dato igual a dia de la semana
                              end
-                         if(push_d && !push_i) 
+                         if(push_d && !push_i)
                              begin
                              s_next=s8;
-                             address=8'h28;
                              end
                          if(!push_d && push_i)
                              begin
                              s_next=s6;
-                             address=8'h26;
                              end
                          if(!push_d && !push_i)
                              begin
                              s_next=s_actual;
-                             end                        
+                             end
                    end
             end
-            
-            
+
+
       s8:begin
                if((Reset) && (!RW|Escribir))
                  begin
@@ -503,10 +504,10 @@ data_mod = data_mod; //salida default de leer
                  begin
                  s_next=sY;
                  end
-                 end 
-                 
-                 
-               if(!Inicio && !Reset && (!RW|Escribir))  
+                 end
+
+
+               if(!Inicio && !Reset && (!RW|Escribir))
                  begin
                  reset2=1'b0;
                  address=8'h28;
@@ -522,23 +523,24 @@ data_mod = data_mod; //salida default de leer
                  begin
                  data_mod=num_semana;     //dejo el dato igual a dia de la semana
                  end
-               if(push_d && !push_i) 
+               if(push_d && !push_i)
                   begin
                   s_next=s1;
-                  address=8'h00;
                    end
                 if(!push_d && push_i)
                   begin
                     s_next=s7;
-                    address=8'h27;
                     end
                 if(!push_d && !push_i)
                     begin
                     s_next=s_actual;
-                    end                        
+                    end
             end
-                      
+
     end
-     
+
   endcase
 end
+end
+
+endmodule

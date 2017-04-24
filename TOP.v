@@ -151,10 +151,27 @@ end
 wire [3:0] contador_datos1;
 
 
+
+///Mux Direccion Registros
+
+reg [7:0] DireccionRegistros;
+always@*
+
+if (Escribir) begin
+DireccionRegistros=ADDRESS_write;
+end
+
+else begin
+DireccionRegistros=DATA_ADDRESS;
+end
+
+
+
+
 Registros Register_unit(.clk(clk),.data_vga(data_intermedia),.contador(contador2),
                             .Read(READ),.datos0(segundos),
                         .datos1(minutos),.datos2(horas),.datos3(date),.datos4(mes),.datos5(ano),.datos6(dia_sem),.datos7(num_semana),
-                        .datos8(datos8),.datos9(datos9),.datos10(datos10),.IndicadorMaquina(RW),.address(DATA_ADDRESS),.Write(Write),.AoD(AoD)
+                        .datos8(datos8),.datos9(datos9),.datos10(datos10),.IndicadorMaquina(RW),.address(DireccionRegistros),.Write(Write),.AoD(AoD)
                         );
 //reg [7:0] data_out1;
 
@@ -162,7 +179,7 @@ Registros Register_unit(.clk(clk),.data_vga(data_intermedia),.contador(contador2
 
 Interfaz Interfaz_unit(.clk(clk),.reset(Reset),.rgbO(rgbO),.resetSync(Reset),.inicioSecuencia(bit_inicio1),.datoRTC(data_out),.hsync(hsync),.vsync(vsync),.video_on(video_on),
                         .datos0(segundos),.datos1(minutos),.datos2(horas),.datos3(date),.datos4(mes),.datos5(ano),.datos6(dia_sem),.datos7(num_semana),
-                        .datos8(datos8),.datos9(datos9),.datos10(datos10),.instrucciones(instrucciones)
+                        .datos8(datos8),.datos9(datos9),.datos10(datos10),.instrucciones(instrucciones),.Escribir(Escribir)
 
                         );
 
