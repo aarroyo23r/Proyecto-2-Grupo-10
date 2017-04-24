@@ -340,7 +340,7 @@ case (s_actualcrono)
         if(!Reset && !PushInicioCrono && !FinalizoCrono  && ProgramarCrono && !ar && !ab && !iz && !de)
             begin
             registro<=2'd0;
-            Cursor<=8'h42;
+            Cursor<=8'h41;
             suma<=0;
             resta<=0;
             //segundosReg<=segundosReg;
@@ -349,7 +349,7 @@ case (s_actualcrono)
         if( (ar) && !Reset && !PushInicioCrono && !FinalizoCrono && ProgramarCrono)
             begin
             registro<=2'd1;
-            Cursor<=8'h42;
+            Cursor<=8'h41;
             suma<=1;
             resta<=0;
              //segundosReg<=segundosReg + 8'd1;
@@ -358,7 +358,7 @@ case (s_actualcrono)
          if((ab) && !Reset && !PushInicioCrono && !FinalizoCrono && ProgramarCrono)
              begin
              registro<=2'd1;
-             Cursor<=8'h42;
+             Cursor<=8'h41;
              resta<=1;
              suma<=0;
              //segundosReg<=segundosReg - 8'd1;
@@ -368,7 +368,7 @@ case (s_actualcrono)
              if( (iz) && !Reset && !PushInicioCrono && !FinalizoCrono && ProgramarCrono)
                  begin
                  registro<=2'd0;
-                 Cursor<=8'h43;
+                 Cursor<=8'h42;
                  suma<=0;
                  resta<=0;
                   //segundosReg<=segundosReg;
@@ -377,7 +377,7 @@ case (s_actualcrono)
               if((de) && !Reset && !PushInicioCrono && !FinalizoCrono && ProgramarCrono)
                   begin
                   registro<=2'd0;
-                  Cursor<=8'h42;
+                  Cursor<=8'h41;
                   suma<=0;
                   resta<=0;
                   //segundosReg<=segundosReg;
@@ -386,7 +386,7 @@ case (s_actualcrono)
                   if( Reset) //Estado
                       begin
                       registro<=2'd0;
-                      Cursor<=8'h42;
+                      Cursor<=8'h41;
                       suma<=0;
                       resta<=0;
                       s_sig<=ss;
@@ -408,7 +408,7 @@ case (s_actualcrono)
     if(!Reset && !PushInicioCrono && !FinalizoCrono  && ProgramarCrono && !ar && !ab && !iz && !de)
         begin
         registro<=2'd0;
-        Cursor<=8'h43;
+        Cursor<=8'h42;
         suma<=0;
         resta<=0;
         //minutosReg<=minutosReg;
@@ -417,7 +417,7 @@ case (s_actualcrono)
     if( (ar) && !Reset && !PushInicioCrono && !FinalizoCrono && ProgramarCrono)
         begin
         registro<=2'd2;
-        Cursor<=8'h43;
+        Cursor<=8'h42;
         suma<=1;
         resta<=0;
          //minutosReg<=minutosReg + 8'd1;
@@ -426,7 +426,7 @@ case (s_actualcrono)
      if((ab) && !Reset && !PushInicioCrono && !FinalizoCrono && ProgramarCrono)
          begin
          registro<=2'd2;
-         Cursor<=8'h43;
+         Cursor<=8'h42;
          suma<=0;
          resta<=1;
          //minutosReg<=minutosReg - 8'd1;
@@ -436,7 +436,7 @@ case (s_actualcrono)
          if( (iz) && !Reset && !PushInicioCrono && !FinalizoCrono && ProgramarCrono)
              begin
              registro<=2'd0;
-             Cursor<=8'h21;
+             Cursor<=8'h43;
              suma<=0;
              resta<=0;
               //minutosReg<=minutosReg;
@@ -445,7 +445,7 @@ case (s_actualcrono)
           if((de) && !Reset && !PushInicioCrono && !FinalizoCrono && ProgramarCrono)
               begin
               registro<=2'd0;
-              Cursor<=8'h42;
+              Cursor<=8'h41;
               suma<=0;
               resta<=0;
               //minutosReg<=minutosReg;
@@ -455,7 +455,7 @@ case (s_actualcrono)
               if( Reset) //Estado
                   begin
                   registro<=2'd0;
-                  Cursor<=8'h42;
+                  Cursor<=8'h41;
                   suma<=0;
                   resta<=0;
                   s_sig<=ss;
@@ -495,7 +495,7 @@ end
              if(!Reset && !PushInicioCrono && !FinalizoCrono && !ar && !ab && !iz && !de )
                  begin
                  registro<=2'd0;
-                 Cursor<=8'h21;
+                 Cursor<=8'h43;
                  suma<=0;
                  resta<=0;
                  //horasReg<=horasReg;
@@ -504,7 +504,7 @@ end
              if( (ar) && !Reset && !PushInicioCrono && !FinalizoCrono)
                  begin
                  registro<=2'd3;
-                 Cursor<=8'h21;
+                 Cursor<=8'h43;
                  suma<=1;
                  resta<=0;
                   //horasReg<=horasReg + 8'd1;
@@ -513,7 +513,7 @@ end
               if((ab) && !Reset && !PushInicioCrono && !FinalizoCrono)
                   begin
                   registro<=2'd3;
-                  Cursor<=8'h21;
+                  Cursor<=8'h43;
                   suma<=0;
                   resta<=1;
                   //horasReg<=horasReg - 8'd1;
@@ -523,7 +523,7 @@ end
                   if( (iz) && !Reset && !PushInicioCrono && !FinalizoCrono)
                       begin
                       registro<=2'd0;
-                      Cursor<=8'h43;
+                      Cursor<=8'h42;
                       suma<=0;
                       resta<=0;
                        //horasReg<=horasReg;
@@ -532,7 +532,7 @@ end
                    if((de) && !Reset && !PushInicioCrono && !FinalizoCrono)
                        begin
                        registro<=2'd0;
-                       Cursor<=8'h21;
+                       Cursor<=8'h43;
                        suma<=0;
                        resta<=0;
                        //horasReg<=horasReg;
@@ -542,7 +542,7 @@ end
                        if( Reset) //Estado
                            begin
                            registro<=2'd0;
-                           Cursor<=8'h42;
+                           Cursor<=8'h41;
                            suma<=0;
                            resta<=0;
                            s_sig<=ss;

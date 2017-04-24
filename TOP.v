@@ -190,7 +190,7 @@ MaquinaCrono MaquinaCrono_unit(
 
 
 //Mux datos Cronometro y cursor
-reg horaCrono,minutosCrono,segundosCrono;
+reg [7:0] horaCrono,minutosCrono,segundosCrono;
 wire [7:0] Cursor;
 reg [7:0] CursorTop;
 
@@ -217,7 +217,8 @@ end
 
 Interfaz Interfaz_unit(.clk(clk),.reset(Reset),.rgbO(rgbO),.resetSync(Reset),.inicioSecuencia(bit_inicio1),.datoRTC(data_out),.hsync(hsync),.vsync(vsync),.video_on(video_on),
                  .datos0(segundos),.datos1(minutos),.datos2(horas),.datos3(date),.datos4(mes),.datos5(ano),.datos6(dia_sem),.datos7(num_semana),
-                     .datos8(segundosCrono),.datos9(minutosCrono),.datos10(horaCrono),.instrucciones(instrucciones),.Escribir(Escribir),.cursor(Cursor),.ProgramarCrono(ProgramarCrono)
+                     .datos8(segundosCrono),.datos9(minutosCrono),.datos10(horaCrono),.instrucciones(instrucciones),.Escribir(Escribir),.cursor(CursorTop),.ProgramarCrono(ProgramarCrono),
+                     .ring(Ring)
                      );
 
 endmodule

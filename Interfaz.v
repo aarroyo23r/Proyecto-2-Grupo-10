@@ -22,7 +22,7 @@
 
 module Interfaz( //Definicion entradas y salidas
     input wire clk,reset,resetSync,
-    input wire instrucciones,ProgramarCrono,
+    input wire instrucciones,ProgramarCrono,ring,
     input wire inicioSecuencia,//Indica si se esta iniciando una secuencia de la transmision de datos
     input wire [7:0] datoRTC,//Dato proveniente del RTC
     input wire [7:0] cursor,
@@ -117,7 +117,7 @@ reg zero=0;// Para concatenar 0s
 
 reg [6:0] contadorAlarma;
 reg alternarColor=0;
-reg [11:0] colorAlarma;
+reg [11:0] colorAlarma=12'hf11;
 //Cursor ***************
 
 
@@ -593,10 +593,10 @@ always @*
 if (graficos)begin
 colorMux=datoGraficos;
 end
-/*
-else if (ring_reg==1  && (pixely >= 10'd473) && (pixely<= 10'd480) ) begin
+
+else if (ring==1  && (pixely >= 10'd473) && (pixely<= 10'd480) ) begin
 colorMux= colorAlarma; end //Cambio de color
-*/
+
 else begin
 colorMux=color;
 end
