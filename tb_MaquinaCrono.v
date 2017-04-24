@@ -1,135 +1,94 @@
-`timescale 1ns / 1ps
-
-
 module tb_MaquinaCrono();
-   wire Reset,clk;
-   wire ProgramarCrono,FinalizoCrono,InicioCrono;
-   reg CronoActivo,Ring;
 
- Interfaz uut(
-           .clk(clk),.reset(reset),.ProgramarCrono(ProgramarCrono)
-           ,.FinalizoCrono(FinalizoCrono),.InicioCrono(InicioCrono)
-           ,.CronoActivo(CronoActivo),.Ring(Ring)
+   reg Reset,clk;
+   reg ProgramarCrono,PushInicioCrono;
+    //input wire [7:0] horas,minutos,segundos,
+    reg arriba,abajo,izquierda,derecha;
+    wire CronoActivo,Ring;
+    wire [7:0] horasSal,minutosSal,segundosSal;
 
-           );
-
- initial begin
-Reset=1;
-#20
-
-s0:
-
- S2
-Reset==0;
-FinalizoCrono ==0;
-ProgramarCrono==0;
-InicioCrono==1;
-#50;
-
-S1
-Reset==0;
-FinalizoCrono ==0;
-ProgramarCrono==0;
-InicioCrono==0;
-#50;
-
-S0
-ProgramarCrono==1;
-reset ==0;
-#50;
-
-reset=1;
-#50;
-
-FinalizoCrono==1;
-reset=0;
-#50;
+    always
+    begin
+   clk=~clk;
+   #5;
+    end
 
 
-
-s1:
-
-S1
-Reset==0;
-FinalizoCrono ==0;
-ProgramarCrono==0;
-InicioCrono==0;
-#50;
-
-S2
-Reset==0;
-FinalizoCrono ==0;
-ProgramarCrono==0;
-InicioCrono==1;
-#50;
-
-S3
-Reset==0;
-FinalizoCrono ==1;
-ProgramarCrono==0;
-#50;
-
-S0
-Reset==1;
-Reset==0;
-FinalizoCrono ==0;
-ProgramarCrono==1;
-InicioCrono==0;
-#50;
-
-s2:
-
-S2
-Reset==0;
-FinalizoCrono ==0;
-ProgramarCrono==0;
-InicioCrono==1;
-#50;
-
-S3
-Reset==0;
-FinalizoCrono ==1;
-ProgramarCrono==0;
-#50;
-
-S0
-Reset==1;
-#50;
-Reset==0;
-FinalizoCrono ==0;
-ProgramarCrono==1;
-InicioCrono==0;
-#50;
-
-S1
-Reset==0;
-FinalizoCrono ==0;
-ProgramarCrono==0;
-InicioCrono==0;
-#50;
+   MaquinaCrono uut(
+        .Reset(Reset),.clk(clk),
+        .ProgramarCrono(ProgramarCrono),.PushInicioCrono(PushInicioCrono),
+        .arriba(arriba),.abajo(abajo),.izquierda(izquierda),.derecha(derecha),
+        .CronoActivo(CronoActivo),.Ring(Ring),
+        .horasSal(horasSal),.minutosSal(minutosSal),.segundosSal(segundosSal)
+        ,.horas(horas),.minutos(minutos),.segundos(segundos)
+        );
 
 
-s3:
+initial begin
+Reset=0;
+clk=0;
+ProgramarCrono=0;
+PushInicioCrono=0;
+arriba=0;
+abajo=0;
+izquierda=0;
+derecha=0;
 
-S0
-reset==1;
-#50;
-Reset==0;
-FinalizoCrono ==0;
-#50;
+#100;
 
-Reset==0;
-FinalizoCrono ==0;
-ProgramarCrono==1;
-InicioCrono==0;
-#50;
- end
+ProgramarCrono=1;
+#40;
 
- always
- begin
-clk=~clk;
-#5;
- end
+arriba=1;
+#30;
+arriba=0;
+#20;
 
 
- endmodule
+arriba=1;
+#30;
+arriba=0;
+#20;
+
+
+arriba=1;
+#30;
+arriba=0;
+#20;
+
+
+arriba=1;
+#30;
+arriba=0;
+#20;
+
+
+arriba=1;
+#30;
+arriba=0;
+#20;
+
+
+abajo=1;
+#30;
+
+izquierda=1;
+#30;
+izquierda=0;
+#20;
+
+izquierda=1;//Pasa a minutos
+#30;
+
+arriba=1;
+#30;
+
+ProgramarCrono=0;
+PushInicioCrono=1;
+#70;
+
+$finish;
+
+end
+
+endmodule
