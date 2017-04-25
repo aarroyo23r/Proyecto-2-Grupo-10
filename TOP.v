@@ -1,249 +1,484 @@
 `timescale 1ns / 1ps
-module TOP(
-    input wire push_izquierda,
-    input wire push_derecha,
-    input wire push_arriba,  //Push Buttons (Para escribir)
-    input wire push_abajo,
-    input wire Reset,Escribir,ResetCrono,
-    input wire clk,ProgramarCrono,
-    input wire instrucciones, //Muestra o esconde las instrucciones
-    input wire push_centro, //Push para cronometro
-    inout wire [7:0] DATA_ADDRESS, //variable inout hacia y desde rtc
-    output wire ChipSelect,Read,Write,AoD, //Señales de control rtc
-    output wire hsync,vsync,
-    output wire  [11:0] rgbO,
-    output wire video_on
-
-
+module MaquinaEscritura(
+    input wire Inicio,Reset,Crono,Escribir,
+    input wire clk,Per_read,
+    input wire RW,
+    input wire push_arriba,push_abajo,push_izquierda,push_derecha,
+    input wire [7:0]segundos,minutos,horas,date,num_semana,mes,ano,dia_sem,
+    output reg [7:0] address,
+    output reg reset2,
+    output reg [7:0] minutosSal, segundosSal,horasSal,dateSal,
+    output reg [7:0]data_mod
     );
- //wire bit_inicio1; //Bit de inicio hacia controlador vga
+reg [32:0]contador=0;
+reg[3:0]c_dir=0;
+localparam [3:0] s0 = 4'h1, 
+                 s1 = 4'h2, //segundos
+                 s2 = 4'h3, //minutos
+                 s3 = 4'h4, //horas
+                 s4 = 4'h5, //date
+                 s5 = 4'h6, //mes
+                 s6 = 4'h7, //año
+                 s7 = 4'h8, //día de semana
+                 s8 = 4'h9, //#de semana
+                 sY = 4'h1; //estado 12/24hrs
 
-wire RW;//Variables OUTPUT MaquinaGeneral, indica cuales señales generar
-wire Crono; //Variable OUTPUT MaquinaGeneral, activa o desactiva el modulo del cronometrp
-wire Per_read; //Variable OUTPUT MaquinaGeneral, activa modulo de lectura permanente MaquinaLectura
+reg [3:0] s_next=s1;reg [3:0] s_actual;
+reg push_ar, push_ab, push_i, push_d; //salida del detector de flancos
+reg push_ar1, push_ab1, push_i1, push_d1; //salida del detector de flancos
+reg ar,ab,iz,de;//Pulsos
+reg escribir3;reg escribir4; reg es;
 
+always @ (posedge clk) begin
+if (!Reset) begin
+push_ar<=push_arriba;
+push_ar1<=push_ar;
 
-reg [15:0] contador3=0;
-reg Inicio1=1'b1; //Señal Incio que solo posee valor 1 al iniciar el sistema
+escribir3<=Escribir;
+escribir4<=escribir3;
 
-always@(posedge clk)
-begin
-contador3<=contador3 + 1'b1;
-if(contador3==16'd110 && Inicio1)  //Se le asigna el valor correspondiente  a Inicio
-    begin
-    Inicio1<=1'b0;
-    end
+push_ab<=push_abajo;
+push_ab1<=push_ab;
+
+push_d<=push_derecha;
+push_d1<=push_d;
+
+push_i<=push_izquierda;
+push_i1<=push_i;
 end
 
-//MODULO MAQUINA GENERAL
-MaquinaGeneral General_unit(.clk(clk), .Reset(Reset), .Inicio1(Inicio1), .Escribir(Escribir),
-                            .ProgramarCrono(ProgramarCrono),.RW(RW),.Crono(Crono),.Per_read(Per_read));
-reg PER_READ;
-always@(posedge clk)
-begin
-    PER_READ<=Per_read;
+if (push_ar && !push_ar1) begin
+ar<=1;end
+
+else if (push_ab && !push_ab1) begin
+ab<=1;end
+
+else if (push_d && !push_d1) begin
+de<=1;end
+
+else if (push_i && !push_i1) begin
+iz<=1;end
+
+else if(escribir3 && !escribir4)begin
+es<=1;end
+
+else begin
+es<=0;
+ar<=0;
+ab<=0;
+iz<=0;
+de<=0;
+end
 end
 
 
-//Maquina de Lectura Permanante
-wire [7:0]ADDRESS_read;  //direccion hacia rtc cuando esta en lectura
-wire reset3; //va a activar el modulo que activa el modulo reset
+always @(posedge clk,posedge Reset)begin//Logica de Reset y estado siguiente
+    if(Reset)begin
+        s_actual <=s0;
+    end
+    else
+        s_actual <=s_next;
+end
 
 
-MaquinaLectura Lectura_unit(.clk(clk),.RW(RW),.address(ADDRESS_read),.Per_read(PER_READ),.reset2(reset3));
+reg suma;reg resta;reg[4:0] registro; 
 
-wire [7:0]ADDRESS_reset;
-wire [7:0]data_reset;
-reset reset_unit(.clk(clk),.reset2(reset3),.address(ADDRESS_reset),.data(data_reset));
-
-
-
-wire [7:0]data_mod; //datos_modificados
-wire [7:0]ADDRESS_write;
-
-wire [7:0]segundos2;
-wire [7:0]minutos2;
-wire [7:0]horas2;
-wire [7:0]date; //para escritura de entrada
-wire [7:0]num_semana;
-wire[7:0]mes;
-wire [7:0]ano;
-wire [7:0]dia_sem;
-
-wire [7:0]datos8;
-wire [7:0]datos9;
-wire [7:0]datos102;
-
-//Crono
-
-wire CronoActivo,Ring;
-wire  [7:0] horasSal,minutosSal,segundosSal;
-
-wire [7:0] address_crono;
-wire [7:0] data_crono;
-wire IniciaCronometro;
-wire [7:0] Cursor;
+reg [7:0]segundosReg;reg [7:0]minutosReg;reg[7:0]horasReg;reg [7:0]dateReg;
+reg[7:0]minutosReg1,segundosReg1,horasReg1,dateReg1;
 
 
 
-
-
-
-reg [7:0]minutos;
-reg [7:0]segundos;
-reg [7:0]horas;
-//reg [7:0]segundos,minutos,horas,date,num_semana,mes,ano,dia_sem;
-wire [7:0]contador2;
-wire [7:0]minutosSal_w,segundosSal_w,horasSal_w;
-MaquinaEscritura Escritura_unit(.clk(clk),.RW(RW),.Inicio(Inicio1),.Reset(Reset),.push_arriba(push_arriba),
-                                .push_abajo(push_abajo),.push_izquierda(push_izquierda),.push_derecha(push_derecha),.address(ADDRESS_write),
-                                .data_mod(data_mod),.reset2(reset3),.segundos(segundos2),.minutos(minutos2),.horas(horas2),.date(date),
-                                .num_semana(num_semana),.mes(mes),.ano(ano),.dia_sem(dia_sem),.Escribir(Escribir),.Per_read(Per_read),
-                                .segundosSal(segundoSal_w),.minutosSal(minutosSal_w),.horasSal(horasSal_w));
-wire [7:0]address;
-reg [7:0] address2;
-wire [7:0] data_inicio;
-wire [7:0] address_inicio;
-
-inicializacion inicio(.clk(clk),.Inicio1(Inicio1),.address(address_inicio),.data_mod(data_inicio));
-
-//assign address=(Escribir | reset3)? ADDRESS_write:ADDRESS_read;
-reg [7:0] data_mod2;
 
 always@(posedge clk)
-begin
-    if(Inicio1)
-    begin
-    address2<=address_inicio;
-    end
+   begin
+   if(RW)begin
+   minutosReg1<=minutos;
+   segundosReg1<=segundos;
+   horasReg1<=horas;
+   dateReg1<=date;
+   end
+   minutosReg1<=minutosReg1;
+   horasReg1<=horasReg1;
+   segundosReg1<=segundosReg1;
+   dateReg1<=dateReg1;
+   end
 
-    if (Crono)begin
-      address2<=address_crono;
-    end
-    if((Escribir|(reset3 |!RW)) && (!Inicio1))
-        begin
-        address2<=ADDRESS_write;
-        if(Reset)
-            begin
-            address2<=ADDRESS_reset;
-            end
-        end
-        else
-        begin
-        address2<=ADDRESS_read;
-        end
+
+
+always @(posedge clk) begin
+//sumador
+if(suma && !resta) begin
+if(registro==0)begin
+   segundosReg1<=segundosReg1;
+   minutosReg1<=minutosReg1;
+   horasReg1<=horasReg1;
+   dateReg1<=dateReg1;
+end
+else if (registro==5'd1)begin
+segundosReg1<=segundosReg1 + 1;
+end
+
+else if (registro==5'd2)begin
+minutosReg1<=minutosReg1 + 1;
+end
+
+ else if(registro==5'd3)begin
+horasReg1<=horasReg1+1;
+end
+
+ else if(registro==5'd4)begin
+ dateReg1<=dateReg1+1;
  end
-
-
-wire [7:0] data_vga; //datos hacia controlador_vga
-wire [7:0] data_intermedia;
-
-always@(posedge clk)
-    begin
-    if(Reset)
-       begin
-       data_mod2<=data_reset;
-       end
-
-       if (Crono)begin
-         data_mod2<=data_crono;
-       end
-
-    if((!RW |Escribir |reset3)& !Inicio1)
-        begin
-       data_mod2<=data_mod;
-        end
-    if(Inicio1)
-        begin
-        data_mod2<=data_inicio;
-        end
-    end
-
-
-
-
-Protocolo_rtc Proto_unit(.clk(clk),.address(address2),.DATA_WRITE(data_mod2),.IndicadorMaquina(RW),
-                         .ChipSelect(ChipSelect),.Read(Read),.Write(Write),.AoD(AoD),.DATA_ADDRESS(DATA_ADDRESS),
-                         .data_vga(data_intermedia),.contador_todo(contador2) );
-
-//REGISTROS PARA ENTREGAR DATA A CONTROLADOR VGA
-reg [7:0] data_vga_entrada;
-reg [7:0] contador;
-reg READ;
-always@(posedge clk)
-begin
-
-    data_vga_entrada<=data_intermedia;
-    contador<=contador2;
-    READ<=Read;
-
+ 
+else begin
+minutosReg1<=minutosReg1;
+segundosReg1<=segundosReg1;
+horasReg1<=horasReg1;
+dateReg1<=dateReg1;
+end
 end
 
-wire [3:0] contador_datos1;
+//Restador
+else if(!suma && resta) begin
+if(registro==5'd0)begin
+    segundosReg1<=segundosReg1;
+    minutosReg1<=minutosReg1;
+    horasReg1<=horasReg1;
+    dateReg1<=dateReg1;
+end
+else if (registro==5'd1)begin
+segundosReg1<=segundosReg1 - 8'd1;
+end
 
+ else if (registro==5'd2)begin
+minutosReg1<=minutosReg1 - 8'd1;
+end
 
-Registros Register_unit(.clk(clk),.data_vga(data_vga_entrada),.contador(contador2),
-                        .Read(READ),.datos0(segundos2),
-                        .datos1(minutos2),.datos2(horas2),.datos3(date),.datos4(mes),.datos5(ano),.datos6(dia_sem),.datos7(num_semana),
-                        .datos8(datos8),.datos9(datos9),.datos10(datos102),.IndicadorMaquina(RW),.address(DATA_ADDRESS),.Write(Write),.AoD(AoD)
-                        );
-//reg [7:0] data_out1;
-//reg [7:0]segundos2; //para escritura de salida
+ else if(registro==5'd3)begin
+horasReg1<=horasReg1-8'd1;
+end
 
-
-
-
-
-
-//Mux datos Cronometro y cursor
-reg [7:0] horaCrono,minutosCrono,segundosCrono;
-reg [7:0] CursorTop;
-
-always @*
-if (ProgramarCrono && !CronoActivo) begin
-horaCrono=horasSal;
-minutosCrono=minutosSal;
-segundosCrono=segundosSal;
-CursorTop=Cursor;
+else if(registro ==5'h4)begin
+dateReg1<=dateReg1-8'd1;
 end
 
 else begin
-horaCrono=datos8;
-minutosCrono=datos9;
-segundosCrono=datos10;
-CursorTop=address2;
+minutosReg1<=minutosReg1;
+segundosReg1<=segundosReg1;
+horasReg1<=horasReg1;
+dateReg1<=dateReg1;
+end
+
+end
+
+else begin
+minutosReg1<=minutosReg1;
+segundosReg1<=segundosReg1;
+horasReg1<=horasReg1;
+dateReg1<=dateReg1;
+end
+end
+
+// fin de sumador y restador
+//CONTADOR PARA DURACIÓN DE ESTADO DE INICIALIZACIÓN
+reg [11:0] contador2=0;
+reg activa=0;
+always @(posedge clk)
+begin
+if(!Inicio && !Reset)
+begin
+    contador2<=contador2 +1'b1;
+    activa<=0;
+end
+if(contador2==12'h04a)
+begin
+    activa<=1;
+end
+end
+
+
+//Maquina programar hora
+always @ (posedge clk)  begin
+s_next=s_actual; //siguiente estado default el actual
+minutosReg1<=minutosReg1;
+segundosReg1<=segundosReg1;
+horasReg1<=horasReg1;
+dateReg1<=dateReg1;
+case (s_actual)
+    s1: begin //segundos
+        if(!Reset && Escribir && !ar && !ab && !iz && !de)begin
+            reset2<=1'b0;
+            registro<=5'd0;
+            address<=8'h21;
+            suma<=0;
+            resta<=0;
+            s_next<=s1;
+            end
+        if((ar) && !Reset && Escribir)begin
+            reset2<=1'b0;
+            registro<=5'd1;
+            address<=8'h21;
+            suma<=1;
+            resta<=0;
+             //segundosReg<=segundosReg + 8'd1;
+             s_next<=s1;
+             end
+         if((ab) && !Reset && Escribir)begin
+            reset2<=1'b0;
+             registro<=5'd1;
+             address<=8'h21;
+             resta<=1;
+             suma<=0;
+             //segundosReg<=segundosReg - 8'd1;
+             s_next<=s1;
+             end
+
+             if( (iz) && !Reset && Escribir)begin
+                 reset2<=1'b0;
+                 registro<=5'd0;
+                 address<=8'h22;
+                 suma<=0;
+                 resta<=0;
+                  //segundosReg<=segundosReg;
+                  s_next<=s2;
+                  end
+              if((de) && !Reset && Escribir)
+                  begin
+                  reset2<=1'b0;
+                  registro<=5'd0;
+                  address<=8'h21;
+                  suma<=0;
+                  resta<=0;
+                  //segundosReg<=segundosReg;
+                  s_next<=s1;
+                  end
+                  if(Reset) //Estado
+                      begin
+                      reset2<=1'b0;
+                      registro<=5'd0;
+                      address<=8'h21;
+                      suma<=0;
+                      resta<=0;
+                      s_next<=s1;
+                       end
+        end
+        
+        
+    s2: begin //horas
+    if(!Reset && Escribir && !ar && !ab && !iz && !de)
+        begin
+        reset2<=1'b0;
+        registro<=5'd0;
+        address<=8'h22;
+        suma<=0;
+        resta<=0;
+        //minutosReg<=minutosReg;
+        s_next<=s_actual;
+        end
+    if( (ar) && !Reset && Escribir)
+        begin
+        reset2<=1'b0;
+        registro<=5'd2;
+        address<=8'h22;
+        suma<=1;
+        resta<=0;
+         //minutosReg<=minutosReg + 8'd1;
+         s_next<=s_actual;
+         end
+     if((ab) && !Reset && Escribir)
+         begin
+         reset2<=1'b0;
+         registro<=5'd2;
+         address<=8'h22;
+         suma<=0;
+         resta<=1;
+         //minutosReg<=minutosReg - 8'd1;
+         s_next<=s_actual;
+         end
+
+         if( (iz) && !Reset && Escribir)
+             begin
+             reset2<=1'b0;
+             registro<=5'd0;
+             address<=8'h23;
+             suma<=0;
+             resta<=0;
+              //minutosReg<=minutosReg;
+              s_next<=s3;
+              end
+          if((de) && !Reset && Escribir)
+              begin
+              reset2<=1'b0;
+              registro<=5'd0;
+              address<=8'h21;
+              suma<=0;
+              resta<=0;
+              //minutosReg<=minutosReg;
+              s_next<=s1;
+              end
+
+              if( Reset) //Estado
+                  begin
+                  reset2<=1'b0;
+                  registro<=5'd0;
+                  address<=8'h21;
+                  suma<=0;
+                  resta<=0;
+                  s_next<=s1;
+                  end
+     end
+    s3: begin //Minutos
+         if(!Reset && Escribir && !ar && !ab && !iz && !de)
+             begin
+             reset2<=1'b0;
+             registro<=5'd0;
+             address<=8'h23;
+             suma<=0;
+             resta<=0;
+             //minutosReg<=minutosReg;
+             s_next<=s_actual;
+             end
+         if( (ar) && !Reset && Escribir)
+             begin
+             reset2<=1'b0;
+             registro<=5'd3;
+             address<=8'h23;
+             suma<=1;
+             resta<=0;
+              //minutosReg<=minutosReg + 8'd1;
+              s_next<=s_actual;
+              end
+          if((ab) && !Reset && Escribir)
+              begin
+              reset2<=1'b0;
+              registro<=5'd3;
+              address<=8'h23;
+              suma<=0;
+              resta<=1;
+              //minutosReg<=minutosReg - 8'd1;
+              s_next<=s_actual;
+              end
+     
+              if( (iz) && !Reset && Escribir)
+                  begin
+                  reset2<=1'b0;
+                  registro<=5'd0;
+                  address<=8'h24;
+                  suma<=0;
+                  resta<=0;
+                   //minutosReg<=minutosReg;
+                   s_next=s4;
+                   end
+               if((de) && !Reset && Escribir)
+                   begin
+                   reset2<=1'b0;
+                   registro<=5'd0;
+                   address<=8'h22;
+                   suma<=0;
+                   resta<=0;
+                   //minutosReg<=minutosReg;
+                   s_next<=s2;
+                   end
+     
+                   if( Reset) //Estado
+                       begin
+                       reset2<=1'b0;
+                       registro<=5'd0;
+                       address<=8'h21;
+                       suma<=0;
+                       resta<=0;
+                       s_next<=s1;
+                       end
+          end 
+     s4: begin //Minutos
+                   if(!Reset && Escribir && !ar && !ab && !iz && !de)
+                       begin
+                       reset2<=1'b0;
+                       registro<=5'd0;
+                       address<=8'h24;
+                       suma<=0;
+                       resta<=0;
+                       //minutosReg<=minutosReg;
+                       s_next<=s_actual;
+                       end
+                   if( (ar) && !Reset && Escribir)
+                       begin
+                       reset2<=1'b0;
+                       registro<=5'h4;
+                       address<=8'h24;
+                       suma<=1;
+                       resta<=0;
+                        //minutosReg<=minutosReg + 8'd1;
+                        s_next<=s_actual;
+                        end
+                    if((ab) && !Reset && Escribir)
+                        begin
+                        reset2<=1'b0;
+                        registro<=5'h4;
+                        address<=8'h24;
+                        suma<=0;
+                        resta<=1;
+                        //minutosReg<=minutosReg - 8'd1;
+                        s_next<=s_actual;
+                        end
+               
+                        if( (iz) && !Reset && Escribir)
+                            begin
+                            reset2<=1'b0;
+                            registro<=5'd0;
+                            address<=8'h24;
+                            suma<=0;
+                            resta<=0;
+                             //minutosReg<=minutosReg;
+                             s_next=s4;
+                             end
+                         if((de) && !Reset && Escribir)
+                             begin
+                             reset2<=1'b0;
+                             registro<=5'd0;
+                             address<=8'h23;
+                             suma<=0;
+                             resta<=0;
+                             //minutosReg<=minutosReg;
+                             s_next<=s3;
+                             end
+               
+                             if( Reset) //Estado
+                                 begin
+                                 reset2<=1'b0;
+                                 registro<=5'd0;
+                                 address<=8'h21;
+                                 suma<=0;
+                                 resta<=0;
+                                 s_next<=s1;
+                                 end
+                    end 
+endcase
 end
 
 
 always@*
 begin
-if(Escribir) begin
-minutos =minutosSal_w;
-segundos =segundosSal_w;
-horas=horasSal_w;
-end
-else begin
-minutos=minutos2;
-segundos=segundos2;
-horas=horas2;
-end
+minutosSal=minutosReg1;
+segundosSal=segundosReg1;
+horasSal=horasReg1;
+dateSal=dateReg1;
 end
 
-MaquinaCrono MaquinaCrono_unit(
-    .Reset(ResetCrono),.clk(clk),
-    .ProgramarCrono(Crono),.PushInicioCrono(push_centro),
-    .horas(datos10),.minutos(datos9),.segundos(datos8),
-    .arriba(push_arriba),.abajo(push_abajo),.izquierda(push_izquierda),.derecha(push_derecha),
-    .CronoActivo(CronoActivo),.Ring(Ring),
-    .horasSal(horasSal),.minutosSal(minutosSal),.segundosSal(segundosSal),.Cursor(Cursor)
-    ,.address(address_crono),.data_crono(data_crono)
-    );
-
-
-Interfaz Interfaz_unit(.clk(clk),.reset(Reset),.rgbO(rgbO),.resetSync(Reset),.inicioSecuencia(bit_inicio1),.datoRTC(data_out),.hsync(hsync),.vsync(vsync),.video_on(video_on),
-                 .datos0(segundos),.datos1(minutos),.datos2(horas),.datos3(date),.datos4(mes),.datos5(ano),.datos6(dia_sem),.datos7(num_sem),
-                     .datos8(segundosCrono),.datos9(minutosCrono),.datos10(horasCrono),.instrucciones(instrucciones),.Escribir(Escribir),.cursor(CursorTop),.ProgramarCrono(ProgramarCrono),
-                     .ring(Ring)
-                     );
+always@*
+begin
+  if(address==8'h21)begin
+    data_mod<=segundosReg1;
+    end
+  else if(address==8'h22)begin
+    data_mod<=minutosReg1;
+    end
+  else if(address==8'h23)begin
+    data_mod<=horasReg1;
+    end
+  else if(address==8'h24)begin
+    data_mod<=dateReg1;
+    end
+end
 
 endmodule
