@@ -49,9 +49,10 @@ reg ar,ab,iz,de;//Pulsos
 always @ (posedge clk) begin
 
 if (!Reset) begin
+/*
 PushCentro_d1<=PushInicioCrono;
 PushCentro_d2<=PushCentro_d1;
-
+*/
 arribaReg1<=arriba;
 arribaReg2<=arribaReg1;
 
@@ -65,7 +66,7 @@ derechaReg1<=derecha;
 derechaReg2<=derechaReg1;
 end
 
-
+/*
 if (PushCentro_d1 && !PushCentro_d2) begin
 InicioCrono<=~InicioCrono; //Enciende o apaga el cronometro
 end
@@ -73,6 +74,7 @@ end
 else begin
 InicioCrono<=InicioCrono;
 end
+*/
 
 if (arribaReg1 && !arribaReg2) begin
 ar<=1;end
@@ -146,6 +148,8 @@ unidadesHoras<=horasReg[3:0];
 
 if (registro==2'd1)begin
 
+
+if (segundosReg<=8'h60) begin
 if (unidadesSegundos==4'h9) begin
 segundosReg<=segundosReg+7;
 end
@@ -155,13 +159,22 @@ segundosReg<=segundosReg+1;
 end
 end
 
+else begin
+
+segundosReg<=segundosReg;
+end
+
+end
+
 
 else if (registro==2'd2)begin
 
 if (unidadesMinutos==4'h9) begin
 minutosReg<=minutosReg+7;
 end
-
+else if (4'h9<unidadesSegundos<=4'hf) begin
+segundosReg<=segundosReg;
+end
 else begin
 minutosReg<=minutosReg+1;
 end
@@ -170,6 +183,10 @@ end
 else if (registro==2'd3)begin
 if (unidadesHoras==4'h9) begin
 horasReg<=horasReg+7;
+end
+
+else if (4'h9<unidadesSegundos<=4'hf) begin
+segundosReg<=segundosReg;
 end
 
 else begin
@@ -192,8 +209,10 @@ decenasHoras<=horasReg[7:4];
 decenasMinutos<=minutosReg[7:4];
 decenasSegundos<=segundosReg[7:4];
 
+
 if (registro==2'd1)begin
 
+if (segundosReg>=8'h00) begin
 if (decenasSegundos==4'h1) begin
 segundosReg<=segundosReg-7;
 end
@@ -201,12 +220,23 @@ end
 else begin
 segundosReg<=segundosReg-1;
 end
+
+end
+
+else begin
+segundosReg<=segundosReg;
+
+end
+
 end
 
 else if (registro==2'd2)begin
 
 if (decenasMinutos==4'h1) begin
 minutosReg<=minutosReg-7;
+end
+else if (4'h9<unidadesSegundos<=4'hf) begin
+segundosReg<=segundosReg;
 end
 
 else begin
@@ -218,6 +248,9 @@ else if (registro==2'd3)begin
 
 if (decenasHoras==4'h1) begin
 horasReg<=horasReg-7;
+end
+else if (4'h9<unidadesSegundos<=4'hf) begin
+segundosReg<=segundosReg;
 end
 
 else begin
@@ -254,13 +287,13 @@ begin*/
     //CronoActivo <= 1'b0; //Default crono apagado
     case (s_actual)
         s0: begin //Estado Programar Cronometro
-            if(Reset==0 && FinalizoCrono ==0 && ProgramarCrono==0 && InicioCrono==1)
+            if(Reset==0 && FinalizoCrono ==0 && ProgramarCrono==0 && PushInicioCrono==1)
                 begin
                  CronoActivo <=1'b1;  //Para protocolo read
                  Ring <=1'b0;
                 s_next<=s2;
                 end
-            if(Reset==0 && FinalizoCrono ==0 && ProgramarCrono==0 && InicioCrono==0)
+            if(Reset==0 && FinalizoCrono ==0 && ProgramarCrono==0 && PushInicioCrono==0)
                 begin
                  CronoActivo <=1'b0;  //Para protocolo read
                  Ring <=1'b0;
@@ -282,13 +315,13 @@ begin*/
 
             end
         s1: begin
-            if(Reset==0 && FinalizoCrono ==0 && ProgramarCrono==0 && InicioCrono==0)
+            if(Reset==0 && FinalizoCrono ==0 && ProgramarCrono==0 && PushInicioCrono==0)
                 begin
                 CronoActivo <=1'b0;  //Para protocolo read
                 Ring <=1'b0;
                 s_next<=s_actual;
                 end
-             if(Reset==0 && FinalizoCrono ==0 && ProgramarCrono==0 && InicioCrono==1)
+             if(Reset==0 && FinalizoCrono ==0 && ProgramarCrono==0 && PushInicioCrono==1)
                 begin
                 CronoActivo <=1'b1;  //Para protocolo read
                 Ring <=1'b0;
@@ -300,7 +333,7 @@ begin*/
                 Ring <=1'b1;
                 s_next<=s3;
                 end
-             if(Reset==1  | (Reset==0 && FinalizoCrono ==0 && ProgramarCrono==1 && InicioCrono==0))
+             if(Reset==1  | (Reset==0 && FinalizoCrono ==0 && ProgramarCrono==1 && PushInicioCrono==0))
                 begin
                 CronoActivo <=1'b0;  //Para protocolo read
                 Ring <=1'b0;
@@ -309,7 +342,7 @@ begin*/
 
             end
        s2:begin
-            if(Reset==0 && FinalizoCrono ==0 && ProgramarCrono==0 && InicioCrono==1)
+            if(Reset==0 && FinalizoCrono ==0 && ProgramarCrono==0 && PushInicioCrono==1)
                 begin
                 CronoActivo <=1'b1;  //Para protocolo read
                 Ring <=1'b0;
@@ -322,14 +355,14 @@ begin*/
                 s_next<=s3;
                 end
 
-            if(Reset==1  | (Reset==0 && FinalizoCrono ==0 && ProgramarCrono==1 && InicioCrono==0))
+            if(Reset==1  | (Reset==0 && FinalizoCrono ==0 && ProgramarCrono==1 && PushInicioCrono==0))
                 begin
                 CronoActivo <=1'b0;  //Para protocolo read
                 Ring <=1'b0;
                 s_next<=s0;
                 end
 
-            if(Reset==0 && FinalizoCrono ==0 && ProgramarCrono==0 && InicioCrono==0)
+            if(Reset==0 && FinalizoCrono ==0 && ProgramarCrono==0 && PushInicioCrono==0)
                 begin
                 CronoActivo <=1'b0;  //Para protocolo read
                 Ring <=1'b0;
@@ -578,7 +611,7 @@ end
                       suma<=0;
                       resta<=0;
                        //horasReg<=horasReg;
-                       s_sig<=sm;
+                       s_sig<=s_actualcrono;
                        end
                    if((de) && !Reset && !PushInicioCrono && !FinalizoCrono)
                        begin
@@ -587,7 +620,7 @@ end
                        suma<=0;
                        resta<=0;
                        //horasReg<=horasReg;
-                       s_sig<=s_actualcrono;
+                       s_sig<=sm;
                        end
 
                        if( Reset) //Estado
@@ -620,7 +653,7 @@ localparam [11:0] limit = 12'd36; //tiempo en el que la dirección se mantiene
 
     always @(posedge clk)
     begin
-        if(CronoActivo && !ProgramarCrono && InicioCrono)
+        if(!ProgramarCrono && PushInicioCrono)
         begin
         contador<=contador + 1'b1;
         IniciaCronometro<=1;
@@ -632,7 +665,7 @@ localparam [11:0] limit = 12'd36; //tiempo en el que la dirección se mantiene
             c_dir<=1;
         end
 
-        if(!CronoActivo && !ProgramarCrono && !InicioCrono)
+        if(!ProgramarCrono && !PushInicioCrono)
         begin
         contador<=contador + 1'b1;
         IniciaCronometro<=1;
@@ -669,10 +702,10 @@ end
             end
          1'b1:
             begin
-            address<=8'hZZ;
-            data_crono<=8'hZZ;
+            address<=8'h01;
+            data_crono<=8'h01;
             end
-         default:address<=8'hZZ;
+         default:address<=8'h01;
     endcase
     end
 
@@ -685,17 +718,17 @@ end
             end
          1'b1:
             begin
-            address<=8'hZZ;
-            data_crono<=8'hZZ;
+            address<=8'h01;
+            data_crono<=8'h01;
             end
-         default:address<=8'hZZ;
+         default:address<=8'h01;
     endcase
     end
 
 
     else
-    data_crono<=8'hZZ;
-    address<=8'hZZ;
+    data_crono<=8'h01;
+    address<=8'h01;
     end
 
 

@@ -77,25 +77,6 @@ wire [7:0]datos9;
 wire [7:0]datos10;
 
 
-//Variables Crono
-
-wire CronoActivo,Ring;
-wire  [7:0] horasSal,minutosSal,segundosSal;
-
-wire [7:0] address_crono;
-wire [7:0] data_crono;
-wire IniciaCronometro;
-
-
-
-
-//Mux datos Cronometro y cursor
-reg [7:0] horaCrono,minutosCrono,segundosCrono;
-wire [7:0] Cursor;
-reg [7:0] CursorTop;
-
-
-
 MaquinaCrono MaquinaCrono_unit(
     .Reset(ResetCrono),.clk(clk),
     .ProgramarCrono(ProgramarCrono),.PushInicioCrono(push_centro),
@@ -202,7 +183,20 @@ Registros Register_unit(.clk(clk),.data_vga(data_vga_entrada),.contador(contador
 //reg [7:0] data_out1;
 //reg [7:0]segundos2; //para escritura de salida
 
+wire CronoActivo,Ring;
+wire  [7:0] horasSal,minutosSal,segundosSal;
 
+wire [7:0] address_crono;
+wire [7:0] data_crono;
+wire IniciaCronometro;
+
+
+
+
+//Mux datos Cronometro y cursor
+reg [7:0] horaCrono,minutosCrono,segundosCrono;
+wire [7:0] Cursor;
+reg [7:0] CursorTop;
 
 always @*
 if (ProgramarCrono && !CronoActivo) begin

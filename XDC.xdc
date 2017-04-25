@@ -26,8 +26,8 @@ set_property IOSTANDARD LVCMOS33 [get_ports ProgramarCrono]
 set_property PACKAGE_PIN R6 [get_ports {instrucciones}]
 set_property IOSTANDARD LVCMOS33 [get_ports {instrucciones}]
 ##Bank = 34, Pin name = IO_L19N_T3_VREF_34,					Sch name = SW4
-#set_property PACKAGE_PIN R5 [get_ports {sw[4]}]
-#set_property IOSTANDARD LVCMOS33 [get_ports {sw[4]}]
+set_property PACKAGE_PIN R5 [get_ports {ResetCrono}]
+set_property IOSTANDARD LVCMOS33 [get_ports {ResetCrono}]
 ##Bank = 34, Pin name = IO_L20P_T3_34,						Sch name = SW5
 #set_property PACKAGE_PIN V7 [get_ports {sw[5]}]
 #set_property IOSTANDARD LVCMOS33 [get_ports {sw[5]}]
@@ -59,8 +59,8 @@ set_property IOSTANDARD LVCMOS33 [get_ports {instrucciones}]
 #set_property PACKAGE_PIN P3 [get_ports {sw[14]}]
 #set_property IOSTANDARD LVCMOS33 [get_ports {sw[14]}]
 ##Bank = 34, Pin name = IO_L14P_T2_SRCC_34,					Sch name = SW15
-#set_property PACKAGE_PIN P4 [get_ports {sw[15]}]
-#set_property IOSTANDARD LVCMOS33 [get_ports {sw[15]}]
+set_property PACKAGE_PIN P4 [get_ports {push_centro}]
+set_property IOSTANDARD LVCMOS33 [get_ports {push_centro}]
 
 
 
@@ -194,8 +194,8 @@ set_property IOSTANDARD LVCMOS33 [get_ports {instrucciones}]
 #set_property PACKAGE_PIN C12 [get_ports btnCpuReset]
 #set_property IOSTANDARD LVCMOS33 [get_ports btnCpuReset]
 ##Bank = 15, Pin name = IO_L11N_T1_SRCC_15,					Sch name = BTNC
-set_property PACKAGE_PIN E16 [get_ports push_centro]
-set_property IOSTANDARD LVCMOS33 [get_ports push_centro]
+#set_property PACKAGE_PIN E16 [get_ports push_centro]
+#set_property IOSTANDARD LVCMOS33 [get_ports push_centro]
 ##Bank = 15, Pin name = IO_L14P_T2_SRCC_15,					Sch name = BTNU
 set_property PACKAGE_PIN F15 [get_ports push_arriba]
 set_property IOSTANDARD LVCMOS33 [get_ports push_arriba]
