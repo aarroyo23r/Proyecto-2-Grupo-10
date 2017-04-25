@@ -12,7 +12,6 @@ module TOP(
     output wire ChipSelect,Read,Write,AoD, //Señales de control rtc
     output wire hsync,vsync,
     output wire  [11:0] rgbO,
-    output wire bit_inicio1,
     output wire video_on
 
 
@@ -62,10 +61,9 @@ reset reset_unit(.clk(clk),.reset2(reset3),.address(ADDRESS_reset),.data(data_re
 wire [7:0]data_mod; //datos_modificados
 wire [7:0]ADDRESS_write;
 
-
-wire [7:0]segundos;
-wire [7:0]minutos;
-wire [7:0]horas;
+wire [7:0]segundos2;
+wire [7:0]minutos2;
+wire [7:0]horas2;
 wire [7:0]date; //para escritura de entrada
 wire [7:0]num_semana;
 wire[7:0]mes;
@@ -74,9 +72,9 @@ wire [7:0]dia_sem;
 
 wire [7:0]datos8;
 wire [7:0]datos9;
-wire [7:0]datos10;
+wire [7:0]datos102;
 
-
+<<<<<<< HEAD
 MaquinaCrono MaquinaCrono_unit(
     .Reset(ResetCrono),.clk(clk),
     .ProgramarCrono(Crono),.PushInicioCrono(push_centro),
@@ -86,14 +84,20 @@ MaquinaCrono MaquinaCrono_unit(
     .horasSal(horasSal),.minutosSal(minutosSal),.segundosSal(segundosSal),.Cursor(Cursor)
     ,.address(address_crono),.data_crono(data_crono),.IniciaCronometro(IniciaCronometro)
     );
+=======
+>>>>>>> 21a4a991c1d18aeaedb8443891c2197345c02daa
 
+reg [7:0]minutos;
+reg [7:0]segundos;
+reg [7:0]horas;
 //reg [7:0]segundos,minutos,horas,date,num_semana,mes,ano,dia_sem;
 wire [7:0]contador2;
-
+wire [7:0]minutosSal_w,segundosSal_w,horasSal_w;
 MaquinaEscritura Escritura_unit(.clk(clk),.RW(RW),.Inicio(Inicio1),.Reset(Reset),.push_arriba(push_arriba),
                                 .push_abajo(push_abajo),.push_izquierda(push_izquierda),.push_derecha(push_derecha),.address(ADDRESS_write),
-                                .data_mod(data_mod),.reset2(reset3),.segundos(segundos),.minutos(minutos),.horas(horas),.date(date),
-                                .num_semana(num_semana),.mes(mes),.ano(ano),.dia_sem(dia_sem),.Escribir(Escribir),.Per_read(Per_read));
+                                .data_mod(data_mod),.reset2(reset3),.segundos(segundos2),.minutos(minutos2),.horas(horas2),.date(date),
+                                .num_semana(num_semana),.mes(mes),.ano(ano),.dia_sem(dia_sem),.Escribir(Escribir),.Per_read(Per_read),
+                                .segundosSal(segundoSal_w),.minutosSal(minutosSal_w),.horasSal(horasSal_w));
 wire [7:0]address;
 reg [7:0] address2;
 wire [7:0] data_inicio;
@@ -177,9 +181,9 @@ wire [3:0] contador_datos1;
 
 
 Registros Register_unit(.clk(clk),.data_vga(data_vga_entrada),.contador(contador2),
-                        .Read(READ),.datos0(segundos),
-                        .datos1(minutos),.datos2(horas),.datos3(date),.datos4(mes),.datos5(ano),.datos6(dia_sem),.datos7(num_semana),
-                        .datos8(datos8),.datos9(datos9),.datos10(datos10),.IndicadorMaquina(RW),.address(DATA_ADDRESS),.Write(Write),.AoD(AoD)
+                        .Read(READ),.datos0(segundos2),
+                        .datos1(minutos2),.datos2(horas2),.datos3(date),.datos4(mes),.datos5(ano),.datos6(dia_sem),.datos7(num_semana),
+                        .datos8(datos8),.datos9(datos9),.datos10(datos102),.IndicadorMaquina(RW),.address(DATA_ADDRESS),.Write(Write),.AoD(AoD)
                         );
 //reg [7:0] data_out1;
 //reg [7:0]segundos2; //para escritura de salida
@@ -190,13 +194,21 @@ wire  [7:0] horasSal,minutosSal,segundosSal;
 wire [7:0] address_crono;
 wire [7:0] data_crono;
 wire IniciaCronometro;
+wire [7:0] Cursor;
 
-
+MaquinaCrono MaquinaCrono_unit(
+    .Reset(ResetCrono),.clk(clk),
+    .ProgramarCrono(ProgramarCrono),.PushInicioCrono(push_centro),
+    .horas(datos10),.minutos(datos9),.segundos(datos8),
+    .arriba(push_arriba),.abajo(push_abajo),.izquierda(push_izquierda),.derecha(push_derecha),
+    .CronoActivo(CronoActivo),.Ring(Ring),
+    .horasSal(horasSal),.minutosSal(minutosSal),.segundosSal(segundosSal),.Cursor(Cursor)
+    ,.address(address_crono),.data_mod(data_crono),.IniciaCronometro(IniciaCronometro)
+    );
 
 
 //Mux datos Cronometro y cursor
 reg [7:0] horaCrono,minutosCrono,segundosCrono;
-wire [7:0] Cursor;
 reg [7:0] CursorTop;
 
 always @*
@@ -206,23 +218,33 @@ minutosCrono=minutosSal;
 segundosCrono=segundosSal;
 CursorTop=Cursor;
 end
-
+ 
 else begin
-horaCrono=datos10;
+horaCrono=datos8;
 minutosCrono=datos9;
-segundosCrono=datos8;
+segundosCrono=datos10;
 CursorTop=address2;
 end
 
 
-
-
-
+always@*
+begin
+if(Escribir) begin
+minutos =minutosSal_w;
+segundos =segundosSal_w;
+horas=horasSal_w;
+end
+else begin
+minutos=minutos2;
+segundos=segundos2;
+horas=horas2;
+end
+end
 
 
 Interfaz Interfaz_unit(.clk(clk),.reset(Reset),.rgbO(rgbO),.resetSync(Reset),.inicioSecuencia(bit_inicio1),.datoRTC(data_out),.hsync(hsync),.vsync(vsync),.video_on(video_on),
-                 .datos0(segundos),.datos1(minutos),.datos2(horas),.datos3(date),.datos4(mes),.datos5(ano),.datos6(dia_sem),.datos7(num_semana),
-                     .datos8(segundosCrono),.datos9(minutosCrono),.datos10(horaCrono),.instrucciones(instrucciones),.Escribir(Escribir),.cursor(CursorTop),.ProgramarCrono(ProgramarCrono),
+                 .datos0(segundos),.datos1(minutos),.datos2(horas),.datos3(date),.datos4(mes),.datos5(ano),.datos6(dia_sem),.datos7(num_sem),
+                     .datos8(segundosCrono),.datos9(minutosCrono),.datos10(horasCrono),.instrucciones(instrucciones),.Escribir(Escribir),.cursor(CursorTop),.ProgramarCrono(ProgramarCrono),
                      .ring(Ring)
                      );
 
