@@ -30,7 +30,7 @@ reg ar,ab,iz,de;//Pulsos
 reg escribir3;reg escribir4; reg es;
 
 always @ (posedge clk) begin
-if (!Reset && Escribir) begin
+if (!Reset) begin
 push_ar<=push_arriba;
 push_ar1<=push_ar;
 
@@ -91,7 +91,7 @@ reg[7:0]minutosReg1,segundosReg1,horasReg1,dateReg1;
 
 always@(posedge clk)
    begin
-   if(!Escribir)begin
+   if(RW)begin
    minutosReg1<=minutos;
    segundosReg1<=segundos;
    horasReg1<=horas;
@@ -137,7 +137,6 @@ horasReg1<=horasReg1;
 dateReg1<=dateReg1;
 end
 end
-
 
 //Restador
 else if(!suma && resta) begin
