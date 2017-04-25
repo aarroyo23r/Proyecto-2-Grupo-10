@@ -1,5 +1,4 @@
 `timescale 1ns / 1ps
-
 module MaquinaEscritura(
     input wire Inicio,Reset,Crono,Escribir,
     input wire clk,Per_read,
@@ -7,13 +6,13 @@ module MaquinaEscritura(
     input wire push_arriba,push_abajo,push_izquierda,push_derecha,
     input wire [7:0]segundos,minutos,horas,date,num_semana,mes,ano,dia_sem,
     output reg [7:0] address,
-    output reg [7:0] data_mod,
-    output reg reset2
+    output reg reset2,
+    output reg [7:0] minutosSal, segundosSal,horasSal,
+    output reg [7:0]data_mod
     );
 reg [32:0]contador=0;
 reg[3:0]c_dir=0;
-localparam [11:0] limit = 12'd74;
-localparam [3:0] s0 = 4'h0, //inicialización
+localparam [3:0] s0 = 4'h1, 
                  s1 = 4'h2, //segundos
                  s2 = 4'h3, //minutos
                  s3 = 4'h4, //horas
@@ -24,73 +23,150 @@ localparam [3:0] s0 = 4'h0, //inicialización
                  s8 = 4'h9, //#de semana
                  sY = 4'h1; //estado 12/24hrs
 
-reg [3:0] s_next;
-reg [3:0] s_actual=sY;
-reg push_ar=0, push_ab=0, push_i=0, push_d=0; //salida del detector de flancos
+reg [3:0] s_next=s1;reg [3:0] s_actual=s1;
+reg push_ar, push_ab, push_i, push_d; //salida del detector de flancos
+reg push_ar1, push_ab1, push_i1, push_d1; //salida del detector de flancos
+reg ar,ab,iz,de;//Pulsos
+reg escribir3;reg escribir4; reg es;
 
-//detector de pulsos formato
+always @ (posedge clk) begin
+if (!Reset && Escribir) begin
+push_ar<=push_arriba;
+push_ar1<=push_ar;
+
+escribir3<=Escribir;
+escribir4<=escribir3;
+
+push_ab<=push_abajo;
+push_ab1<=push_ab;
+
+push_d<=push_derecha;
+push_d1<=push_d;
+
+push_i<=push_izquierda;
+push_i1<=push_i;
+end
+
+if (push_ar && !push_ar1) begin
+ar<=1;end
+
+else if (push_ab && !push_ab1) begin
+ab<=1;end
+
+else if (push_d && !push_d1) begin
+de<=1;end
+
+else if (push_i && !push_i1) begin
+iz<=1;end
+
+else if(escribir3 && !escribir4)begin
+es<=1;end
+
+else begin
+es<=0;
+ar<=0;
+ab<=0;
+iz<=0;
+de<=0;
+end
+end
 
 
-
-
-//MAQUINA ESCRITURA
-//registro de estados
-always @(posedge clk)begin
-    if(Inicio)begin
+always @(posedge clk,posedge Reset)begin//Logica de Reset y estado siguiente
+    if(Reset)begin
         s_actual <=s0;
     end
     else
         s_actual <=s_next;
 end
 
-//DETECTOR DE FLANCOS
-always@(posedge clk)
-begin
-  if((push_arriba |push_abajo | push_izquierda | push_derecha))
-  begin
-  contador<=contador+1'b1;
-  end
-  if(!push_arriba && !push_abajo && !push_izquierda && !push_derecha)
-  begin
-  contador<=32'h00000000;
-  end
-end
+
+reg suma;reg resta;reg[3:0] registro; 
+
+reg [7:0]segundosReg;reg [7:0]minutosReg;reg[7:0]horasReg;
+reg[7:0]minutosReg1,segundosReg1,horasReg1;
+
+
 
 
 always@(posedge clk)
-begin
-   if(contador<limit)
    begin
-    if(push_arriba)
-        begin
-        push_ar<=1'b1;
-        end
-     if(push_abajo)
-        begin
-        push_ab<=1'b1;
-        end
-     if(push_izquierda)
-        begin
-        push_i<=1'b1;
-        end
-     if(push_derecha)
-        begin
-        push_d<=1'b1;
-        end
+   if(es)begin
+   minutosReg1<=minutos;
+   segundosReg1<=segundos;
+   horasReg1<=horas;
    end
-   if((contador>1) && (push_arriba |push_abajo | push_izquierda | push_derecha))
-   begin
-    push_d<=0;
-    push_i<=0;
+   else
+   minutosReg1<=minutosReg1;
+   segundosReg1<=segundosReg1;
+   horasReg1<=horasReg1;
    end
-   else if(contador>limit && (push_arriba |push_abajo | push_izquierda | push_derecha))
-   begin
-   push_ab<=0;
-   push_ar<=0;
-   end
-end
-//fin de detector de flancos
 
+
+
+always @(posedge clk) begin
+minutosReg<=minutosReg1;
+segundosReg<=segundosReg1;
+horasReg<=horasReg1;
+//sumador
+if(suma && !resta) begin
+
+ if(registro==2'd0)begin
+    
+ end
+else if (registro==2'd1)begin
+segundosReg<=segundosReg + 1;
+end
+
+else if (registro==2'd2)begin
+minutosReg<=minutosReg + 1;
+end
+
+ else if(registro==2'd3)begin
+horasReg<=horasReg+1;
+end
+
+else begin
+minutosReg<=minutosReg;
+segundosReg<=segundosReg;
+horasReg<=horasReg;
+end
+end
+
+
+//Restador
+else if(!suma && resta) begin
+if(registro==2'd0)begin
+    
+end
+else if (registro==2'd1)begin
+segundosReg<=segundosReg - 8'd1;
+end
+
+ else if (registro==2'd2)begin
+minutosReg<=minutosReg - 8'd1;
+end
+
+ else if(registro==2'd3)begin
+horasReg<=horasReg-8'd1;
+end
+
+else begin
+minutosReg<=minutosReg;
+segundosReg<=segundosReg;
+horasReg<=horasReg;
+end
+
+end
+
+else begin
+minutosReg<=minutosReg;
+segundosReg<=segundosReg;
+horasReg<=horasReg;
+end
+end
+
+// fin de sumador y restador
 //CONTADOR PARA DURACIÓN DE ESTADO DE INICIALIZACIÓN
 reg [11:0] contador2=0;
 reg activa=0;
@@ -107,493 +183,208 @@ begin
 end
 end
 
-//CONTADOR PARA RESET
-reg [11:0] contador3=0;
-reg activa2=0;
-always @(posedge clk)
-begin
-if(Reset)
-begin
-    contador3<=contador3 +1'b1;
-    activa2<=0;
-end
-if(contador3==12'h250)
-begin
-    activa2<=1;
-end
-end
 
-reg cte=1;
-
-///maquina de estados de escritura
-
-always @(posedge clk)
-begin
-if(!RW |Escribir |Inicio |reset2)
-begin
-s_next<=s_actual; //siguiente estado default el actual
-data_mod <= data_mod; //salida default de leer
-        case(s_actual)
-        s0 : begin
-             if((Inicio|Reset))
-                begin
-                    reset2<=1'b1;
-                    s_next<=s0;
-                    address<=8'h02;
-                    data_mod<=8'h10;
-                    end
-                 if(!Inicio && !Reset)
-                   begin
-                    address<=8'h02;
-                    data_mod<=8'h00;
-                    s_next<=s0;
-                    if(activa)
-                    begin
-                    reset2<=1'b0;
-                    s_next<=sY;
-                    end
-                    end
-                end
-        sY : begin  // varía formato 24 o 12 hrs
-                if(((Reset) && (!RW|Escribir)))
-                       begin
-                           reset2<=1'b1;
-                           address<= 8'h00;
-                           data_mod<= 8'h00;
-                           if(activa2)
-                           begin
-                           s_next<=sY;
+//Maquina programar hora
+always @ (posedge clk)  begin
+s_next=s_actual; //siguiente estado default el actual
+minutosReg<=minutosReg;
+segundosReg<=segundosReg;
+horasReg<=horasReg;
+case (s_actual)
+    s1: begin //segundos
+        if(!Reset && Escribir && !ar && !ab && !iz && !de)begin
+            reset2<=1'b0;
+            registro<=2'd0;
+            address<=8'h21;
+            suma<=0;
+            resta<=0;
+            s_next<=s1;
             end
-            end
-            if(!Inicio && !Reset && (!RW|Escribir))
-            begin
-             reset2<=1'b0;
-             address<=8'h00;
-             if(push_ar && !push_ab)
-             begin
-                data_mod<= 8'h10;
+        if((ar) && !Reset && Escribir)begin
+            reset2<=1'b0;
+            registro<=2'd1;
+            address<=8'h21;
+            suma<=1;
+            resta<=0;
+             //segundosReg<=segundosReg + 8'd1;
+             s_next<=s1;
+             end
+         if((ab) && !Reset && Escribir)begin
+            reset2<=1'b0;
+             registro<=2'd1;
+             address<=8'h21;
+             resta<=1;
+             suma<=0;
+             //segundosReg<=segundosReg - 8'd1;
+             s_next<=s1;
              end
 
-             if(push_d && !push_i)
-             begin
-                s_next<=s1;
-             end
-             if(!push_d && push_i)
-             begin
-                s_next<=s8;
-             end
-             if(!push_d && !push_i)
-             begin
-                s_next<=sY;
-             end
-           end
-          end
-
-
-        s1: begin           //estado escritura de segundos
-            if((Reset) && (!RW|Escribir))
-                begin
-                    reset2<=1'b1;
-                    address<= 8'h00;
-                    data_mod<= 8'h00;
-                    if(activa2)
-                    begin
-                    s_next<=sY;
-                    end
-                end
-            if(!Inicio && !Reset && (!RW|Escribir))
-                begin
-                    reset2<=1'b0;
-                    address<=8'h21;
-                        if(push_ar && !push_ab)
-                            begin
-                            data_mod<= segundos +1'b1;  ///le sumo +1 a segundos
-                            s_next<=s_actual;
-                            end
-                        if(!push_ar && push_ab)
-                            begin
-                            data_mod<=segundos - 1'b1;    ///le resto -1 a segundos
-                            s_next<=s_actual;
-                            end
-                        if(!push_ab &&!push_ar)
-                            begin
-                            data_mod<=segundos;  //dejo el dato igual
-                            s_next<=s_actual;
-                            end
-                        if(push_d && !push_i)
-                            begin
-                            s_next<=s2;
-                            address<=8'h22;
-                            end
-                        if(!push_d && push_i)
-                            begin
-                            s_next<=s8;
-                            address<=8'h28;
-                            end
-                         if(!push_d && !push_i)
-                            begin
-                            s_next<=s_actual;
-                            end
-                end
-
-            end
-         s2: begin
-                       if((Reset) && (!RW|Escribir))
-                           begin
-                               reset2<=1'b1;
-                               address<= 8'h00;
-                               data_mod<= 8'h00;
-                               if(activa2)
-                               begin
-                               s_next<=sY;
-                               end
-                           end
-                       if(!Inicio && !Reset && (!RW|Escribir))
-                           begin
-                               reset2<=1'b0;
-                               address<=8'h22;
-                                   if(push_ar && !push_ab)
-                                       begin
-                                       data_mod<= minutos +1'b1;  ///le sumo +1 a minutos
-                                                                   s_next<=s_actual;
-
-                                       end
-                                   if(!push_ar && push_ab)
-                                       begin
-                                       data_mod<=minutos - 1'b1;    ///le resto -1 a minutos
-                                                                   s_next<=s_actual;
-
-                                       end
-                                   if(!push_ab &&!push_ar)
-                                       begin
-                                       data_mod<=minutos;  //dejo el dato igual
-                                                                   s_next<=s_actual;
-
-                                       end
-                                   if(push_d && !push_i)
-                                       begin
-                                       s_next<=s3;
-                                       address<=8'h23;
-                                       end
-                                   if(!push_d && push_i)
-                                       begin
-                                       s_next<=s1;
-                                       address<=8'h21;
-                                       end
-                                    if(!push_d && !push_i)
-                                       begin
-                                       s_next<=s_actual;
-                                       end
-                           end
-
+             if( (iz) && !Reset && Escribir)begin
+                 reset2<=1'b0;
+                 registro<=2'd0;
+                 address<=8'h22;
+                 suma<=0;
+                 resta<=0;
+                  //segundosReg<=segundosReg;
+                  s_next<=s2;
+                  end
+              if((de) && !Reset && Escribir)
+                  begin
+                  reset2<=1'b0;
+                  registro<=2'd0;
+                  address<=8'h21;
+                  suma<=0;
+                  resta<=0;
+                  //segundosReg<=segundosReg;
+                  s_next<=s1;
+                  end
+                  if(Reset) //Estado
+                      begin
+                      reset2<=1'b0;
+                      registro<=2'd0;
+                      address<=8'h21;
+                      suma<=0;
+                      resta<=0;
+                      s_next<=s1;
                        end
-          s3:begin
-                       if((Reset) && (!RW|Escribir))
-                        begin
-                        reset2<=1'b1;
-                        address <= 8'h00;
-                        data_mod<= 8'h00;
-                        if(activa2)
-                        begin
-                        s_next<=sY;
-                        end
-                        end
+        end
+        
+        
+    s2: begin //horas
+    if(!Reset && Escribir && !ar && !ab && !iz && !de)
+        begin
+        reset2<=1'b0;
+        registro<=2'd0;
+        address<=8'h22;
+        suma<=0;
+        resta<=0;
+        //minutosReg<=minutosReg;
+        s_next<=s_actual;
+        end
+    if( (ar) && !Reset && Escribir)
+        begin
+        reset2<=1'b0;
+        registro<=2'd2;
+        address<=8'h22;
+        suma<=1;
+        resta<=0;
+         //minutosReg<=minutosReg + 8'd1;
+         s_next<=s_actual;
+         end
+     if((ab) && !Reset && Escribir)
+         begin
+         reset2<=1'b0;
+         registro<=2'd2;
+         address<=8'h22;
+         suma<=0;
+         resta<=1;
+         //minutosReg<=minutosReg - 8'd1;
+         s_next<=s_actual;
+         end
 
-                       if(!Inicio && !Reset && (!RW|Escribir))
-                         begin
-                          reset2<=1'b0;
-                          address<=8'h23;
-                                if(push_ar && !push_ab)
-                                   begin
-                                   data_mod<= horas +1'b1;  ///le sumo +1 a horas
-                                                               s_next<=s_actual;
-
-                                   end
-                                if(!push_ar && push_ab)
-                                   begin
-                                   data_mod<=horas - 1'b1;    ///le resto -1 a horas
-                                                               s_next<=s_actual;
-
-                                   end
-                                if(!push_ab &&!push_ar)
-                                    begin
-                                    data_mod<=horas;  //dejo el dato horas
-                                                                s_next<=s_actual;
-
-                                    end
-                                if(push_d && !push_i)
-                                     begin
-                                     s_next<=s4;
-                                     address<=8'h24;
-                                     end
-                                if(!push_d && push_i)
-                                     begin
-                                     s_next<=s2;
-                                     address<=8'h22;
-                                     end
-                                if(!push_d && !push_i)
-                                     begin
-                                     s_next<=s_actual;
-                                     end
-                          end
-
-                 end
-        s4:begin
-                        if((Reset) && (!RW|Escribir))
-                           begin
-                           reset2<=1'b1;
-                           address <= 8'h00;
-                           data_mod<= 8'h00;
-                           if(activa2)
-                           begin
-                           s_next<=sY;
-                           end
-                           end
-                           if(!Inicio && !Reset && (!RW|Escribir))
-                              begin
-                              reset2<=1'b0;
-                              address<=8'h24;
-                                if(push_ar && !push_ab)
-                                  begin
-                                  data_mod<= date +1'b1;  ///le sumo +1 a dia
-                                                              s_next<=s_actual;
-
-                                  end
-                                if(!push_ar && push_ab)
-                                   begin
-                                   data_mod<=date - 1'b1;    ///le resto -1 a dia
-                                                               s_next<=s_actual;
-
-                                   end
-                                if(!push_ab &&!push_ar)
-                                   begin
-                                   data_mod<=date;     //dejo el dato igual dia
-                                                               s_next<=s_actual;
-
-                                   end
-                                if(push_d && !push_i)
-                                   begin
-                                   s_next<=s5;
-                                   address<=8'h25;
-                                   end
-                                if(!push_d && push_i)
-                                    begin
-                                    s_next<=s3;
-                                    address<=8'h23;
-                                    end
-                                 if(!push_d && !push_i)
-                                     begin
-                                     s_next<=s_actual;
-                                      end
-                              end
-            end
-         s5:begin
-             if((Reset) && (!RW|Escribir))
+         if( (iz) && !Reset && Escribir)
              begin
-             reset2<=1'b1;
-             address <= 8'h00;
-             data_mod<= 8'h00;
-             if(activa2)
+             reset2<=1'b0;
+             registro<=2'd0;
+             address<=8'h23;
+             suma<=0;
+             resta<=0;
+              //minutosReg<=minutosReg;
+              s_next<=s3;
+              end
+          if((de) && !Reset && Escribir)
+              begin
+              reset2<=1'b0;
+              registro<=2'd0;
+              address<=8'h21;
+              suma<=0;
+              resta<=0;
+              //minutosReg<=minutosReg;
+              s_next<=s1;
+              end
+
+              if( Reset) //Estado
+                  begin
+                  reset2<=1'b0;
+                  registro<=2'd0;
+                  address<=8'h21;
+                  suma<=0;
+                  resta<=0;
+                  s_next<=s1;
+                  end
+     end
+    s3: begin //Minutos
+         if(!Reset && Escribir && !ar && !ab && !iz && !de)
              begin
-             s_next<=sY;
+             reset2<=1'b0;
+             registro<=2'd0;
+             address<=8'h23;
+             suma<=0;
+             resta<=0;
+             //minutosReg<=minutosReg;
+             s_next<=s_actual;
              end
-             end
-
-
-             if(!Inicio && !Reset && (!RW|Escribir))
-                begin
-                reset2<=1'b0;
-                address<=8'h25;
-                  if(push_ar && !push_ab)
-                     begin
-                     data_mod<= mes +1'b1;  ///le sumo +1 a mes
-                                                 s_next<=s_actual;
-
-                     end
-                  if(!push_ar && push_ab)
-                     begin
-                     data_mod<=mes- 1'b1;    ///le resto -1 a mes
-                                                 s_next<=s_actual;
-
-                      end
-                  if(!push_ab &&!push_ar)
-                     begin
-                     data_mod<=mes;     //dejo el dato igual mes
-                                                 s_next<=s_actual;
-
-                     end
-                     if(push_d && !push_i)
-                     begin
-                     s_next<=s6;
-                     address<=8'h26;
-                     end
-                  if(!push_d && push_i)
-                     begin
-                     s_next<=s4;
-                     address<=8'h24;
-                     end
-                   if(!push_d && !push_i)
-                     begin
-                     s_next<=s_actual;
-                     end
-            end
-    end
-        s6:begin
-                    if((Reset) && (!RW|Escribir))
-                    begin
-                    reset2<=1'b1;
-                    address<= 8'h00;
-                    data_mod<= 8'h00;
-                    if(activa2)
-                    begin
-                    s_next<=sY;
-                    end
-                    end
-                        if(!Inicio && !Reset && (!RW|Escribir))
-                                  begin
-                                  reset2<=1'b0;
-                                  address<=8'h26;
-                                    if(push_ar && !push_ab)
-                                      begin
-                                      data_mod<= ano +1'b1;  ///le sumo +1 a año
-                                                                  s_next<=s_actual;
-
-                                      end
-                                    if(!push_ar && push_ab)
-                                       begin
-                                       data_mod<=ano - 1'b1;    ///le resto -1 a año
-                                                                   s_next<=s_actual;
-
-                                       end
-                                    if(!push_ab &&!push_ar)
-                                       begin
-                                       data_mod<=ano;     //dejo el dato igual año
-                                                                   s_next<=s_actual;
-
-                                       end
-                                    if(push_d && !push_i)
-                                       begin
-                                       s_next<=s7;
-                                       address<=8'h27;
-                                       end
-                                    if(!push_d && push_i)
-                                        begin
-                                        s_next<=s5;
-                                        address<=8'h25;
-                                        end
-                                     if(!push_d && !push_i)
-                                         begin
-                                         s_next<=s_actual;
-                                          end
-                                  end
-                end
-  s7:begin
-               if((Reset) && (!RW|Escribir))
-                   begin
-                   reset2<=1'b1;
-                   address <= 8'h00;
-                   data_mod<= 8'h00;
-                   if(activa2)
-                   begin
-                   s_next<=sY;
+         if( (ar) && !Reset && Escribir)
+             begin
+             reset2<=1'b0;
+             registro<=2'd3;
+             address<=8'h23;
+             suma<=1;
+             resta<=0;
+              //minutosReg<=minutosReg + 8'd1;
+              s_next<=s_actual;
+              end
+          if((ab) && !Reset && Escribir)
+              begin
+              reset2<=1'b0;
+              registro<=2'd3;
+              address<=8'h23;
+              suma<=0;
+              resta<=1;
+              //minutosReg<=minutosReg - 8'd1;
+              s_next<=s_actual;
+              end
+     
+              if( (iz) && !Reset && Escribir)
+                  begin
+                  reset2<=1'b0;
+                  registro<=2'd0;
+                  address<=8'h23;
+                  suma<=0;
+                  resta<=0;
+                   //minutosReg<=minutosReg;
+                   s_next=s3;
                    end
-                   end
-               if(!Inicio && !Reset && (!RW|Escribir))
+               if((de) && !Reset && Escribir)
                    begin
                    reset2<=1'b0;
-                   address <=8'h27;
-                        if(push_ar && !push_ab)
-                             begin
-                             data_mod<= dia_sem +1'b1;  ///le sumo +1 a día de la semana
-                                                         s_next<=s_actual;
-
-                             end
-                        if(!push_ar && push_ab)
-                             begin
-                             data_mod<=dia_sem - 1'b1;    ///le resto -1 a dia de la semana
-                                                         s_next<=s_actual;
-
-                             end
-                         if(!push_ab &&!push_ar)
-                             begin
-                             data_mod<=dia_sem;     //dejo el dato igual a dia de la semana
-                                                         s_next<=s_actual;
-
-                             end
-                         if(push_d && !push_i)
-                             begin
-                             s_next<=s8;
-                             address<=8'h28;
-                             end
-                         if(!push_d && push_i)
-                             begin
-                             s_next<=s6;
-                             address<=8'h26;
-                             end
-                         if(!push_d && !push_i)
-                             begin
-                             s_next<=s_actual;
-                             end
+                   registro<=2'd0;
+                   address<=8'h22;
+                   suma<=0;
+                   resta<=0;
+                   //minutosReg<=minutosReg;
+                   s_next<=s2;
                    end
-            end
-
-
-      s8:begin
-               if((Reset) && (!RW|Escribir))
-                 begin
-                 reset2<=1'b1;
-                 address<= 8'h00;
-                 data_mod<= 8'h00;
-                 if(activa2)
-                 begin
-                 s_next<=sY;
-                 end
-                 end
-
-
-               if(!Inicio && !Reset && (!RW|Escribir))
-                 begin
-                 reset2<=1'b0;
-                 address<=8'h28;
-               if(push_ar && !push_ab)
-                 begin
-                 data_mod<= num_semana +1'b1;  ///le sumo +1 a día de la semana
-                                             s_next<=s_actual;
-
-                 end
-               if(!push_ar && push_ab)
-                 begin
-                 data_mod<=num_semana - 1'b1;    ///le resto -1 a dia de la semana
-                                             s_next<=s_actual;
-
-                 end
-               if(!push_ab &&!push_ar)
-                 begin
-                 data_mod<=num_semana;     //dejo el dato igual a dia de la semana
-                                             s_next<=s_actual;
-
-                 end
-               if(push_d && !push_i)
-                  begin
-                  s_next<=s1;
-                  address<=8'h00;
-                   end
-                if(!push_d && push_i)
-                  begin
-                    s_next<=s7;
-                    address<=8'h27;
-                    end
-                if(!push_d && !push_i)
-                    begin
-                    s_next<=s_actual;
-                    end
-            end
-
-    end
-
-  endcase
+     
+                   if( Reset) //Estado
+                       begin
+                       reset2<=1'b0;
+                       registro<=2'd0;
+                       address<=8'h21;
+                       suma<=0;
+                       resta<=0;
+                       s_next<=s1;
+                       end
+          end 
+     
+endcase
 end
 
 
+always@*
+begin
+minutosSal=minutosReg;
+segundosSal=segundosReg;
+horasSal=horasReg;
 end
 endmodule
