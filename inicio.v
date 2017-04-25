@@ -44,12 +44,12 @@ localparam [11:0] limit = 12'd36; //tiempo en el que la dirección se mantiene
         4'b0000:
             begin
             address<=8'h02;
-            data_mod<=8'h08;
+            data_mod<=8'h08;//Activa crono
             end
          4'b0001:
             begin
             address<=8'h02;
-            data_mod<=8'h00;
+            data_mod<=8'h00;//Desactiva Crono
             end
          default:address<=8'hZZ;
     endcase

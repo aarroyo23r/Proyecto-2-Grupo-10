@@ -9,7 +9,6 @@ module MaquinaCrono(
     output reg [7:0] Cursor,
     output reg[7:0] data_crono,
     output reg[7:0] address,
-    output reg IniciaCronometro,
     output wire [7:0] horasSal,minutosSal,segundosSal
     );
 
@@ -141,16 +140,18 @@ always @(posedge clk) begin
 
 //sumador
 if(suma && !resta) begin
+/*
 unidadesSegundos<=segundosReg[3:0];
 unidadesMinutos<=minutosReg[3:0];
 unidadesHoras<=horasReg[3:0];
-
+*/
 
 if (registro==2'd1)begin
 
 
-if (segundosReg<=8'h60) begin
-if (unidadesSegundos==4'h9) begin
+if (segundosReg<=8'h59) begin
+
+if (segundosReg[3:0]==4'h9) begin
 segundosReg<=segundosReg+7;
 end
 
@@ -169,30 +170,42 @@ end
 
 else if (registro==2'd2)begin
 
-if (unidadesMinutos==4'h9) begin
+if (minutosReg<=8'h59) begin
+
+if (minutosReg[3:0]==4'h9) begin
 minutosReg<=minutosReg+7;
 end
-else if (4'h9<unidadesSegundos<=4'hf) begin
-segundosReg<=segundosReg;
-end
+
 else begin
 minutosReg<=minutosReg+1;
 end
 end
 
-else if (registro==2'd3)begin
-if (unidadesHoras==4'h9) begin
-horasReg<=horasReg+7;
+else begin
+minutosReg<=minutosReg;
 end
 
-else if (4'h9<unidadesSegundos<=4'hf) begin
-segundosReg<=segundosReg;
+end
+
+else if (registro==2'd3)begin
+
+if (horasReg<=8'h23)begin
+
+if (horasReg[3:0]==4'h9) begin
+horasReg<=horasReg+7;
 end
 
 else begin
 horasReg<=horasReg+1;
 end
+
 end
+
+else begin
+horasReg<=horasReg;
+end
+end
+
 
 else begin
 horasReg<=horasReg;
@@ -205,15 +218,17 @@ end
 
 //Restador
 else if(!suma && resta) begin
+/*
 decenasHoras<=horasReg[7:4];
 decenasMinutos<=minutosReg[7:4];
 decenasSegundos<=segundosReg[7:4];
 
-
+*/
 if (registro==2'd1)begin
 
-if (segundosReg>=8'h00) begin
-if (decenasSegundos==4'h1) begin
+if (segundosReg>8'h00) begin
+
+if (segundosReg[7:4]==4'h1) begin
 segundosReg<=segundosReg-7;
 end
 
@@ -227,16 +242,15 @@ else begin
 segundosReg<=segundosReg;
 
 end
-
 end
+
 
 else if (registro==2'd2)begin
 
+if (minutosReg>8'h00)begin
+
 if (decenasMinutos==4'h1) begin
 minutosReg<=minutosReg-7;
-end
-else if (4'h9<unidadesSegundos<=4'hf) begin
-segundosReg<=segundosReg;
 end
 
 else begin
@@ -244,19 +258,31 @@ minutosReg<=minutosReg-1;
 end
 end
 
+else begin
+minutosReg<=minutosReg;
+end
+end
+
+
 else if (registro==2'd3)begin
 
-if (decenasHoras==4'h1) begin
+if (horasReg>8'h00)begin
+
+if (horasReg[7:4]==4'h1) begin
 horasReg<=horasReg-7;
-end
-else if (4'h9<unidadesSegundos<=4'hf) begin
-segundosReg<=segundosReg;
 end
 
 else begin
 horasReg<=horasReg-1;
 end
 end
+
+else begin
+horasReg<=horasReg;
+
+end
+end
+
 
 else begin
 horasReg<=horasReg;
@@ -287,19 +313,19 @@ begin*/
     //CronoActivo <= 1'b0; //Default crono apagado
     case (s_actual)
         s0: begin //Estado Programar Cronometro
-            if(Reset==0 && FinalizoCrono ==0 && ProgramarCrono==0 && PushInicioCrono==1)
+            if(Reset==0 && FinalizoCrono ==0  && PushInicioCrono==1)
                 begin
                  CronoActivo <=1'b1;  //Para protocolo read
                  Ring <=1'b0;
                 s_next<=s2;
                 end
-            if(Reset==0 && FinalizoCrono ==0 && ProgramarCrono==0 && PushInicioCrono==0)
+            if(Reset==0 && FinalizoCrono ==0 && PushInicioCrono==0)
                 begin
                  CronoActivo <=1'b0;  //Para protocolo read
                  Ring <=1'b0;
                  s_next<=s1;
                  end
-             if( (ProgramarCrono && !Reset ) | Reset)
+             if( Reset)
                  begin
                  CronoActivo <=1'b0;  //Para protocolo read
                  Ring <=1'b0;
@@ -315,13 +341,13 @@ begin*/
 
             end
         s1: begin
-            if(Reset==0 && FinalizoCrono ==0 && ProgramarCrono==0 && PushInicioCrono==0)
+            if(Reset==0 && FinalizoCrono ==0 && PushInicioCrono==0)
                 begin
                 CronoActivo <=1'b0;  //Para protocolo read
                 Ring <=1'b0;
                 s_next<=s_actual;
                 end
-             if(Reset==0 && FinalizoCrono ==0 && ProgramarCrono==0 && PushInicioCrono==1)
+             if(Reset==0 && FinalizoCrono ==0 && PushInicioCrono==1)
                 begin
                 CronoActivo <=1'b1;  //Para protocolo read
                 Ring <=1'b0;
@@ -333,7 +359,7 @@ begin*/
                 Ring <=1'b1;
                 s_next<=s3;
                 end
-             if(Reset==1  | (Reset==0 && FinalizoCrono ==0 && ProgramarCrono==1 && PushInicioCrono==0))
+             if(Reset==1 )
                 begin
                 CronoActivo <=1'b0;  //Para protocolo read
                 Ring <=1'b0;
@@ -342,7 +368,7 @@ begin*/
 
             end
        s2:begin
-            if(Reset==0 && FinalizoCrono ==0 && ProgramarCrono==0 && PushInicioCrono==1)
+            if(Reset==0 && FinalizoCrono ==0  && PushInicioCrono==1)
                 begin
                 CronoActivo <=1'b1;  //Para protocolo read
                 Ring <=1'b0;
@@ -355,14 +381,14 @@ begin*/
                 s_next<=s3;
                 end
 
-            if(Reset==1  | (Reset==0 && FinalizoCrono ==0 && ProgramarCrono==1 && PushInicioCrono==0))
+            if(Reset==1 )
                 begin
                 CronoActivo <=1'b0;  //Para protocolo read
                 Ring <=1'b0;
                 s_next<=s0;
                 end
 
-            if(Reset==0 && FinalizoCrono ==0 && ProgramarCrono==0 && PushInicioCrono==0)
+            if(Reset==0 && FinalizoCrono ==0  && PushInicioCrono==0)
                 begin
                 CronoActivo <=1'b0;  //Para protocolo read
                 Ring <=1'b0;
@@ -371,7 +397,7 @@ begin*/
 
 end
         s3: begin
-            if(Reset==1 | (Reset==0 && FinalizoCrono ==0 && ProgramarCrono==1 && InicioCrono==0))
+            if(Reset==1 | (Reset==0 && FinalizoCrono ==0  && InicioCrono==0))
                 begin
                 CronoActivo <=1'b0;  //Para protocolo read
                 Ring <=1'b0;
@@ -414,7 +440,7 @@ reg resta;
 
 always @ (posedge clk)  begin
 
-s_sig=s_actualcrono; //siguiente estado default el actual
+//s_sig=s_actualcrono; //siguiente estado default el actual
 
 horasReg<=horasReg;
 minutosReg<=minutosReg;
@@ -646,34 +672,37 @@ endcase
 
 end
 
-localparam [11:0] limit = 12'd337; //tiempo en el que la dirección se mantiene
+
+
+
+localparam [11:0] limit = 12'd338; //tiempo en el que la dirección se mantiene
     reg [11:0] contador=0;
     reg c_dir=1;
 
 
+
+
+
     always @(posedge clk)
     begin
-        if(!ProgramarCrono && PushInicioCrono)
+        if( ProgramarCrono && CronoActivo)
         begin
         contador<=contador + 1'b1;
-        IniciaCronometro<=1;
         c_dir<=0;
         if(contador==limit)
         begin
-            contador<=0;
-            IniciaCronometro<=0;
+            //contador<=0;
             c_dir<=1;
         end
 
-        if(!ProgramarCrono && !PushInicioCrono)
+        if(ProgramarCrono && !CronoActivo)
         begin
         contador<=contador + 1'b1;
-        IniciaCronometro<=1;
+
         c_dir<=0;
         if(contador==limit)
         begin
-            contador<=0;
-            IniciaCronometro<=0;
+            //contador<=0;
             c_dir<=1;
         end
 
@@ -681,7 +710,6 @@ localparam [11:0] limit = 12'd337; //tiempo en el que la dirección se mantiene
             begin
             c_dir<=0;
             contador<=0;
-            IniciaCronometro<=0;
             end
 
         end
@@ -692,7 +720,7 @@ end
 
     always @(posedge clk)
     begin
-    if(CronoActivo)
+    if( ProgramarCrono && CronoActivo)
     begin
     if (!c_dir)
             begin
@@ -702,11 +730,11 @@ end
     else
             begin
             address<=8'h00;
-            data_crono<=8'h80;
+            data_crono<=8'hZZ;
             end
     end
 
-    else if (!CronoActivo) begin
+    else if (ProgramarCrono && !CronoActivo) begin
     if (!c_dir)
             begin
             address<=8'h00;
@@ -715,12 +743,12 @@ end
     else
             begin
             address<=8'h00;
-            data_crono<=8'h80;
+            data_crono<=8'hZZ;
             end
     end
 else begin
             address<=8'h00;
-            data_crono<=8'h80;
+            data_crono<=8'hZZ;
 end
 
 end

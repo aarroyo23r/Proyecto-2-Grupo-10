@@ -74,18 +74,20 @@ wire [7:0]datos8;
 wire [7:0]datos9;
 wire [7:0]datos102;
 
-<<<<<<< HEAD
-MaquinaCrono MaquinaCrono_unit(
-    .Reset(ResetCrono),.clk(clk),
-    .ProgramarCrono(Crono),.PushInicioCrono(push_centro),
-    .horas(datos10),.minutos(datos9),.segundos(datos8),
-    .arriba(push_arriba),.abajo(push_abajo),.izquierda(push_izquierda),.derecha(push_derecha),
-    .CronoActivo(CronoActivo),.Ring(Ring),
-    .horasSal(horasSal),.minutosSal(minutosSal),.segundosSal(segundosSal),.Cursor(Cursor)
-    ,.address(address_crono),.data_crono(data_crono),.IniciaCronometro(IniciaCronometro)
-    );
-=======
->>>>>>> 21a4a991c1d18aeaedb8443891c2197345c02daa
+//Crono
+
+wire CronoActivo,Ring;
+wire  [7:0] horasSal,minutosSal,segundosSal;
+
+wire [7:0] address_crono;
+wire [7:0] data_crono;
+wire IniciaCronometro;
+wire [7:0] Cursor;
+
+
+
+
+
 
 reg [7:0]minutos;
 reg [7:0]segundos;
@@ -115,7 +117,7 @@ begin
     address2<=address_inicio;
     end
 
-    if (IniciaCronometro)begin
+    if (Crono)begin
       address2<=address_crono;
     end
     if((Escribir|(reset3 |!RW)) && (!Inicio1))
@@ -143,7 +145,7 @@ always@(posedge clk)
        data_mod2<=data_reset;
        end
 
-       if (IniciaCronometro)begin
+       if (Crono)begin
          data_mod2<=data_crono;
        end
 
@@ -188,23 +190,9 @@ Registros Register_unit(.clk(clk),.data_vga(data_vga_entrada),.contador(contador
 //reg [7:0] data_out1;
 //reg [7:0]segundos2; //para escritura de salida
 
-wire CronoActivo,Ring;
-wire  [7:0] horasSal,minutosSal,segundosSal;
 
-wire [7:0] address_crono;
-wire [7:0] data_crono;
-wire IniciaCronometro;
-wire [7:0] Cursor;
 
-MaquinaCrono MaquinaCrono_unit(
-    .Reset(ResetCrono),.clk(clk),
-    .ProgramarCrono(ProgramarCrono),.PushInicioCrono(push_centro),
-    .horas(datos10),.minutos(datos9),.segundos(datos8),
-    .arriba(push_arriba),.abajo(push_abajo),.izquierda(push_izquierda),.derecha(push_derecha),
-    .CronoActivo(CronoActivo),.Ring(Ring),
-    .horasSal(horasSal),.minutosSal(minutosSal),.segundosSal(segundosSal),.Cursor(Cursor)
-    ,.address(address_crono),.data_mod(data_crono),.IniciaCronometro(IniciaCronometro)
-    );
+
 
 
 //Mux datos Cronometro y cursor
@@ -218,7 +206,7 @@ minutosCrono=minutosSal;
 segundosCrono=segundosSal;
 CursorTop=Cursor;
 end
- 
+
 else begin
 horaCrono=datos8;
 minutosCrono=datos9;
@@ -240,6 +228,16 @@ segundos=segundos2;
 horas=horas2;
 end
 end
+
+MaquinaCrono MaquinaCrono_unit(
+    .Reset(ResetCrono),.clk(clk),
+    .ProgramarCrono(Crono),.PushInicioCrono(push_centro),
+    .horas(datos10),.minutos(datos9),.segundos(datos8),
+    .arriba(push_arriba),.abajo(push_abajo),.izquierda(push_izquierda),.derecha(push_derecha),
+    .CronoActivo(CronoActivo),.Ring(Ring),
+    .horasSal(horasSal),.minutosSal(minutosSal),.segundosSal(segundosSal),.Cursor(Cursor)
+    ,.address(address_crono),.data_crono(data_crono)
+    );
 
 
 Interfaz Interfaz_unit(.clk(clk),.reset(Reset),.rgbO(rgbO),.resetSync(Reset),.inicioSecuencia(bit_inicio1),.datoRTC(data_out),.hsync(hsync),.vsync(vsync),.video_on(video_on),
