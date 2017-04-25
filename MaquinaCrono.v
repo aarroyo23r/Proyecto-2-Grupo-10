@@ -8,7 +8,7 @@ module MaquinaCrono(
     output reg CronoActivo,Ring,
     output reg [7:0] Cursor,
     output reg[7:0] data_crono,
-    output reg [7:0] address,
+    output reg[7:0] address,
     output reg IniciaCronometro,
     output wire [7:0] horasSal,minutosSal,segundosSal
     );
@@ -26,8 +26,8 @@ localparam[1:0] s0 = 2'b00, //Estado Programar Cronometro
 
 //localparam [11:0] limit = 12'h100;
  //señales de estado
- reg[1:0]s_actual,s_next;
-  reg[1:0]s_actualcrono,s_sig;
+ reg[1:0]s_actual,s_next=s0;
+  reg[1:0]s_actualcrono,s_sig=ss;
 
  //reg [11:0] contador=0;
 
@@ -646,7 +646,7 @@ endcase
 
 end
 
-localparam [11:0] limit = 12'd36; //tiempo en el que la dirección se mantiene
+localparam [11:0] limit = 12'd337; //tiempo en el que la dirección se mantiene
     reg [11:0] contador=0;
     reg c_dir=1;
 
@@ -694,46 +694,36 @@ end
     begin
     if(CronoActivo)
     begin
-    case(c_dir)
-        1'b0:
+    if (!c_dir)
             begin
             address<=8'h00;
-            data_crono<=8'h10;
+            data_crono<=8'h08;
             end
-         1'b1:
+    else
             begin
-            address<=8'h01;
-            data_crono<=8'h01;
+            address<=8'h00;
+            data_crono<=8'h80;
             end
-         default:address<=8'h01;
-    endcase
     end
 
     else if (!CronoActivo) begin
-    case(c_dir)
-        1'b0:
+    if (!c_dir)
             begin
             address<=8'h00;
             data_crono<=8'h00;
             end
-         1'b1:
-            begin
-            address<=8'h01;
-            data_crono<=8'h01;
-            end
-         default:address<=8'h01;
-    endcase
-    end
-
-
     else
-    data_crono<=8'h01;
-    address<=8'h01;
+            begin
+            address<=8'h00;
+            data_crono<=8'h80;
+            end
     end
+else begin
+            address<=8'h00;
+            data_crono<=8'h80;
+end
 
-
-
-
+end
 assign horasSal=horasReg;
 assign minutosSal=minutosReg;
 assign segundosSal=segundosReg;

@@ -23,7 +23,7 @@ module tb_MaquinaCrono();
         .arriba(arriba),.abajo(abajo),.izquierda(izquierda),.derecha(derecha),
         .CronoActivo(CronoActivo),.Ring(Ring),
         .horasSal(horasSal),.minutosSal(minutosSal),.segundosSal(segundosSal)
-        ,.horas(horas),.minutos(minutos),.segundos(segundos),.FinalizoCrono(FinalizoCrono)
+        ,.horas(horas),.minutos(minutos),.segundos(segundos)
         );
 
 
@@ -96,6 +96,10 @@ arriba=0;
 
 arriba=1;
 #30;
+
+PushInicioCrono=1;
+
+#100;
 
 $finish;
 

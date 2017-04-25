@@ -79,7 +79,7 @@ wire [7:0]datos10;
 
 MaquinaCrono MaquinaCrono_unit(
     .Reset(ResetCrono),.clk(clk),
-    .ProgramarCrono(ProgramarCrono),.PushInicioCrono(push_centro),
+    .ProgramarCrono(Crono),.PushInicioCrono(push_centro),
     .horas(datos10),.minutos(datos9),.segundos(datos8),
     .arriba(push_arriba),.abajo(push_abajo),.izquierda(push_izquierda),.derecha(push_derecha),
     .CronoActivo(CronoActivo),.Ring(Ring),
@@ -142,6 +142,7 @@ always@(posedge clk)
        if (IniciaCronometro)begin
          data_mod2<=data_crono;
        end
+
     if((!RW |Escribir |reset3)& !Inicio1)
         begin
        data_mod2<=data_mod;
