@@ -262,8 +262,8 @@ set_property IOSTANDARD LVCMOS33 [get_ports AoD]
 #set_property PACKAGE_PIN T9 [get_ports {JB[6]}]
 #set_property IOSTANDARD LVCMOS33 [get_ports {JB[6]}]
 ##Bank = 14, Pin name = IO_L19N_T3_A09_D25_VREF_14,			Sch name = JB10
-set_property PACKAGE_PIN U11 [get_ports {bit_inicio1}]
-set_property IOSTANDARD LVCMOS33 [get_ports {bit_inicio1}]
+#set_property PACKAGE_PIN U11 [get_ports {bit_inicio1}]
+#set_property IOSTANDARD LVCMOS33 [get_ports {bit_inicio1}]
 
 
 

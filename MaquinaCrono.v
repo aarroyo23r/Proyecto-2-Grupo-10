@@ -44,6 +44,9 @@ reg ar,ab,iz,de;//Pulsos
 
 
 
+//Programar el Cronometro
+reg [7:0] horasReg=0,minutosReg=0,segundosReg=0;
+
 
 always @ (posedge clk) begin
 
@@ -134,6 +137,8 @@ always @(posedge clk)
 
 reg [3:0] unidadesSegundos,unidadesMinutos,unidadesHoras;
 reg [3:0] decenasSegundos,decenasMinutos,decenasHoras;
+
+
 //Sumador y restador
 
 always @(posedge clk) begin
@@ -187,6 +192,8 @@ end
 
 end
 
+
+
 else if (registro==2'd3)begin
 
 if (horasReg<=8'h23)begin
@@ -228,7 +235,7 @@ if (registro==2'd1)begin
 
 if (segundosReg>8'h00) begin
 
-if (segundosReg[7:4]==4'h1) begin
+if (segundosReg==8'h10 |segundosReg==8'h20 |segundosReg==8'h30 |segundosReg==8'h40 |segundosReg==8'h50 |segundosReg==8'h60) begin
 segundosReg<=segundosReg-7;
 end
 
@@ -249,7 +256,7 @@ else if (registro==2'd2)begin
 
 if (minutosReg>8'h00)begin
 
-if (decenasMinutos==4'h1) begin
+if (minutosReg==8'h10 |minutosReg==8'h20 |minutosReg==8'h30 |minutosReg==8'h40 |minutosReg==8'h50 |minutosReg==8'h60) begin
 minutosReg<=minutosReg-7;
 end
 
@@ -268,7 +275,7 @@ else if (registro==2'd3)begin
 
 if (horasReg>8'h00)begin
 
-if (horasReg[7:4]==4'h1) begin
+if (horasReg==8'h10 |horasReg==8'h20 |horasReg==8'h30 |horasReg==8'h40 |horasReg==8'h50 |horasReg==8'h60) begin
 horasReg<=horasReg-7;
 end
 
@@ -309,7 +316,7 @@ begin
 /*
 if(contador==limit)
 begin*/
-    s_next<=s_actual; //siguiente estado default el actual
+    //s_next<=s_actual; //siguiente estado default el actual
     //CronoActivo <= 1'b0; //Default crono apagado
     case (s_actual)
         s0: begin //Estado Programar Cronometro
@@ -422,9 +429,6 @@ end
 
 
 
-
-//Programar el Cronometro
-reg [7:0] horasReg=0,minutosReg=0,segundosReg=0;
 
 
 localparam [3:0] ss = 4'h0, //inicialización
@@ -675,7 +679,7 @@ end
 
 
 
-localparam [11:0] limit = 12'd338; //tiempo en el que la dirección se mantiene
+localparam [11:0] limit = 12'd3380; //tiempo en el que la dirección se mantiene
     reg [11:0] contador=0;
     reg c_dir=1;
 
@@ -685,30 +689,36 @@ localparam [11:0] limit = 12'd338; //tiempo en el que la dirección se mantiene
 
     always @(posedge clk)
     begin
-        if( ProgramarCrono && CronoActivo)
+        if( CronoActivo)
         begin
         contador<=contador + 1'b1;
-        c_dir<=0;
+        address<=8'h00;
+        data_crono<=8'h08;
         if(contador==limit)
         begin
             //contador<=0;
-            c_dir<=1;
+            address<=8'h01;
+            data_crono<=8'h01;
         end
 
-        if(ProgramarCrono && !CronoActivo)
+        if(!CronoActivo)
         begin
         contador<=contador + 1'b1;
 
-        c_dir<=0;
+        address<=8'h00;
+        data_crono<=8'h00;
+
         if(contador==limit)
         begin
             //contador<=0;
-            c_dir<=1;
+            address<=8'h01;
+            data_crono<=8'h01;
         end
 
-        if(Reset)
+        if(Reset | FinalizoCrono)
             begin
-            c_dir<=0;
+            address<=8'h00;
+            data_crono<=8'h00;
             contador<=0;
             end
 
@@ -716,6 +726,7 @@ localparam [11:0] limit = 12'd338; //tiempo en el que la dirección se mantiene
     end
 end
 
+/*
 //Activar Cronometro RTC
 
     always @(posedge clk)
@@ -730,7 +741,7 @@ end
     else
             begin
             address<=8'h00;
-            data_crono<=8'hZZ;
+            data_crono<=8'h80;
             end
     end
 
@@ -743,15 +754,16 @@ end
     else
             begin
             address<=8'h00;
-            data_crono<=8'hZZ;
+            data_crono<=8'h80;
             end
     end
 else begin
             address<=8'h00;
-            data_crono<=8'hZZ;
+            data_crono<=8'h80;
 end
 
 end
+*/
 assign horasSal=horasReg;
 assign minutosSal=minutosReg;
 assign segundosSal=segundosReg;

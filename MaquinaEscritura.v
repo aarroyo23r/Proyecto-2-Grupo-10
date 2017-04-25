@@ -12,7 +12,7 @@ module MaquinaEscritura(
     );
 reg [32:0]contador=0;
 reg[3:0]c_dir=0;
-localparam [3:0] s0 = 4'h1, 
+localparam [3:0] s0 = 4'h1,
                  s1 = 4'h2, //segundos
                  s2 = 4'h3, //minutos
                  s3 = 4'h4, //horas
@@ -81,7 +81,7 @@ always @(posedge clk,posedge Reset)begin//Logica de Reset y estado siguiente
 end
 
 
-reg suma;reg resta;reg[4:0] registro; 
+reg suma;reg resta;reg[4:0] registro;
 
 reg [7:0]segundosReg;reg [7:0]minutosReg;reg[7:0]horasReg;reg [7:0]dateReg;
 reg[7:0]minutosReg1,segundosReg1,horasReg1,dateReg1;
@@ -119,7 +119,7 @@ segundosReg1<=segundosReg1 + 1;
 end
 
 else if (registro==5'd2)begin
-minutosReg1<=minutosReg1 + 1;
+minutosReg1<=minutosReg1 + 0.5;
 end
 
  else if(registro==5'd3)begin
@@ -129,7 +129,7 @@ end
  else if(registro==5'd4)begin
  dateReg1<=dateReg1+1;
  end
- 
+
 else begin
 minutosReg1<=minutosReg1;
 segundosReg1<=segundosReg1;
@@ -147,11 +147,11 @@ if(registro==5'd0)begin
     dateReg1<=dateReg1;
 end
 else if (registro==5'd1)begin
-segundosReg1<=segundosReg1 - 8'd1;
+segundosReg1<=segundosReg1 - 1;
 end
 
  else if (registro==5'd2)begin
-minutosReg1<=minutosReg1 - 8'd1;
+minutosReg1<=minutosReg1 - 0.5;
 end
 
  else if(registro==5'd3)begin
@@ -262,8 +262,8 @@ case (s_actual)
                       s_next<=s1;
                        end
         end
-        
-        
+
+
     s2: begin //horas
     if(!Reset && Escribir && !ar && !ab && !iz && !de)
         begin
@@ -358,7 +358,7 @@ case (s_actual)
               //minutosReg<=minutosReg - 8'd1;
               s_next<=s_actual;
               end
-     
+
               if( (iz) && !Reset && Escribir)
                   begin
                   reset2<=1'b0;
@@ -379,7 +379,7 @@ case (s_actual)
                    //minutosReg<=minutosReg;
                    s_next<=s2;
                    end
-     
+
                    if( Reset) //Estado
                        begin
                        reset2<=1'b0;
@@ -389,7 +389,7 @@ case (s_actual)
                        resta<=0;
                        s_next<=s1;
                        end
-          end 
+          end
      s4: begin //Minutos
                    if(!Reset && Escribir && !ar && !ab && !iz && !de)
                        begin
@@ -421,7 +421,7 @@ case (s_actual)
                         //minutosReg<=minutosReg - 8'd1;
                         s_next<=s_actual;
                         end
-               
+
                         if( (iz) && !Reset && Escribir)
                             begin
                             reset2<=1'b0;
@@ -442,7 +442,7 @@ case (s_actual)
                              //minutosReg<=minutosReg;
                              s_next<=s3;
                              end
-               
+
                              if( Reset) //Estado
                                  begin
                                  reset2<=1'b0;
@@ -452,7 +452,7 @@ case (s_actual)
                                  resta<=0;
                                  s_next<=s1;
                                  end
-                    end 
+                    end
 endcase
 end
 
