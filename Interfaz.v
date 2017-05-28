@@ -33,8 +33,8 @@ module Interfaz( //Definicion entradas y salidas
 
     //Datos Paralelo de entrada
     input wire [7:0] datos0,datos1,datos2,datos3,datos4,datos5,datos6,datos7,datos8,
-    datos9,datos10
-    //output wire [9:0] pixelx, pixely
+    datos9,datos10,
+    output wire [9:0] pixelx, pixely
     //output reg [3:0] contGuardados
     );
 
@@ -43,7 +43,7 @@ module Interfaz( //Definicion entradas y salidas
 //_____________________________________________________________________
 
 //SincronizadorVGA
-wire [9:0] pixelx, pixely;
+//wire [9:0] pixelx, pixely;
 
 SincronizadorVGA SincronizadorVGA_unit(
           .clk(clk),.reset(resetSync),
